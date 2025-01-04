@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import ProductPage from "./pages/ProductPage";
 import AddNewProduct from "./pages/AddNewProduct";
 import MyProducts from "./pages/MyProducts";
+import PaymentHistory from "./pages/PaymentHistory";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/p/:id/details" element={<ProductPage />} />
           <Route path="/seller/add-product" element={<AddNewProduct />} />
           <Route path="/seller/my-products" element={<MyProducts />} />
+          <Route path="/seller/payment-history" element={<PaymentHistory />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
