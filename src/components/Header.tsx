@@ -1,5 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Menu } from "lucide-react";
 
 export function Header() {
   return (
@@ -18,9 +25,38 @@ export function Header() {
             <Link to="/featured" className="text-muted-foreground hover:text-foreground transition-colors">
               Featured
             </Link>
+            <Link to="/product-approvals" className="text-muted-foreground hover:text-foreground transition-colors">
+              Product Approvals
+            </Link>
           </nav>
+          
+          {/* Mobile Navigation */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link to="/">Index</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/login">Login</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/signup">Sign Up</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/forgot-password">Forgot Password</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/product-approvals">Product Approvals</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
           <Button variant="ghost" asChild>
             <Link to="/login">Login</Link>
           </Button>
