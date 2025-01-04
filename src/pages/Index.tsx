@@ -1,15 +1,17 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import debounce from "lodash.debounce";
 import ReactPaginate from "react-paginate";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductCarousel } from "@/components/ProductCarousel";
+import { SkeletonCard } from "@/components/SkeletonCard";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 // Mock data - replace with actual data later
-const MOCK_PRODUCTS = Array.from({ length: 50 }, (_, i) => {
-  // Randomly assign categories to products for demo purposes
+const MOCK_PRODUCTS = Array.from({ length: 120 }, (_, i) => {
   const categories = ["Electronics", "Fashion", "Home", "Beauty", "Sports"];
   const randomCategory = categories[Math.floor(Math.random() * categories.length)];
   
@@ -18,7 +20,8 @@ const MOCK_PRODUCTS = Array.from({ length: 50 }, (_, i) => {
     title: `Product ${i + 1}`,
     price: Math.floor(Math.random() * 900000) + 100000,
     image: "/placeholder.svg",
-    category: randomCategory, // Add category to each product
+    category: randomCategory,
+    isFeatured: i < 12 // P1-P12 are featured
   };
 });
 
@@ -28,6 +31,15 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Debounced search handler
   const debouncedSearch = useCallback(
@@ -38,17 +50,18 @@ const Index = () => {
     []
   );
 
-  // Filter products based on search and category
-  const filteredProducts = MOCK_PRODUCTS.filter((product) => {
+  // Filter products
+  const featuredProducts = MOCK_PRODUCTS.filter(p => p.isFeatured);
+  const standardProducts = MOCK_PRODUCTS.filter(p => !p.isFeatured).filter((product) => {
     const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   // Calculate pagination
-  const pageCount = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const pageCount = Math.ceil(standardProducts.length / ITEMS_PER_PAGE);
   const offset = currentPage * ITEMS_PER_PAGE;
-  const currentProducts = filteredProducts.slice(offset, offset + ITEMS_PER_PAGE);
+  const currentProducts = standardProducts.slice(offset, offset + ITEMS_PER_PAGE);
 
   const handlePageChange = ({ selected }: { selected: number }) => {
     setCurrentPage(selected);
@@ -58,7 +71,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 container py-6 space-y-6">
+      <main className="flex-1 container py-6 space-y-8">
         {/* Search and Filters */}
         <div className="space-y-4">
           <div className="relative">
@@ -85,21 +98,48 @@ const Index = () => {
             </p>
           </div>
           
-          {/* Product Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {currentProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                title={product.title}
-                price={product.price}
-                image={product.image}
-                className="animate-fadeIn"
-              />
-            ))}
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          ) : (
+            <ProductCarousel products={featuredProducts} />
+          )}
+        </section>
+
+        {/* Standard Products */}
+        <section className="space-y-4">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-semibold tracking-tight">All Products</h2>
+            <p className="text-sm text-muted-foreground">
+              Browse our complete collection.
+            </p>
           </div>
+          
+          {isLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {currentProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  title={product.title}
+                  price={product.price}
+                  image={product.image}
+                  className="animate-fadeIn"
+                />
+              ))}
+            </div>
+          )}
 
           {/* Pagination */}
-          {pageCount > 1 && (
+          {pageCount > 1 && !isLoading && (
             <ReactPaginate
               previousLabel="Previous"
               nextLabel="Next"
@@ -115,6 +155,7 @@ const Index = () => {
           )}
         </section>
       </main>
+      <Footer />
     </div>
   );
 };
