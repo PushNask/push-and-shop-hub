@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Facebook, Twitter, WhatsApp, Share2, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { Facebook, Twitter, Share2, MessageCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { toast } from "sonner";
@@ -52,9 +52,9 @@ const ProductPage = () => {
   const shareText = `Check out ${product.title} on PushNshop!`;
 
   const shareHandlers = {
-    whatsapp: () => {
-      window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, '_blank');
-      toast.success("Opening WhatsApp...");
+    message: () => {
+      window.open(`sms:?body=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, '_blank');
+      toast.success("Opening messaging app...");
     },
     facebook: () => {
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
@@ -123,9 +123,9 @@ const ProductPage = () => {
 
         {/* Share Buttons */}
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={shareHandlers.whatsapp}>
-            <WhatsApp className="mr-2 h-4 w-4" />
-            WhatsApp
+          <Button variant="outline" onClick={shareHandlers.message}>
+            <MessageCircle className="mr-2 h-4 w-4" />
+            Message
           </Button>
           <Button variant="outline" onClick={shareHandlers.facebook}>
             <Facebook className="mr-2 h-4 w-4" />
