@@ -11,6 +11,7 @@ import PaymentHistory from "./pages/PaymentHistory";
 import ProductApprovals from "./pages/ProductApprovals";
 import LinkManagement from "./pages/LinkManagement";
 import AdminManagement from "./pages/AdminManagement";
+import SellerAnalytics from "./pages/SellerAnalytics";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/seller/add-product" element={<AddNewProduct />} />
           <Route path="/seller/my-products" element={<MyProducts />} />
           <Route path="/seller/payment-history" element={<PaymentHistory />} />
+          <Route path="/seller/analytics" element={<SellerAnalytics />} />
           <Route path="/admin/product-approvals" element={<ProductApprovals />} />
           <Route path="/admin/link-management" element={<LinkManagement />} />
           <Route path="/admin/admin-management" element={<AdminManagement />} />
