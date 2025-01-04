@@ -8,6 +8,7 @@ import ProductPage from "./pages/ProductPage";
 import AddNewProduct from "./pages/AddNewProduct";
 import MyProducts from "./pages/MyProducts";
 import PaymentHistory from "./pages/PaymentHistory";
+import ProductApprovals from "./pages/ProductApprovals";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/seller/add-product" element={<AddNewProduct />} />
           <Route path="/seller/my-products" element={<MyProducts />} />
           <Route path="/seller/payment-history" element={<PaymentHistory />} />
+          <Route path="/admin/product-approvals" element={<ProductApprovals />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
