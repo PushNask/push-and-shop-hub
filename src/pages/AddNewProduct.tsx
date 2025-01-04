@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
-import { ImagePlus, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -19,8 +19,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { DeliveryOptionsSection } from "@/components/forms/DeliveryOptionsSection";
+import { ImageUploadSection } from "@/components/forms/ImageUploadSection";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -39,7 +39,7 @@ const formSchema = z.object({
   shipping: z.boolean().optional(),
 }).refine((data) => data.pickup || data.shipping, {
   message: "Select at least one delivery option",
-  path: ["delivery"], // This is used to show the error message
+  path: ["delivery"],
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -70,16 +70,19 @@ export default function AddNewProduct() {
       return;
     }
 
-    // Create preview URLs for the images
     const urls = files.map(file => URL.createObjectURL(file));
     setImageUrls(prev => [...prev, ...urls]);
     
-    // Update form value
     const currentImages = form.getValues("images");
     form.setValue("images", [...currentImages, ...files]);
   };
 
   const onSubmit = async (data: FormValues) => {
+    if (!data.pickup && !data.shipping) {
+      toast.error("Please select at least one delivery option");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // Simulate API call
@@ -156,52 +159,10 @@ export default function AddNewProduct() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="images"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product Images</FormLabel>
-                <FormControl>
-                  <div className="space-y-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full h-32 flex flex-col gap-2"
-                      onClick={() => document.getElementById("image-upload")?.click()}
-                    >
-                      <ImagePlus className="h-8 w-8" />
-                      <span>Upload Images (Max 7)</span>
-                    </Button>
-                    <input
-                      id="image-upload"
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={handleImageChange}
-                    />
-                    {imageUrls.length > 0 && (
-                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                        {imageUrls.map((url, index) => (
-                          <div key={index} className="relative aspect-square">
-                            <img
-                              src={url}
-                              alt={`Preview ${index + 1}`}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </FormControl>
-                <FormDescription>
-                  Upload up to 7 images of your product
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+          <ImageUploadSection 
+            form={form}
+            imageUrls={imageUrls}
+            onImageChange={handleImageChange}
           />
 
           <FormField
@@ -274,62 +235,7 @@ export default function AddNewProduct() {
             )}
           />
 
-          <div className="space-y-3">
-            <FormLabel>Delivery Options</FormLabel>
-            <div className="flex flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="pickup"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        Pickup Available
-                      </FormLabel>
-                      <FormDescription>
-                        Buyers can pick up the product from your location
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="shipping"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        Shipping Available
-                      </FormLabel>
-                      <FormDescription>
-                        You can ship the product to buyers
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </div>
-            {!form.getValues("pickup") && !form.getValues("shipping") && (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  Please select at least one delivery option
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
+          <DeliveryOptionsSection form={form} />
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? (
