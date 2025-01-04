@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      analytics: {
+        Row: {
+          active_products: number | null
+          created_at: string | null
+          date: string
+          id: string
+          pending_approvals: number | null
+          seller_id: string | null
+          total_chats: number | null
+          total_revenue: number | null
+          total_views: number | null
+        }
+        Insert: {
+          active_products?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          pending_approvals?: number | null
+          seller_id?: string | null
+          total_chats?: number | null
+          total_revenue?: number | null
+          total_views?: number | null
+        }
+        Update: {
+          active_products?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          pending_approvals?: number | null
+          seller_id?: string | null
+          total_chats?: number | null
+          total_revenue?: number | null
+          total_views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string
@@ -91,6 +135,67 @@ export type Database = {
           role?: string
         }
         Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string
+          id: string
+          payment_method: string
+          product_id: string | null
+          seller_id: string | null
+          status: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string
+          id?: string
+          payment_method: string
+          product_id?: string | null
+          seller_id?: string | null
+          status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string
+          id?: string
+          payment_method?: string
+          product_id?: string | null
+          seller_id?: string | null
+          status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

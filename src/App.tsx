@@ -10,25 +10,45 @@ import ProductApprovals from "@/pages/ProductApprovals";
 import AdminProfile from "@/pages/AdminProfile";
 import SellerProfile from "@/pages/SellerProfile";
 import UserProfile from "@/pages/UserProfile";
+import AdminAnalytics from "@/pages/AdminAnalytics";
+import AdminManagement from "@/pages/AdminManagement";
+import TransactionHistory from "@/pages/TransactionHistory";
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/product-approvals" element={<ProductApprovals />} />
-            <Route path="/admin/profile" element={<AdminProfile />} />
-            <Route path="/seller/profile" element={<SellerProfile />} />
-            <Route path="/profile" element={<UserProfile />} />
-          </Routes>
-        </main>
-        <Footer />
+        <Routes>
+          {/* Public routes */}
+          <Route
+            path="/"
+            element={
+              <>
+                <Header />
+                <main className="flex-1">
+                  <Index />
+                </main>
+                <Footer />
+              </>
+            }
+          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+
+          {/* Admin routes */}
+          <Route path="/admin/analytics" element={<AdminAnalytics />} />
+          <Route path="/admin/users" element={<AdminManagement />} />
+          <Route path="/product-approvals" element={<ProductApprovals />} />
+          <Route path="/admin/transactions" element={<TransactionHistory />} />
+          <Route path="/admin/profile" element={<AdminProfile />} />
+
+          {/* Seller routes */}
+          <Route path="/seller/profile" element={<SellerProfile />} />
+          
+          {/* User routes */}
+          <Route path="/profile" element={<UserProfile />} />
+        </Routes>
       </div>
       <Toaster />
     </Router>
