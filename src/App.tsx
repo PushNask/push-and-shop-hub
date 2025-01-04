@@ -9,6 +9,7 @@ import ForgotPassword from "@/pages/ForgotPassword";
 import ProductApprovals from "@/pages/ProductApprovals";
 import AdminProfile from "@/pages/AdminProfile";
 import SellerProfile from "@/pages/SellerProfile";
+import UserProfile from "@/pages/UserProfile";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/product-approvals" element={<ProductApprovals />} />
             <Route path="/admin/profile" element={<AdminProfile />} />
             <Route path="/seller/profile" element={<SellerProfile />} />
+            <Route path="/profile" element={<UserProfile />} />
           </Routes>
         </main>
         <Footer />
