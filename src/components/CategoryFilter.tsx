@@ -2,11 +2,21 @@ import { Button } from "@/components/ui/button";
 
 const categories = [
   "All",
-  "Electronics",
-  "Fashion",
-  "Home",
-  "Beauty",
-  "Sports",
+  "Home & Furniture",
+  "Building Materials & Hardware",
+  "Automotive & Transportation",
+  "Health & Wellness",
+  "Office & School Supplies",
+  "Sports & Outdoor Gear",
+  "Services & Digital Goods",
+  "Properties",
+  "Business",
+  "Agricultural",
+  "Arts, Crafts",
+  "Clothing & Fashion",
+  "Electronics & Appliances",
+  "Beauty & Personal Care",
+  "Containers"
 ];
 
 interface CategoryFilterProps {
