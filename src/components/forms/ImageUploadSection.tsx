@@ -1,4 +1,4 @@
-import { FormField, FormItem, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
+import { FormField, FormItem, FormControl, FormDescription, FormMessage, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { ImagePlus } from "lucide-react";
 
