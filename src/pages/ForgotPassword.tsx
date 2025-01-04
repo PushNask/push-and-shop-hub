@@ -13,7 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -35,13 +36,18 @@ export default function ForgotPassword() {
   const onSubmit = async (data: ForgotPasswordForm) => {
     setIsLoading(true);
     try {
-      // TODO: Implement Supabase password reset
-      console.log("Reset password for:", data.email);
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
+
       toast({
-        title: "Coming soon",
-        description: "Password reset will be implemented with Supabase",
+        title: "Check your email",
+        description: "We've sent you a password reset link.",
       });
     } catch (error) {
+      console.error("Password reset error:", error);
       toast({
         variant: "destructive",
         title: "Error",

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const signUpSchema = z
   .object({
@@ -42,6 +43,7 @@ type SignUpForm = z.infer<typeof signUpSchema>;
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema),
@@ -57,13 +59,27 @@ export default function SignUp() {
   const onSubmit = async (data: SignUpForm) => {
     setIsLoading(true);
     try {
-      // TODO: Implement Supabase authentication
-      console.log("Sign up data:", data);
-      toast({
-        title: "Coming soon",
-        description: "Sign up functionality will be implemented with Supabase",
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            phone: data.phone,
+            country: data.country,
+          },
+        },
       });
+
+      if (signUpError) throw signUpError;
+
+      toast({
+        title: "Account created successfully",
+        description: "Please check your email to verify your account.",
+      });
+      
+      navigate("/login");
     } catch (error) {
+      console.error("Sign up error:", error);
       toast({
         variant: "destructive",
         title: "Error",

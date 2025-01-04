@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -25,6 +26,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -37,17 +39,25 @@ export default function Login() {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     try {
-      // TODO: Implement Supabase authentication
-      console.log("Login data:", data);
-      toast({
-        title: "Coming soon",
-        description: "Login functionality will be implemented with Supabase",
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
       });
+
+      if (signInError) throw signInError;
+
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully logged in.",
+      });
+      
+      navigate("/");
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Something went wrong. Please try again.",
+        description: "Invalid email or password. Please try again.",
       });
     } finally {
       setIsLoading(false);

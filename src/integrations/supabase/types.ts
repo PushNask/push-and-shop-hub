@@ -9,7 +9,89 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          category: string
+          created_at: string | null
+          currency: string
+          description: string | null
+          expiry: string | null
+          id: string
+          images: string[] | null
+          link_slot: number | null
+          price: number
+          seller_id: string | null
+          status: string | null
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          expiry?: string | null
+          id?: string
+          images?: string[] | null
+          link_slot?: number | null
+          price: number
+          seller_id?: string | null
+          status?: string | null
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          expiry?: string | null
+          id?: string
+          images?: string[] | null
+          link_slot?: number | null
+          price?: number
+          seller_id?: string | null
+          status?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          country: string | null
+          created_at: string | null
+          email: string
+          id: string
+          is_verified: boolean | null
+          phone: string | null
+          role: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string | null
+          email: string
+          id: string
+          is_verified?: boolean | null
+          phone?: string | null
+          role?: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_verified?: boolean | null
+          phone?: string | null
+          role?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
