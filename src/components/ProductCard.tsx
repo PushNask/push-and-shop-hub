@@ -10,7 +10,7 @@ interface ProductCardProps {
 
 export function ProductCard({ title, price, image, className }: ProductCardProps) {
   return (
-    <Link to={`/product/${title.toLowerCase().replace(/\s+/g, '-')}`}>
+    <Link to={`/p/${title.toLowerCase().replace(/\s+/g, '-')}/details`}>
       <div className={cn(
         "group relative overflow-hidden rounded-lg hover-lift glass-card h-full",
         "transition-all duration-300 hover:shadow-lg",
