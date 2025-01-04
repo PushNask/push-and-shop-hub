@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface ProductCardProps {
   title: string;
@@ -9,18 +10,25 @@ interface ProductCardProps {
 
 export function ProductCard({ title, price, image, className }: ProductCardProps) {
   return (
-    <div className={cn("group relative overflow-hidden rounded-lg hover-lift glass-card", className)}>
-      <div className="aspect-square overflow-hidden">
-        <img
-          src={image}
-          alt={title}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+    <Link to={`/product/${title.toLowerCase().replace(/\s+/g, '-')}`}>
+      <div className={cn(
+        "group relative overflow-hidden rounded-lg hover-lift glass-card h-full",
+        "transition-all duration-300 hover:shadow-lg",
+        className
+      )}>
+        <div className="aspect-square overflow-hidden bg-gray-100">
+          <img
+            src={image}
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+          />
+        </div>
+        <div className="p-3">
+          <h3 className="font-medium text-sm sm:text-base truncate">{title}</h3>
+          <p className="text-sm text-muted-foreground mt-1">XAF {price.toLocaleString()}</p>
+        </div>
       </div>
-      <div className="p-4">
-        <h3 className="font-medium text-lg truncate">{title}</h3>
-        <p className="text-muted-foreground mt-1">XAF {price.toLocaleString()}</p>
-      </div>
-    </div>
+    </Link>
   );
 }
