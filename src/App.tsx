@@ -10,6 +10,7 @@ import MyProducts from "./pages/MyProducts";
 import PaymentHistory from "./pages/PaymentHistory";
 import ProductApprovals from "./pages/ProductApprovals";
 import LinkManagement from "./pages/LinkManagement";
+import AdminManagement from "./pages/AdminManagement";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/seller/payment-history" element={<PaymentHistory />} />
           <Route path="/admin/product-approvals" element={<ProductApprovals />} />
           <Route path="/admin/link-management" element={<LinkManagement />} />
+          <Route path="/admin/admin-management" element={<AdminManagement />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
