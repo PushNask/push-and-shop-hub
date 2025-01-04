@@ -56,11 +56,11 @@ const MetricCard = ({ title, value, icon: Icon, bgColor }: {
 
 const AdminAnalytics = () => {
   return (
-    <div className="container mx-auto p-6 space-y-6 animate-fadeIn">
-      <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
+    <div className="container mx-auto p-6 space-y-8 animate-fadeIn">
+      <h1 className="text-3xl font-bold mb-8">Analytics Dashboard</h1>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <MetricCard
           title="Active Visitors"
           value={mockAnalytics.activeVisitors}
@@ -88,12 +88,12 @@ const AdminAnalytics = () => {
       </div>
 
       {/* Weekly Trends Chart */}
-      <Card>
+      <Card className="mb-8">
         <CardHeader>
           <CardTitle>Weekly Trends</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
+          <div className="h-[400px] w-full">
             <ChartContainer
               config={{
                 revenue: {
@@ -129,14 +129,14 @@ const AdminAnalytics = () => {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Top Categories */}
         <Card>
           <CardHeader>
             <CardTitle>Top Categories</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[400px] w-full">
               <ChartContainer
                 config={{
                   value: {
@@ -162,7 +162,7 @@ const AdminAnalytics = () => {
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[400px] overflow-y-auto">
               {mockAnalytics.recentActivity.map((activity, index) => (
                 <div
                   key={index}
