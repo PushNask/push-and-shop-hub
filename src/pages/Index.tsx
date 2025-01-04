@@ -1,8 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import debounce from "lodash.debounce";
 import ReactPaginate from "react-paginate";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductCarousel } from "@/components/ProductCarousel";
 import { SkeletonCard } from "@/components/SkeletonCard";
@@ -69,101 +67,97 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container py-6 space-y-8">
-        {/* Search and Filters */}
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search products..."
-              className="pl-10"
-              onChange={(e) => debouncedSearch(e.target.value)}
-            />
-          </div>
-          <CategoryFilter
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
+    <div className="container py-6 space-y-8">
+      {/* Search and Filters */}
+      <div className="space-y-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search products..."
+            className="pl-10"
+            onChange={(e) => debouncedSearch(e.target.value)}
           />
         </div>
+        <CategoryFilter
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+      </div>
 
-        {/* Featured Products */}
-        <section className="space-y-4">
-          <div className="space-y-1">
-            <h2 className="text-2xl font-semibold tracking-tight">Featured Products</h2>
-            <p className="text-sm text-muted-foreground">
-              Discover our handpicked selection of premium items.
-            </p>
+      {/* Featured Products */}
+      <section className="space-y-4">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-semibold tracking-tight">Featured Products</h2>
+          <p className="text-sm text-muted-foreground">
+            Discover our handpicked selection of premium items.
+          </p>
+        </div>
+        
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
-          
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))}
-            </div>
-          ) : (
-            <ProductCarousel products={featuredProducts} />
-          )}
-        </section>
+        ) : (
+          <ProductCarousel products={featuredProducts} />
+        )}
+      </section>
 
-        {/* Standard Products */}
-        <section className="space-y-4">
-          <div className="space-y-1">
-            <h2 className="text-2xl font-semibold tracking-tight">All Products</h2>
-            <p className="text-sm text-muted-foreground">
-              Browse our complete collection.
-            </p>
+      {/* Standard Products */}
+      <section className="space-y-4">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-semibold tracking-tight">All Products</h2>
+          <p className="text-sm text-muted-foreground">
+            Browse our complete collection.
+          </p>
+        </div>
+        
+        {isLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
-          
-          {isLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {currentProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  title={product.title}
-                  price={product.price}
-                  image={product.image}
-                  className="animate-fadeIn"
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Enhanced Pagination */}
-          {pageCount > 1 && !isLoading && (
-            <div className="mt-8">
-              <ReactPaginate
-                previousLabel="Previous"
-                nextLabel="Next"
-                pageCount={pageCount}
-                onPageChange={handlePageChange}
-                containerClassName="flex flex-wrap items-center justify-center gap-2"
-                previousClassName="px-3 py-1 rounded border hover:bg-gray-100 transition-colors duration-200"
-                nextClassName="px-3 py-1 rounded border hover:bg-gray-100 transition-colors duration-200"
-                pageClassName="hidden sm:block"
-                pageLinkClassName="px-3 py-1 rounded border hover:bg-gray-100 transition-colors duration-200"
-                activeClassName="!bg-primary text-primary-foreground border-primary"
-                disabledClassName="opacity-50 cursor-not-allowed"
-                breakLabel="..."
-                breakClassName="px-3 py-1"
-                marginPagesDisplayed={1}
-                pageRangeDisplayed={3}
-                renderOnZeroPageCount={null}
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {currentProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                title={product.title}
+                price={product.price}
+                image={product.image}
+                className="animate-fadeIn"
               />
-            </div>
-          )}
-        </section>
-      </main>
-      <Footer />
+            ))}
+          </div>
+        )}
+
+        {/* Enhanced Pagination */}
+        {pageCount > 1 && !isLoading && (
+          <div className="mt-8">
+            <ReactPaginate
+              previousLabel="Previous"
+              nextLabel="Next"
+              pageCount={pageCount}
+              onPageChange={handlePageChange}
+              containerClassName="flex flex-wrap items-center justify-center gap-2"
+              previousClassName="px-3 py-1 rounded border hover:bg-gray-100 transition-colors duration-200"
+              nextClassName="px-3 py-1 rounded border hover:bg-gray-100 transition-colors duration-200"
+              pageClassName="hidden sm:block"
+              pageLinkClassName="px-3 py-1 rounded border hover:bg-gray-100 transition-colors duration-200"
+              activeClassName="!bg-primary text-primary-foreground border-primary"
+              disabledClassName="opacity-50 cursor-not-allowed"
+              breakLabel="..."
+              breakClassName="px-3 py-1"
+              marginPagesDisplayed={1}
+              pageRangeDisplayed={3}
+              renderOnZeroPageCount={null}
+            />
+          </div>
+        )}
+      </section>
     </div>
   );
 };
