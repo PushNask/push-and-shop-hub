@@ -25,9 +25,6 @@ export function Header() {
             <Link to="/featured" className="text-muted-foreground hover:text-foreground transition-colors">
               Featured
             </Link>
-            <Link to="/product-approvals" className="text-muted-foreground hover:text-foreground transition-colors">
-              Product Approvals
-            </Link>
           </nav>
           
           {/* Mobile Navigation */}
@@ -49,9 +46,6 @@ export function Header() {
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/forgot-password">Forgot Password</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/product-approvals">Product Approvals</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
