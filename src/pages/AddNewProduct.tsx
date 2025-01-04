@@ -6,21 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { DeliveryOptionsSection } from "@/components/forms/DeliveryOptionsSection";
 import { ImageUploadSection } from "@/components/forms/ImageUploadSection";
+import { DeliveryOptionsSection } from "@/components/forms/DeliveryOptionsSection";
+import { ListingFeeSection } from "@/components/forms/ListingFeeSection";
+import { PaymentMethodSection } from "@/components/forms/PaymentMethodSection";
+import { ProductDetailsSection } from "@/components/forms/ProductDetailsSection";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -31,6 +23,9 @@ const formSchema = z.object({
   images: z.array(z.instanceof(File)).min(1, "At least one image is required").max(7, "Maximum 7 images allowed"),
   listingType: z.enum(["standard", "featured"], {
     required_error: "Please select a listing type",
+  }),
+  duration: z.enum(["24", "48", "72", "96", "120"], {
+    required_error: "Please select a duration",
   }),
   paymentMethod: z.enum(["cash", "online"], {
     required_error: "Please select a payment method",
@@ -57,6 +52,7 @@ export default function AddNewProduct() {
       price: "",
       images: [],
       listingType: "standard",
+      duration: "24",
       paymentMethod: "cash",
       pickup: true,
       shipping: false,
@@ -99,7 +95,7 @@ export default function AddNewProduct() {
   };
 
   return (
-    <div className="container max-w-2xl py-6 space-y-6 fade-in">
+    <div className="container max-w-2xl py-6 space-y-6 animate-fadeIn">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">Add New Product</h1>
         <p className="text-muted-foreground">
@@ -109,131 +105,17 @@ export default function AddNewProduct() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="Product title" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Describe your product..."
-                    className="resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price (XAF)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+          <ProductDetailsSection form={form} />
+          
           <ImageUploadSection 
             form={form}
             imageUrls={imageUrls}
             onImageChange={handleImageChange}
           />
 
-          <FormField
-            control={form.control}
-            name="listingType"
-            render={({ field }) => (
-              <FormItem className="space-y-3">
-                <FormLabel>Listing Type</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="flex flex-col space-y-1"
-                  >
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="standard" />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        Standard Listing (P13-P120)
-                      </FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="featured" />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        Featured Listing (P1-P12)
-                      </FormLabel>
-                    </FormItem>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="paymentMethod"
-            render={({ field }) => (
-              <FormItem className="space-y-3">
-                <FormLabel>Payment Method</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="flex flex-col space-y-1"
-                  >
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="cash" />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        Cash Payment (via authorized partners)
-                      </FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="online" />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        Online Payment
-                      </FormLabel>
-                    </FormItem>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <ListingFeeSection form={form} />
+          
+          <PaymentMethodSection form={form} />
 
           <DeliveryOptionsSection form={form} />
 
