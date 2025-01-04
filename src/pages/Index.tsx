@@ -8,12 +8,19 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 // Mock data - replace with actual data later
-const MOCK_PRODUCTS = Array.from({ length: 50 }, (_, i) => ({
-  id: `p${i + 1}`,
-  title: `Product ${i + 1}`,
-  price: Math.floor(Math.random() * 900000) + 100000,
-  image: "/placeholder.svg",
-}));
+const MOCK_PRODUCTS = Array.from({ length: 50 }, (_, i) => {
+  // Randomly assign categories to products for demo purposes
+  const categories = ["Electronics", "Fashion", "Home", "Beauty", "Sports"];
+  const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+  
+  return {
+    id: `p${i + 1}`,
+    title: `Product ${i + 1}`,
+    price: Math.floor(Math.random() * 900000) + 100000,
+    image: "/placeholder.svg",
+    category: randomCategory, // Add category to each product
+  };
+});
 
 const ITEMS_PER_PAGE = 12;
 
