@@ -8,6 +8,7 @@ import SignUp from "@/pages/SignUp";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ProductApprovals from "@/pages/ProductApprovals";
 import AdminProfile from "@/pages/AdminProfile";
+import SellerProfile from "@/pages/SellerProfile";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/product-approvals" element={<ProductApprovals />} />
             <Route path="/admin/profile" element={<AdminProfile />} />
+            <Route path="/seller/profile" element={<SellerProfile />} />
           </Routes>
         </main>
         <Footer />
