@@ -1,1 +1,18 @@
 project_id = "asbkbfyymabugonuomrk"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[[functions]]
+name = "product-status-notification"
+verify_jwt = true
+
+[[functions]]
+name = "verify-payment"
+verify_jwt = true
+
+[[functions]]
+name = "handle-expired-products"
+verify_jwt = true
