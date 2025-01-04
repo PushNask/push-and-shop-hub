@@ -138,20 +138,28 @@ const Index = () => {
             </div>
           )}
 
-          {/* Pagination */}
+          {/* Enhanced Pagination */}
           {pageCount > 1 && !isLoading && (
-            <ReactPaginate
-              previousLabel="Previous"
-              nextLabel="Next"
-              pageCount={pageCount}
-              onPageChange={handlePageChange}
-              containerClassName="flex items-center justify-center gap-2 mt-8"
-              previousClassName="px-3 py-1 rounded border hover:bg-gray-100"
-              nextClassName="px-3 py-1 rounded border hover:bg-gray-100"
-              pageClassName="px-3 py-1 rounded border hover:bg-gray-100"
-              activeClassName="!bg-primary text-primary-foreground border-primary"
-              disabledClassName="opacity-50 cursor-not-allowed"
-            />
+            <div className="mt-8">
+              <ReactPaginate
+                previousLabel="Previous"
+                nextLabel="Next"
+                pageCount={pageCount}
+                onPageChange={handlePageChange}
+                containerClassName="flex flex-wrap items-center justify-center gap-2"
+                previousClassName="px-3 py-1 rounded border hover:bg-gray-100 transition-colors duration-200"
+                nextClassName="px-3 py-1 rounded border hover:bg-gray-100 transition-colors duration-200"
+                pageClassName="hidden sm:block"
+                pageLinkClassName="px-3 py-1 rounded border hover:bg-gray-100 transition-colors duration-200"
+                activeClassName="!bg-primary text-primary-foreground border-primary"
+                disabledClassName="opacity-50 cursor-not-allowed"
+                breakLabel="..."
+                breakClassName="px-3 py-1"
+                marginPagesDisplayed={1}
+                pageRangeDisplayed={3}
+                renderOnZeroPageCount={null}
+              />
+            </div>
           )}
         </section>
       </main>
