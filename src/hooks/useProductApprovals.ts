@@ -7,14 +7,13 @@ interface Product {
   title: string;
   description: string;
   price: number;
-  images: string[];
   category: string;
+  images: string[];
   listingType: "featured" | "standard";
   seller: {
-    id: string;
     name: string;
-    rating: number;
     location: string;
+    rating: number;
     joinedDate: string;
   };
   submittedAt: string;
