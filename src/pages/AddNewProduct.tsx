@@ -92,6 +92,9 @@ export default function AddNewProduct() {
         })
       );
 
+      // Calculate expiry date (7 days from now) in ISO string format
+      const expiryDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
       // Insert product data into Supabase
       const { error } = await supabase.from('products').insert({
         title: data.title,
@@ -100,7 +103,7 @@ export default function AddNewProduct() {
         category: data.category,
         images: imageUrls,
         status: 'pending',
-        expiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        expiry: expiryDate,
       });
 
       if (error) throw error;
