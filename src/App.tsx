@@ -12,6 +12,7 @@ import ProductApprovals from "./pages/ProductApprovals";
 import LinkManagement from "./pages/LinkManagement";
 import AdminManagement from "./pages/AdminManagement";
 import SellerAnalytics from "./pages/SellerAnalytics";
+import AdminAnalytics from "./pages/AdminAnalytics";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/admin/product-approvals" element={<ProductApprovals />} />
           <Route path="/admin/link-management" element={<LinkManagement />} />
           <Route path="/admin/admin-management" element={<AdminManagement />} />
+          <Route path="/admin/analytics" element={<AdminAnalytics />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
