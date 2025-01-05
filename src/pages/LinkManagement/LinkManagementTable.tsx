@@ -74,7 +74,7 @@ export function LinkManagementTable({
                   </TableCell>
                   <TableCell>
                     {product ? (
-                      <Badge variant={product.status === "approved" ? "success" : "warning"}>
+                      <Badge variant={product.status === "approved" ? "default" : "secondary"}>
                         {product.status}
                       </Badge>
                     ) : (
