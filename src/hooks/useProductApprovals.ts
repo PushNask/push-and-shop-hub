@@ -25,11 +25,16 @@ export const useProductApprovals = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleAction = async (action: "approve" | "reject") => {
+    if (!selectedProduct?.id) {
+      toast.error("No product selected");
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("products")
         .update({ status: action === "approve" ? "approved" : "rejected" })
-        .eq("id", selectedProduct?.id);
+        .eq("id", selectedProduct.id);
 
       if (error) throw error;
 

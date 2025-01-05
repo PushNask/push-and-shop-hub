@@ -4,10 +4,10 @@ import { ProductReviewDialog } from "@/components/admin/ProductReviewDialog";
 import { useProductApprovals } from "@/hooks/useProductApprovals";
 import { adminNavItems } from "@/components/admin/navigation/AdminNav";
 
-// Mock data - replace with actual data fetching
+// Mock data with proper UUID format
 const MOCK_PENDING_PRODUCTS = [
   {
-    id: "p1",
+    id: "123e4567-e89b-12d3-a456-426614174000",
     title: "iPhone 13 Pro",
     description: "Latest model with advanced features",
     price: 750000,
@@ -23,7 +23,7 @@ const MOCK_PENDING_PRODUCTS = [
     submittedAt: "2024-02-20T10:00:00Z"
   },
   {
-    id: "p2",
+    id: "223e4567-e89b-12d3-a456-426614174001",
     title: "Samsung TV",
     description: "50-inch Smart TV",
     price: 450000,
