@@ -1,144 +1,50 @@
-import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import {
-  BarChart3,
-  Users,
-  ClipboardCheck,
-  CreditCard,
-  LogOut,
-  Menu,
-  Link as LinkIcon,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Link, useLocation } from "react-router-dom";
 
-interface SidebarLink {
+interface NavItem {
+  title: string;
   href: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<any>;
 }
 
-const adminLinks: SidebarLink[] = [
-  {
-    href: "/admin/analytics",
-    label: "Analytics",
-    icon: BarChart3,
-  },
-  {
-    href: "/admin/users",
-    label: "User Management",
-    icon: Users,
-  },
-  {
-    href: "/admin/links",
-    label: "Link Management",
-    icon: LinkIcon,
-  },
-  {
-    href: "/product-approvals",
-    label: "Product Approvals",
-    icon: ClipboardCheck,
-  },
-  {
-    href: "/admin/transactions",
-    label: "Transactions",
-    icon: CreditCard,
-  },
-];
+interface DashboardSidebarProps {
+  navItems: NavItem[];
+}
 
-function SidebarContent() {
+export function DashboardSidebar({ navItems }: DashboardSidebarProps) {
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
-  };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="space-y-4 py-4 flex flex-col h-full">
-        <div className="px-3 py-2">
-          <Link to="/" className="flex items-center gap-2 mb-10">
-            <img
-              src="/lovable-uploads/032557e3-02ca-48fd-8b47-c3029d8d0104.png"
-              alt="PushNshop Logo"
-              className="h-8 w-8"
-            />
-            <span className="font-semibold text-lg">PushNshop</span>
+    <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40">
+      <div className="flex h-full max-h-screen flex-col gap-2">
+        <div className="flex h-[60px] items-center border-b px-6">
+          <Link to="/" className="flex items-center gap-2 font-semibold">
+            <span className="text-lg">PushNshop</span>
           </Link>
-          <div className="space-y-1">
-            {adminLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
+        </div>
+        <ScrollArea className="flex-1 px-3">
+          <div className="space-y-1 p-2">
+            {navItems.map((item) => (
+              <Button
+                key={item.href}
+                variant={location.pathname === item.href ? "secondary" : "ghost"}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent",
-                  location.pathname === link.href ? "bg-accent" : "transparent"
+                  "w-full justify-start gap-2",
+                  location.pathname === item.href && "bg-gray-200 dark:bg-gray-700"
                 )}
+                asChild
               >
-                <link.icon className="h-4 w-4" />
-                {link.label}
-              </Link>
+                <Link to={item.href}>
+                  <item.icon className="h-4 w-4" />
+                  {item.title}
+                </Link>
+              </Button>
             ))}
           </div>
-        </div>
-        <div className="mt-auto px-3 py-2">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-2"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
-        </div>
+        </ScrollArea>
       </div>
-    </div>
-  );
-}
-
-export function DashboardSidebar() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    
-    return () => {
-      window.removeEventListener("resize", checkScreenSize);
-    };
-  }, []);
-
-  if (isMobile) {
-    return (
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-6 w-6" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-72">
-          <SidebarContent />
-        </SheetContent>
-      </Sheet>
-    );
-  }
-
-  return (
-    <div className="hidden border-r bg-background md:block w-72">
-      <SidebarContent />
     </div>
   );
 }
