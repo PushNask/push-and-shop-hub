@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Product } from "@/types/product";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { toast } from "sonner";
 
 interface ProductReviewDialogProps {
   product: Product | null;
@@ -41,37 +43,56 @@ export const ProductReviewDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <h3 className="font-semibold">{product.title}</h3>
-            <p className="text-sm text-muted-foreground">{product.description}</p>
-          </div>
-          
-          <div className="grid gap-2">
-            <h4 className="font-semibold">Seller Information</h4>
-            <div className="text-sm space-y-1">
-              <p>Email: {product.seller?.email || 'Unknown'}</p>
-              <p>Location: {product.seller?.location || product.seller?.country || 'Unknown'}</p>
-              <p>Rating: {product.seller?.rating || 0}/5</p>
-              <p>Member since: {formatDate(product.seller?.joinedDate || product.created_at || new Date().toISOString())}</p>
+        <ErrorBoundary>
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <h3 className="font-semibold">{product.title}</h3>
+              <p className="text-sm text-muted-foreground">{product.description}</p>
+              
+              {product.images && product.images.length > 0 && (
+                <div className="aspect-video relative overflow-hidden rounded-lg bg-muted">
+                  <img
+                    src={product.images[0]}
+                    alt={product.title}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              )}
+            </div>
+            
+            <div className="grid gap-2">
+              <h4 className="font-semibold">Seller Information</h4>
+              <div className="text-sm space-y-1">
+                <p>Email: {product.seller?.email || 'Unknown'}</p>
+                <p>Location: {product.seller?.location || product.seller?.country || 'Unknown'}</p>
+                <p>Rating: {product.seller?.rating || 0}/5</p>
+                <p>Member since: {formatDate(product.seller?.joinedDate || product.created_at || new Date().toISOString())}</p>
+              </div>
+            </div>
+            
+            <div className="grid gap-2">
+              <label htmlFor="feedback" className="font-semibold">Feedback</label>
+              <Textarea
+                id="feedback"
+                placeholder="Enter feedback for the seller (required for rejections)"
+                value={feedback}
+                onChange={(e) => onFeedbackChange(e.target.value)}
+                className="min-h-[100px]"
+              />
             </div>
           </div>
-          
-          <div className="grid gap-2">
-            <label htmlFor="feedback" className="font-semibold">Feedback</label>
-            <Textarea
-              id="feedback"
-              placeholder="Enter feedback for the seller (optional)"
-              value={feedback}
-              onChange={(e) => onFeedbackChange(e.target.value)}
-            />
-          </div>
-        </div>
+        </ErrorBoundary>
         
         <DialogFooter className="flex gap-2">
           <Button
             variant="destructive"
-            onClick={() => onAction("reject")}
+            onClick={() => {
+              if (!feedback && product.status !== 'approved') {
+                toast.error("Please provide feedback when rejecting a product");
+                return;
+              }
+              onAction("reject");
+            }}
             className="flex items-center gap-2"
           >
             <XCircle className="h-4 w-4" />
