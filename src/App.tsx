@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
 import { SellerLayout } from "@/components/layouts/SellerLayout";
+import { ProfileRedirect } from "@/components/auth/ProfileRedirect";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
@@ -38,7 +39,7 @@ function App() {
       <Router>
         <div className="min-h-screen flex flex-col">
           <Routes>
-            {/* Admin routes - placing these first for correct route precedence */}
+            {/* Admin routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Navigate to="/admin/product-approvals" replace />} />
               <Route path="analytics" element={<AdminAnalytics />} />
@@ -76,8 +77,13 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
-            {/* User routes - placing this after admin/seller routes */}
-            <Route path="/profile" element={<UserProfile />} />
+            {/* Protected profile route with role-based redirect */}
+            <Route path="/profile" element={
+              <>
+                <ProfileRedirect />
+                <UserProfile />
+              </>
+            } />
 
             {/* Catch-all redirect */}
             <Route path="*" element={<Navigate to="/" replace />} />
