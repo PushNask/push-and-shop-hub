@@ -69,7 +69,15 @@ const ProductApprovals = () => {
                 }
               }}
               onReview={(product) => {
-                setSelectedProduct(product);
+                const fullProduct: Product = {
+                  ...product,
+                  currency: product.currency || "XAF",
+                  expiry: product.expiry || null,
+                  link_slot: product.link_slot || null,
+                  seller_id: product.seller_id || null,
+                  status: product.status || "pending"
+                };
+                setSelectedProduct(fullProduct);
                 setIsDialogOpen(true);
               }}
             />
