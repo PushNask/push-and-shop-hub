@@ -1,12 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { Product } from '@/types/product';
-import { LinkManagementTable } from '@/pages/LinkManagement/LinkManagementTable';
-
-interface LinkManagementTableProps {
-  products: Product[];
-}
+import { LinkManagementTable } from '@/components/admin/LinkManagementTable';
 
 const mockProduct: Product = {
   id: '1',
@@ -33,46 +29,59 @@ const mockProduct: Product = {
 };
 
 describe('LinkManagementTable', () => {
+  const onAssignProduct = vi.fn();
+
   it('renders the table with correct headers', () => {
     render(
       <BrowserRouter>
-        <LinkManagementTable products={[mockProduct]} />
+        <LinkManagementTable 
+          linkSlots={[mockProduct]} 
+          onAssignProduct={onAssignProduct}
+        />
       </BrowserRouter>
     );
-    expect(screen.getByText('Product')).toBeInTheDocument();
-    expect(screen.getByText('Link Slot')).toBeInTheDocument();
+    expect(screen.getByText('Slot')).toBeInTheDocument();
+    expect(screen.getByText('Type')).toBeInTheDocument();
+    expect(screen.getByText('Current Product')).toBeInTheDocument();
     expect(screen.getByText('Status')).toBeInTheDocument();
-    expect(screen.getByText('Expiry')).toBeInTheDocument();
   });
 
   it('displays product information correctly', () => {
     render(
       <BrowserRouter>
-        <LinkManagementTable products={[mockProduct]} />
+        <LinkManagementTable 
+          linkSlots={[mockProduct]} 
+          onAssignProduct={onAssignProduct}
+        />
       </BrowserRouter>
     );
     expect(screen.getByText('iPhone 13 Pro')).toBeInTheDocument();
-    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.getByText('P1')).toBeInTheDocument();
     expect(screen.getByText('pending')).toBeInTheDocument();
-    expect(screen.getByText('Dec 31, 2024')).toBeInTheDocument();
   });
 
-  it('shows empty state when no products', () => {
+  it('shows empty slots when no products', () => {
     render(
       <BrowserRouter>
-        <LinkManagementTable products={[]} />
+        <LinkManagementTable 
+          linkSlots={[]} 
+          onAssignProduct={onAssignProduct}
+        />
       </BrowserRouter>
     );
-    expect(screen.getByText('No products found')).toBeInTheDocument();
+    expect(screen.getAllByText('Available').length).toBeGreaterThan(0);
   });
 
-  it('formats dates correctly', () => {
+  it('shows featured badge for first 12 slots', () => {
     render(
       <BrowserRouter>
-        <LinkManagementTable products={[mockProduct]} />
+        <LinkManagementTable 
+          linkSlots={[mockProduct]} 
+          onAssignProduct={onAssignProduct}
+        />
       </BrowserRouter>
     );
-    const formattedDate = screen.getByText('Dec 31, 2024');
-    expect(formattedDate).toBeInTheDocument();
+    const featuredBadges = screen.getAllByText('Featured');
+    expect(featuredBadges.length).toBe(12);
   });
 });
