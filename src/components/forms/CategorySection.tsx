@@ -1,22 +1,12 @@
 import { FormField, FormItem, FormControl, FormMessage, FormLabel } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PRODUCT_CATEGORIES } from "@/lib/constants/categories";
 
 interface CategorySectionProps {
   form: any;
 }
 
 export function CategorySection({ form }: CategorySectionProps) {
-  const categories = [
-    "Electronics",
-    "Fashion",
-    "Home & Garden",
-    "Sports",
-    "Beauty",
-    "Books",
-    "Toys",
-    "Other"
-  ];
-
   return (
     <FormField
       control={form.control}
@@ -31,7 +21,7 @@ export function CategorySection({ form }: CategorySectionProps) {
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {categories.map((category) => (
+              {PRODUCT_CATEGORIES.slice(1).map((category) => (
                 <SelectItem key={category} value={category}>
                   {category}
                 </SelectItem>
