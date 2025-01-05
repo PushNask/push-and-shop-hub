@@ -27,6 +27,10 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not configured");
+    }
+
     const { productId, status, feedback } = await req.json() as ProductStatusRequest;
 
     // Get product and seller details
@@ -42,14 +46,26 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("id", productId)
       .single();
 
-    if (productError) throw productError;
-    if (!product) throw new Error("Product not found");
+    if (productError) {
+      console.error("Error fetching product:", productError);
+      throw productError;
+    }
+    if (!product) {
+      throw new Error("Product not found");
+    }
 
+    console.log("Product details:", product);
+    
     const sellerEmail = product.profiles.email;
+    if (!sellerEmail) {
+      throw new Error("Seller email not found");
+    }
+
     const statusText = status === "approved" ? "approved" : "rejected";
     const feedbackText = feedback ? `\n\nFeedback: ${feedback}` : "";
 
     // Send email using Resend
+    console.log("Sending email to:", sellerEmail);
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -70,7 +86,9 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (!emailResponse.ok) {
-      throw new Error(`Failed to send email: ${await emailResponse.text()}`);
+      const errorText = await emailResponse.text();
+      console.error("Resend API error:", errorText);
+      throw new Error(`Failed to send email: ${errorText}`);
     }
 
     return new Response(JSON.stringify({ success: true }), {
