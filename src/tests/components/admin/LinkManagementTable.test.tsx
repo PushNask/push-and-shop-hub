@@ -1,10 +1,11 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { LinkManagementTable } from "@/components/admin/LinkManagementTable";
+import type { Product } from "@/types/product";
 
 describe("LinkManagementTable", () => {
   const mockOnAssignProduct = vi.fn();
-  const mockLinkSlots = [
+  const mockLinkSlots: Product[] = [
     {
       id: "1",
       title: "Test Product",
