@@ -28,7 +28,14 @@ const ProductApprovals = () => {
   }
 
   return (
-    <div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold tracking-tight">Pending Approvals</h2>
+        <p className="text-sm text-muted-foreground">
+          {products?.length || 0} products awaiting review
+        </p>
+      </div>
+
       {isLoading ? (
         <div className="flex items-center justify-center h-[50vh]">
           <Loader2 className="h-8 w-8 animate-spin" />
