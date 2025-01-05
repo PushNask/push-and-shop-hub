@@ -14,12 +14,12 @@ export function RoleSelector({ value, onChange }: RoleSelectorProps) {
       className="flex flex-col space-y-1"
     >
       <div className="flex items-center space-x-2">
-        <RadioGroupItem value="buyer" id="buyer" />
-        <Label htmlFor="buyer">Buyer</Label>
-      </div>
-      <div className="flex items-center space-x-2">
         <RadioGroupItem value="seller" id="seller" />
         <Label htmlFor="seller">Seller</Label>
+      </div>
+      <div className="flex items-center space-x-2">
+        <RadioGroupItem value="buyer" id="buyer" />
+        <Label htmlFor="buyer">Buyer</Label>
       </div>
     </RadioGroup>
   );

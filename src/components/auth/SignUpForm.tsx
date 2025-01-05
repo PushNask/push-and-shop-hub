@@ -11,7 +11,32 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { RoleSelector } from "./RoleSelector";
+
+const COUNTRIES = [
+  { code: "US", name: "USA" },
+  { code: "CM", name: "Cameroon" },
+  { code: "SN", name: "Senegal" },
+  { code: "NG", name: "Nigeria" },
+  { code: "GH", name: "Ghana" },
+  { code: "CI", name: "Ivory Coast" },
+  { code: "GA", name: "Gabon" },
+  { code: "DE", name: "Germany" },
+  { code: "FR", name: "France" },
+  { code: "AE", name: "UAE" },
+  { code: "TZ", name: "Tanzania" },
+  { code: "TG", name: "Togo" },
+  { code: "KE", name: "Kenya" },
+  { code: "MU", name: "Mauritius" },
+  { code: "NA", name: "Namibia" },
+];
 
 const signUpSchema = z
   .object({
@@ -52,7 +77,7 @@ export function SignUpForm({ onSubmit, isLoading }: SignUpFormProps) {
       confirmPassword: "",
       phone: "",
       country: "",
-      role: "buyer",
+      role: "seller",
     },
   });
 
@@ -141,13 +166,20 @@ export function SignUpForm({ onSubmit, isLoading }: SignUpFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Country</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter your country"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your country" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {COUNTRIES.map((country) => (
+                    <SelectItem key={country.code} value={country.code}>
+                      {country.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -158,7 +190,7 @@ export function SignUpForm({ onSubmit, isLoading }: SignUpFormProps) {
           name="role"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>I want to</FormLabel>
+              <FormLabel>I am A</FormLabel>
               <FormControl>
                 <RoleSelector
                   value={field.value}
