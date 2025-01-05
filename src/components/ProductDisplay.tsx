@@ -7,6 +7,7 @@ import { Grid2X2, List } from "lucide-react";
 import { Product } from "@/types/product";
 import { Pagination } from "./ui/pagination";
 import { SkeletonCard } from "./SkeletonCard";
+import { cn } from "@/lib/utils";
 
 interface ProductDisplayProps {
   products: Product[];
@@ -121,10 +122,7 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
             title={product.title}
             price={product.price}
             images={product.images}
-            seller={{
-              phone: product.seller?.phone,
-              country: product.seller?.country
-            }}
+            seller={product.seller}
             expiry={product.expiry}
             deliveryOptions={{
               pickup: product.pickup || false,

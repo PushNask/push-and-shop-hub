@@ -11,7 +11,14 @@ export const useProducts = (page = 1, limit = 12) => {
       // Fetch featured products (slots 1-12)
       const { data: featuredProducts, error: featuredError } = await supabase
         .from("products")
-        .select("*, profiles(email, country)")
+        .select(`
+          *,
+          profiles (
+            email,
+            country,
+            phone
+          )
+        `)
         .eq("status", "approved")
         .lte("link_slot", 12)
         .order("link_slot", { ascending: true });
@@ -21,7 +28,14 @@ export const useProducts = (page = 1, limit = 12) => {
       // Fetch standard products with pagination (slots 13-120)
       const { data: standardProducts, error: standardError, count } = await supabase
         .from("products")
-        .select("*, profiles(email, country)", { count: "exact" })
+        .select(`
+          *,
+          profiles (
+            email,
+            country,
+            phone
+          )
+        `, { count: "exact" })
         .eq("status", "approved")
         .gt("link_slot", 12)
         .range(offset, offset + limit - 1)
