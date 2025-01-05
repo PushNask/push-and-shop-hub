@@ -72,7 +72,8 @@ const MyProducts = () => {
       queryClient.invalidateQueries({ queryKey: ['seller-products'] });
       toast.success("Product removed successfully!");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error removing product:', error);
       toast.error("Failed to remove product");
     }
   });
