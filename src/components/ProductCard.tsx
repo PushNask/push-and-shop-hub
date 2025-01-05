@@ -4,7 +4,6 @@ import { MapPin, Clock, Shield, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { DeliveryBadges } from "./product/DeliveryBadges";
-import { ShareButtons } from "./product/ShareButtons";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 
@@ -46,7 +45,9 @@ export function ProductCard({
 }: ProductCardProps) {
   const [timeLeft, setTimeLeft] = useState<string>("");
 
-  const handleWhatsAppClick = () => {
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!seller?.phone) {
       toast.error("Seller contact information not available");
       return;
@@ -56,7 +57,6 @@ export function ProductCard({
     window.open(whatsappUrl, '_blank');
   };
 
-  // Calculate time remaining until expiry
   useEffect(() => {
     if (!expiry) return;
 
@@ -149,18 +149,15 @@ export function ProductCard({
       </Link>
       
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/90 to-background/0 p-3 translate-y-full transition-transform duration-300 group-hover:translate-y-0">
-        <div className="flex flex-col gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full bg-background/50 backdrop-blur-sm"
-            onClick={handleWhatsAppClick}
-          >
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Contact Seller
-          </Button>
-          <ShareButtons title={title} seller={seller} />
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full bg-background/50 backdrop-blur-sm"
+          onClick={handleWhatsAppClick}
+        >
+          <MessageSquare className="h-4 w-4 mr-2" />
+          Contact Seller
+        </Button>
       </div>
     </div>
   );

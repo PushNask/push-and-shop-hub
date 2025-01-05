@@ -7,7 +7,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ProductImages } from "@/components/product/ProductImages";
 import { ProductInfo } from "@/components/product/ProductInfo";
 import { SellerInfo } from "@/components/product/SellerInfo";
-import { ShareSection } from "@/components/product/ShareSection";
+import { ShareButtons } from "@/components/product/ShareButtons";
+import { DeliveryBadges } from "@/components/product/DeliveryBadges";
+import { Button } from "@/components/ui/button";
+import { MessageSquare } from "lucide-react";
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -53,38 +56,15 @@ const ProductPage = () => {
     }
   }, [id, navigate]);
 
-  useEffect(() => {
-    if (!product?.expiry) return;
-
-    const calculateTimeLeft = () => {
-      const now = new Date().getTime();
-      const expiryTime = new Date(product.expiry).getTime();
-      const distance = expiryTime - now;
-      
-      if (distance < 0) {
-        setTimeLeft("EXPIRED");
-        return null;
-      }
-
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      
-      return `${days}d ${hours}h ${minutes}m`;
-    };
-
-    setTimeLeft(calculateTimeLeft() || "EXPIRED");
-    const timer = setInterval(() => {
-      const remaining = calculateTimeLeft();
-      if (remaining === null) {
-        clearInterval(timer);
-      } else {
-        setTimeLeft(remaining);
-      }
-    }, 60000);
-
-    return () => clearInterval(timer);
-  }, [product?.expiry]);
+  const handleWhatsAppClick = () => {
+    if (!product?.profiles?.phone) {
+      toast.error("Seller contact information not available");
+      return;
+    }
+    const message = `Hi, I'm interested in your product: ${product.title}. Can you provide more details?`;
+    const whatsappUrl = `https://wa.me/${product.profiles.phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   if (loading) {
     return (
@@ -105,14 +85,42 @@ const ProductPage = () => {
     return null;
   }
 
-  const shareUrl = window.location.href;
-
   return (
     <div className="container py-6 space-y-6 animate-fadeIn">
-      <ProductImages images={product.images} title={product.title} />
-      <ProductInfo product={product} timeLeft={timeLeft} />
-      <SellerInfo product={product} />
-      <ShareSection product={product} shareUrl={shareUrl} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <ProductImages images={product.images} title={product.title} />
+        </div>
+        <div className="space-y-6">
+          <ProductInfo product={product} timeLeft={timeLeft} />
+          
+          <div className="flex flex-col gap-4">
+            <Button 
+              size="lg" 
+              className="w-full"
+              onClick={handleWhatsAppClick}
+            >
+              <MessageSquare className="h-5 w-5 mr-2" />
+              Contact Seller
+            </Button>
+            
+            <div className="bg-accent/50 rounded-lg p-4">
+              <h3 className="font-medium mb-2">Share this product</h3>
+              <ShareButtons title={product.title} seller={product.profiles} />
+            </div>
+          </div>
+
+          <DeliveryBadges
+            deliveryOptions={{
+              pickup: product.pickup || false,
+              shipping: product.shipping || false,
+              both: product.both || false
+            }}
+          />
+          
+          <SellerInfo product={product} />
+        </div>
+      </div>
     </div>
   );
 };

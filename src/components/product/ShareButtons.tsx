@@ -14,8 +14,7 @@ export function ShareButtons({ title, seller }: ShareButtonsProps) {
   const shareText = `Check out ${title} on PushNshop!`;
 
   const shareHandlers = {
-    whatsapp: (e: React.MouseEvent) => {
-      e.preventDefault();
+    whatsapp: () => {
       if (!seller?.phone) {
         toast.error("Seller contact information not available");
         return;
@@ -25,18 +24,15 @@ export function ShareButtons({ title, seller }: ShareButtonsProps) {
       window.open(whatsappUrl, '_blank');
       toast.success("Opening WhatsApp...");
     },
-    facebook: (e: React.MouseEvent) => {
-      e.preventDefault();
+    facebook: () => {
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
       toast.success("Opening Facebook...");
     },
-    twitter: (e: React.MouseEvent) => {
-      e.preventDefault();
+    twitter: () => {
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
       toast.success("Opening Twitter...");
     },
-    copyLink: async (e: React.MouseEvent) => {
-      e.preventDefault();
+    copyLink: async () => {
       try {
         await navigator.clipboard.writeText(shareUrl);
         toast.success("Link copied to clipboard!");
@@ -47,38 +43,42 @@ export function ShareButtons({ title, seller }: ShareButtonsProps) {
   };
 
   return (
-    <div className="flex flex-wrap gap-2 justify-center">
+    <div className="flex flex-wrap gap-2">
       <Button 
         variant="outline" 
         size="sm" 
         onClick={shareHandlers.whatsapp}
-        className="bg-background/50 backdrop-blur-sm"
+        className="flex-1"
       >
-        <MessageCircle className="h-4 w-4" />
+        <MessageCircle className="h-4 w-4 mr-2" />
+        WhatsApp
       </Button>
       <Button 
         variant="outline" 
         size="sm" 
         onClick={shareHandlers.facebook}
-        className="bg-background/50 backdrop-blur-sm"
+        className="flex-1"
       >
-        <Facebook className="h-4 w-4" />
+        <Facebook className="h-4 w-4 mr-2" />
+        Facebook
       </Button>
       <Button 
         variant="outline" 
         size="sm" 
         onClick={shareHandlers.twitter}
-        className="bg-background/50 backdrop-blur-sm"
+        className="flex-1"
       >
-        <Twitter className="h-4 w-4" />
+        <Twitter className="h-4 w-4 mr-2" />
+        Twitter
       </Button>
       <Button 
         variant="outline" 
         size="sm" 
         onClick={shareHandlers.copyLink}
-        className="bg-background/50 backdrop-blur-sm"
+        className="flex-1"
       >
-        <Share2 className="h-4 w-4" />
+        <Share2 className="h-4 w-4 mr-2" />
+        Copy Link
       </Button>
     </div>
   );
