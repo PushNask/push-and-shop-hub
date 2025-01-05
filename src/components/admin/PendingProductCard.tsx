@@ -44,7 +44,7 @@ export const PendingProductCard = ({ product, onReview }: PendingProductCardProp
           <div className="flex items-center justify-between">
             <h3 className="font-semibold truncate">{product.title}</h3>
             <Badge variant={product.listingType === "featured" ? "default" : "secondary"}>
-              {product.listingType}
+              {product.listingType || "standard"}
             </Badge>
           </div>
           
