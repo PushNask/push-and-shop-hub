@@ -111,15 +111,30 @@ export default function UserProfile() {
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // First clear any existing session
+      const { error } = await supabase.auth.signOut({ scope: 'local' });
+      if (error) {
+        console.error("Error signing out:", error);
+        throw error;
+      }
+      
+      // Clear any local storage or state
+      localStorage.clear();
+      
+      // Navigate to login page
       navigate("/login");
+      
+      // Show success toast after navigation
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+      });
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error("Error during logout:", error);
       toast({
         title: "Error",
-        description: "Failed to sign out. Please try again.",
         variant: "destructive",
+        description: "Failed to log out. Please try again.",
       });
     }
   };
