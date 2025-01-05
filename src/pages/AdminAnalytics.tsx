@@ -1,27 +1,28 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { adminNavItems } from "@/components/admin/navigation/AdminNav";
-import { Chart } from "@/components/ui/charts";
-import { Users, DollarSign, ShoppingBag, Clock } from "lucide-react";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
+import { adminNavItems } from "@/components/admin/navigation/AdminNav"
+import { Chart, ChartTooltip, ChartTooltipContent } from "@/components/ui/charts"
+import { Users, DollarSign, ShoppingBag, Clock } from "lucide-react"
+import { useAnalytics } from "@/hooks/useAnalytics"
+import { Area, AreaChart, XAxis, YAxis } from "recharts"
 
 export default function AdminAnalytics() {
-  const { data: analyticsData, isLoading } = useAnalytics();
+  const { data: analyticsData, isLoading } = useAnalytics()
 
   const latestAnalytics = analyticsData?.[0] || {
     total_views: 0,
     total_revenue: 0,
     pending_approvals: 0,
     active_products: 0,
-  };
+  }
 
-  const weeklyData = analyticsData?.slice(0, 7).reverse() || [];
+  const weeklyData = analyticsData?.slice(0, 7).reverse() || []
 
   const weeklyChartData = weeklyData.map((data) => ({
     name: new Date(data.date).toLocaleDateString('en-US', { weekday: 'short' }),
     revenue: data.total_revenue,
     views: data.total_views,
-  }));
+  }))
 
   if (isLoading) {
     return (
@@ -30,7 +31,7 @@ export default function AdminAnalytics() {
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
         </div>
       </DashboardLayout>
-    );
+    )
   }
 
   return (
@@ -85,22 +86,27 @@ export default function AdminAnalytics() {
             <CardTitle>Weekly Trends</CardTitle>
           </CardHeader>
           <CardContent>
-            <Chart
-              type="line"
-              data={weeklyChartData}
-              categories={['revenue', 'views']}
-              index="name"
-              colors={['blue', 'green']}
-              valueFormatter={(value: number) => 
-                value.toLocaleString('en-US', {
-                  style: 'currency',
-                  currency: 'XAF',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                })
-              }
-              className="h-[300px]"
-            />
+            <div className="h-[300px]">
+              <AreaChart data={weeklyChartData} width={500} height={300}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#8884d8"
+                  fill="#8884d8"
+                  fillOpacity={0.3}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="views"
+                  stroke="#82ca9d"
+                  fill="#82ca9d"
+                  fillOpacity={0.3}
+                />
+              </AreaChart>
+            </div>
           </CardContent>
         </Card>
 
@@ -110,7 +116,7 @@ export default function AdminAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {weeklyData.map((data, index) => (
+              {weeklyData.map((data) => (
                 <div key={data.id} className="flex items-center">
                   <div className="ml-4 space-y-1">
                     <p className="text-sm font-medium leading-none">
@@ -131,5 +137,5 @@ export default function AdminAnalytics() {
         </Card>
       </div>
     </DashboardLayout>
-  );
+  )
 }

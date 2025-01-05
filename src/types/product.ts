@@ -1,11 +1,17 @@
-import type { Database } from "@/integrations/supabase/types";
-
-type ProductRow = Database["public"]["Tables"]["products"]["Row"];
-
-export interface Product extends ProductRow {
-  seller_email?: string;
-  seller_country?: string;
-  listingType: "featured" | "standard";
+export interface Product {
+  id: string;
+  title: string;
+  description?: string;
+  price: number;
+  currency: string;
+  category: string;
+  images?: string[];
+  status: string;
+  expiry: string;
+  link_slot: number;
+  seller_id: string;
+  created_at?: string;
+  listingType?: "featured" | "standard";
   seller?: {
     name: string;
     location: string;
@@ -14,6 +20,8 @@ export interface Product extends ProductRow {
   };
   image?: string;
 }
+
+export type ProductRow = Omit<Product, 'listingType' | 'seller' | 'image'>;
 
 export const transformProduct = (product: ProductRow & { 
   seller_email?: string; 
