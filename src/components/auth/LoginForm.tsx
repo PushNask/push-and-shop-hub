@@ -40,42 +40,48 @@ export function LoginForm() {
     try {
       setIsLoading(true);
       
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      // Clear any existing session first
+      await supabase.auth.signOut();
+      
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
 
       if (signInError) throw signInError;
 
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .single();
+      if (!data.session) {
+        throw new Error("No session created after login");
+      }
 
-        toast({
-          title: "Success",
-          description: "You have successfully logged in.",
-        });
+      // Fetch user profile with role
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
 
-        // Redirect based on user role
-        if (profile?.role === "admin") {
-          navigate("/admin/product-approvals");
-        } else if (profile?.role === "seller") {
-          navigate("/seller/profile");
-        } else {
-          navigate("/profile");
-        }
+      if (profileError) throw profileError;
+
+      toast({
+        title: "Success",
+        description: "You have successfully logged in.",
+      });
+
+      // Redirect based on user role
+      if (profile?.role === "admin") {
+        navigate("/admin/product-approvals");
+      } else if (profile?.role === "seller") {
+        navigate("/seller/profile");
+      } else {
+        navigate("/profile");
       }
     } catch (error) {
       console.error('Login error:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Invalid email or password.",
+        description: error.message || "Invalid email or password.",
       });
     } finally {
       setIsLoading(false);
