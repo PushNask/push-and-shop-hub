@@ -12,11 +12,19 @@ export function ProfileRedirect() {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        const { data: profile } = await supabase
+        console.log("Current user:", user.email); // Debug log
+        
+        const { data: profile, error } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", user.id)
           .single();
+
+        console.log("User profile:", profile); // Debug log
+        
+        if (error) {
+          console.error("Error fetching profile:", error);
+        }
 
         if (profile) {
           if (profile.role === "admin") {
