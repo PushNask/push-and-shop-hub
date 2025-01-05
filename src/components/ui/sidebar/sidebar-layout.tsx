@@ -58,6 +58,19 @@ export function SidebarGroup({
   )
 }
 
+export function SidebarGroupLabel({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-sidebar="group-label"
+      className={cn("px-2 text-xs font-medium text-muted-foreground", className)}
+      {...props}
+    />
+  )
+}
+
 export function SidebarGroupContent({
   className,
   ...props
