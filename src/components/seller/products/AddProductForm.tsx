@@ -11,6 +11,8 @@ import { ImageUploadSection } from "@/components/forms/ImageUploadSection";
 import { DeliveryOptionsSection } from "@/components/forms/DeliveryOptionsSection";
 import { ListingFeeSection } from "@/components/forms/ListingFeeSection";
 import { PaymentMethodSection } from "@/components/forms/PaymentMethodSection";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -50,6 +52,9 @@ export type AddProductFormValues = z.infer<typeof formSchema>;
 
 export function AddProductForm() {
   const { mutate: addProduct, isPending } = useAddProduct();
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+
   const form = useForm<AddProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -67,8 +72,45 @@ export function AddProductForm() {
     },
   });
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const totalImages = imageFiles.length + files.length;
+
+    if (totalImages > 7) {
+      toast.error("Maximum 7 images allowed");
+      return;
+    }
+
+    // Validate file size and type
+    const invalidFiles = files.filter(
+      file => file.size > MAX_FILE_SIZE || !ACCEPTED_IMAGE_TYPES.includes(file.type)
+    );
+
+    if (invalidFiles.length > 0) {
+      toast.error(`Some files were rejected. Please ensure all files are images under ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
+      return;
+    }
+
+    // Create URLs for preview
+    const newImageUrls = files.map(file => URL.createObjectURL(file));
+    
+    setImageUrls(prev => [...prev, ...newImageUrls]);
+    setImageFiles(prev => [...prev, ...files]);
+    form.setValue('images', [...imageFiles, ...files]);
+  };
+
+  const handleImageRemove = (index: number) => {
+    setImageUrls(prev => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    form.setValue('images', imageFiles.filter((_, i) => i !== index));
+  };
+
   const onSubmit = (data: AddProductFormValues) => {
-    addProduct(data);
+    if (imageFiles.length === 0) {
+      toast.error("Please upload at least one image");
+      return;
+    }
+    addProduct({ ...data, images: imageFiles });
   };
 
   return (
@@ -78,9 +120,11 @@ export function AddProductForm() {
         <CategorySection form={form} />
         <ImageUploadSection 
           form={form}
-          imageUrls={[]} // This should be managed with state in this component
-          onImageChange={() => {}} // Implement image change handler
-          onImageRemove={() => {}} // Implement image remove handler
+          imageUrls={imageUrls}
+          onImageChange={handleImageChange}
+          onImageRemove={handleImageRemove}
+          maxSize={MAX_FILE_SIZE}
+          acceptedTypes={ACCEPTED_IMAGE_TYPES}
         />
         <DeliveryOptionsSection form={form} />
         <ListingFeeSection form={form} />
