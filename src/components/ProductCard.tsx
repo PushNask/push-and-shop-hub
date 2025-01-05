@@ -7,7 +7,7 @@ import { toast } from "sonner";
 interface ProductCardProps {
   title: string;
   price: number;
-  image: string;
+  image?: string; // Made optional to match database type
   className?: string;
 }
 

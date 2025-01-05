@@ -6,13 +6,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { ProductCard } from "@/components/ProductCard";
-
-interface Product {
-  id: string;
-  title: string;
-  price: number;
-  image: string;
-}
+import type { Product } from "@/types/product";
 
 interface ProductCarouselProps {
   products: Product[];

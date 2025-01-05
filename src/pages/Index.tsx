@@ -18,10 +18,6 @@ export default function Index() {
     );
   }
 
-  const handlePageChange = (_: any, page: number) => {
-    setCurrentPage(page);
-  };
-
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Featured Products Section */}
@@ -68,7 +64,7 @@ export default function Index() {
                   className="justify-center"
                   count={products.totalPages}
                   page={currentPage}
-                  onChange={handlePageChange}
+                  onPageChange={(page) => setCurrentPage(page)}
                 />
               </div>
             )}

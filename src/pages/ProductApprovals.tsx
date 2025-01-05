@@ -6,12 +6,12 @@ import { useProductApproval } from "@/hooks/useProductApproval";
 import { useProductList } from "@/hooks/useProductList";
 import { adminNavItems } from "@/components/admin/navigation/AdminNav";
 import { Loader2 } from "lucide-react";
-import { transformProduct } from "@/types/product";
+import { transformProduct, type Product } from "@/types/product";
 
 const ProductApprovals = () => {
   const { data: products, isLoading, error } = useProductList();
   const { mutate: handleApproval } = useProductApproval();
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [feedback, setFeedback] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
