@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -54,6 +54,7 @@ function App() {
 
               {/* Admin routes */}
               <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<Navigate to="/admin/product-approvals" replace />} />
                 <Route path="analytics" element={<AdminAnalytics />} />
                 <Route path="users" element={<AdminManagement />} />
                 <Route path="links" element={<LinkManagement />} />

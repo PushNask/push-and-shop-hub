@@ -1,6 +1,5 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -8,7 +7,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 export function AdminLayout() {
   const navigate = useNavigate();
   
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -25,12 +24,12 @@ export function AdminLayout() {
   });
 
   useEffect(() => {
-    if (profile && profile.role !== "admin") {
+    if (!isLoading && (!profile || profile.role !== "admin")) {
       navigate("/login");
     }
-  }, [profile, navigate]);
+  }, [profile, isLoading, navigate]);
 
-  if (!profile) {
+  if (isLoading || !profile) {
     return null;
   }
 

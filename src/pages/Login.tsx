@@ -16,80 +16,86 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-const loginSchema = z.object({
+const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-type LoginForm = z.infer<typeof loginSchema>;
+type LoginForm = z.infer<typeof formSchema>;
 
 export default function Login() {
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        redirectToDashboard(session.user.id);
-      }
-    });
-  }, []);
-
-  const redirectToDashboard = async (userId: string) => {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
-
-    if (profile) {
-      switch (profile.role) {
-        case "admin":
-          navigate("/admin/analytics");
-          break;
-        case "seller":
-          navigate("/seller/profile");
-          break;
-        default:
-          navigate("/profile");
-      }
-    }
-  };
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (data: LoginForm) => {
-    setIsLoading(true);
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (profile?.role === 'admin') {
+          navigate('/admin/product-approvals');
+        } else if (profile?.role === 'seller') {
+          navigate('/seller/profile');
+        } else {
+          navigate('/profile');
+        }
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
+
+  const onSubmit = async (values: LoginForm) => {
     try {
-      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
+      setIsLoading(true);
+      
+      const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
       });
 
       if (signInError) throw signInError;
 
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
-      });
-      
-      if (authData.user) {
-        await redirectToDashboard(authData.user.id);
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        toast({
+          title: "Success",
+          description: "You have successfully logged in.",
+        });
+
+        if (profile?.role === 'admin') {
+          navigate('/admin/product-approvals');
+        } else if (profile?.role === 'seller') {
+          navigate('/seller/profile');
+        } else {
+          navigate('/profile');
+        }
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error('Login error:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Invalid email or password. Please try again.",
+        description: "Invalid email or password.",
       });
     } finally {
       setIsLoading(false);
@@ -100,7 +106,7 @@ export default function Login() {
     <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)] py-8">
       <div className="w-full max-w-md space-y-6 p-6 glass-card rounded-lg fade-in">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-bold">Welcome back</h1>
+          <h1 className="text-2xl font-bold">Login to your account</h1>
           <p className="text-muted-foreground">
             Enter your credentials to access your account
           </p>
@@ -146,17 +152,8 @@ export default function Login() {
               )}
             />
 
-            <div className="flex items-center justify-end">
-              <Link
-                to="/forgot-password"
-                className="text-sm text-muted-foreground hover:text-primary"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </Form>
