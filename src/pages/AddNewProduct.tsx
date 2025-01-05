@@ -38,6 +38,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+const feeStructure = {
+  standard: { '24': 10, '48': 17, '72': 25, '96': 30, '120': 40 },
+  featured: { '24': 25, '48': 40, '72': 60, '96': 80, '120': 100 },
+} as const;
+
 export default function AddNewProduct() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,6 +87,10 @@ export default function AddNewProduct() {
 
     setIsSubmitting(true);
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
       // Upload images to Supabase Storage
       const imageUrls = await Promise.all(
         data.images.map(async (file) => {
@@ -105,13 +114,12 @@ export default function AddNewProduct() {
       const durationHours = parseInt(data.duration);
       const expiryDate = new Date(Date.now() + durationHours * 60 * 60 * 1000).toISOString();
 
-      // Get user profile for seller_id
-      const { data: profile } = await supabase.auth.getUser();
-      if (!profile.user) throw new Error("User not authenticated");
+      // Calculate listing fee
+      const listingFee = feeStructure[data.listingType][data.duration as keyof (typeof feeStructure)['standard']];
 
-      // Insert product data into Supabase
-      const { error } = await supabase.from('products').insert({
-        seller_id: profile.user.id,
+      // Insert product data
+      const { error: productError, data: productData } = await supabase.from('products').insert({
+        seller_id: user.id,
         title: data.title,
         description: data.description,
         price: parseFloat(data.price),
@@ -120,14 +128,14 @@ export default function AddNewProduct() {
         status: 'pending',
         expiry: expiryDate,
         link_slot: data.listingType === 'featured' ? null : null, // Will be assigned by admin
-      });
+      }).select().single();
 
-      if (error) throw error;
+      if (productError) throw productError;
 
       // Create transaction record for listing fee
-      const listingFee = calculateListingFee(data.listingType, data.duration);
       const { error: transactionError } = await supabase.from('transactions').insert({
-        seller_id: profile.user.id,
+        seller_id: user.id,
+        product_id: productData.id,
         amount: listingFee,
         payment_method: data.paymentMethod,
         status: 'pending'
@@ -143,12 +151,6 @@ export default function AddNewProduct() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const calculateListingFee = (listingType: string, duration: string): number => {
-    const durationHours = parseInt(duration);
-    const baseRate = listingType === 'featured' ? 25 : 10;
-    return baseRate * (durationHours / 24);
   };
 
   return (
