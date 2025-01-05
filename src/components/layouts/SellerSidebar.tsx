@@ -1,109 +1,65 @@
 import { Link, useLocation } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  Package, 
-  PlusCircle, 
-  DollarSign, 
-  BarChart, 
-  User,
-  X 
-} from "lucide-react";
+import { BarChart3, Package, CreditCard, Settings } from "lucide-react";
 import {
   Sidebar,
-  SidebarContent,
+  SidebarHeader,
+  SidebarNav,
+  SidebarNavHeader,
+  SidebarNavHeaderTitle,
+  SidebarNavMain,
+  SidebarNavLink,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarMenuContent,
+  SidebarMenuHeader,
+  SidebarMenuTrigger,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
-const sellerNavItems = [
-  {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-    href: "/seller",
-  },
-  {
-    title: "My Products",
-    icon: Package,
-    href: "/seller/products",
-  },
-  {
-    title: "Add Product",
-    icon: PlusCircle,
-    href: "/seller/add-product",
-  },
-  {
-    title: "Transactions",
-    icon: DollarSign,
-    href: "/seller/transactions",
-  },
-  {
-    title: "Analytics",
-    icon: BarChart,
-    href: "/seller/analytics",
-  },
-  {
-    title: "Profile",
-    icon: User,
-    href: "/seller/profile",
-  },
-];
-
-interface SellerSidebarProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export function SellerSidebar({ open, onOpenChange }: SellerSidebarProps) {
+export function SellerSidebar() {
   const location = useLocation();
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <Sidebar
-      className={cn(
-        "fixed left-0 top-0 z-20 h-full w-64 border-r bg-background transition-transform duration-300",
-        !open && "-translate-x-full"
-      )}
-    >
-      <div className="flex h-14 items-center justify-between border-b px-4">
-        <Link to="/seller" className="flex items-center space-x-2">
-          <span className="font-semibold">PushNshop Seller</span>
+    <Sidebar>
+      <SidebarHeader>
+        <Link to="/seller" className="flex items-center gap-2 font-semibold">
+          PushNshop Seller
         </Link>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => onOpenChange(false)}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {sellerNavItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    data-active={location.pathname === item.href}
-                  >
-                    <Link to={item.href} className="flex items-center space-x-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+      </SidebarHeader>
+      <SidebarNav>
+        <SidebarNavMain>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarNavLink asChild active={isActive("/seller/products")}>
+                <Link to="/seller/products">
+                  <Package className="h-4 w-4" />
+                  Products
+                </Link>
+              </SidebarNavLink>
+              <SidebarNavLink asChild active={isActive("/seller/transactions")}>
+                <Link to="/seller/transactions">
+                  <CreditCard className="h-4 w-4" />
+                  Transactions
+                </Link>
+              </SidebarNavLink>
+              <SidebarNavLink asChild active={isActive("/seller/analytics")}>
+                <Link to="/seller/analytics">
+                  <BarChart3 className="h-4 w-4" />
+                  Analytics
+                </Link>
+              </SidebarNavLink>
+              <SidebarNavLink asChild active={isActive("/seller/profile")}>
+                <Link to="/seller/profile">
+                  <Settings className="h-4 w-4" />
+                  Profile
+                </Link>
+              </SidebarNavLink>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarNavMain>
+      </SidebarNav>
     </Sidebar>
   );
 }
