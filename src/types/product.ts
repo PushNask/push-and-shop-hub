@@ -18,7 +18,7 @@ export interface Product {
   };
 }
 
-export type ProductRow = Product;
+export type ProductRow = Omit<Product, 'listingType' | 'seller'>;
 
 export const transformProduct = (product: ProductRow & { 
   profiles?: { 

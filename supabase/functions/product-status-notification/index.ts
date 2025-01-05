@@ -27,10 +27,6 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    if (!RESEND_API_KEY) {
-      throw new Error("RESEND_API_KEY is not configured");
-    }
-
     const { productId, status, feedback } = await req.json() as ProductStatusRequest;
 
     // Get product and seller details
@@ -56,13 +52,28 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Product details:", product);
     
-    const sellerEmail = product.profiles.email;
+    const sellerEmail = product.profiles?.email;
     if (!sellerEmail) {
       throw new Error("Seller email not found");
     }
 
     const statusText = status === "approved" ? "approved" : "rejected";
     const feedbackText = feedback ? `\n\nFeedback: ${feedback}` : "";
+
+    // Only attempt to send email if RESEND_API_KEY is configured
+    if (!RESEND_API_KEY) {
+      console.log("RESEND_API_KEY not configured, skipping email notification");
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          warning: "Email notification skipped - RESEND_API_KEY not configured" 
+        }), 
+        { 
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200 
+        }
+      );
+    }
 
     // Send email using Resend
     console.log("Sending email to:", sellerEmail);
