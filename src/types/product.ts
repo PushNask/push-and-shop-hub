@@ -2,7 +2,7 @@ export interface Product {
   id: string;
   seller_id: string;
   title: string;
-  description?: string;
+  description: string;
   price: number;
   currency: string;
   category: string;
@@ -12,9 +12,6 @@ export interface Product {
   link_slot: number;
   created_at?: string;
   listingType?: "featured" | "standard";
-  pickup?: boolean;
-  shipping?: boolean;
-  both?: boolean;
   seller?: {
     email: string;
     country: string;

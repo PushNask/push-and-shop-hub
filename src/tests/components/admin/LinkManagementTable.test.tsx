@@ -1,85 +1,68 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import { LinkManagementTable } from "@/components/admin/LinkManagementTable";
-import type { Product } from "@/types/product";
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import { BrowserRouter } from 'react-router-dom';
+import { Product } from '@/types/product';
 
-describe("LinkManagementTable", () => {
-  const mockOnAssignProduct = vi.fn();
-  const mockLinkSlots: Product[] = [
-    {
-      id: "1",
-      title: "Test Product",
-      description: "Test Description",
-      price: 100,
-      currency: "XAF",
-      category: "Electronics",
-      images: ["test.jpg"],
-      status: "approved",
-      link_slot: 1,
-      seller_id: "test-seller",
-      created_at: "2024-01-01",
-      expiry: "2024-12-31",
-      listingType: "featured",
-      seller: {
-        email: "test@example.com",
-        country: "Test Location"
-      }
-    },
-  ];
+const mockProduct: Product = {
+  id: '1',
+  seller_id: '123',
+  title: 'iPhone 13 Pro',
+  description: 'A great phone',
+  price: 750000,
+  currency: 'XAF',
+  category: 'Electronics',
+  status: 'pending',
+  expiry: '2024-12-31',
+  link_slot: 1,
+  listingType: 'featured',
+  seller: {
+    email: 'seller@example.com',
+    country: 'Cameroon',
+    phone: '+237123456789'
+  }
+};
 
-  it("renders table headers correctly", () => {
+describe('LinkManagementTable', () => {
+  it('renders the table with correct headers', () => {
     render(
-      <LinkManagementTable
-        linkSlots={mockLinkSlots}
-        onAssignProduct={mockOnAssignProduct}
-        isLoading={false}
-      />
+      <BrowserRouter>
+        <LinkManagementTable products={[mockProduct]} />
+      </BrowserRouter>
     );
-
-    expect(screen.getByText("Slot")).toBeInTheDocument();
-    expect(screen.getByText("Type")).toBeInTheDocument();
-    expect(screen.getByText("Current Product")).toBeInTheDocument();
-    expect(screen.getByText("Status")).toBeInTheDocument();
-    expect(screen.getByText("Actions")).toBeInTheDocument();
+    expect(screen.getByText('Product')).toBeInTheDocument();
+    expect(screen.getByText('Link Slot')).toBeInTheDocument();
+    expect(screen.getByText('Status')).toBeInTheDocument();
+    expect(screen.getByText('Expiry')).toBeInTheDocument();
   });
 
-  it("displays loading skeleton when isLoading is true", () => {
+  it('displays product information correctly', () => {
     render(
-      <LinkManagementTable
-        linkSlots={[]}
-        onAssignProduct={mockOnAssignProduct}
-        isLoading={true}
-      />
+      <BrowserRouter>
+        <LinkManagementTable products={[mockProduct]} />
+      </BrowserRouter>
     );
-
-    const skeletons = document.querySelectorAll(".animate-pulse");
-    expect(skeletons.length).toBeGreaterThan(0);
+    expect(screen.getByText('iPhone 13 Pro')).toBeInTheDocument();
+    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.getByText('pending')).toBeInTheDocument();
+    expect(screen.getByText('Dec 31, 2024')).toBeInTheDocument();
   });
 
-  it("shows correct badge for featured slots", () => {
+  it('shows empty state when no products', () => {
     render(
-      <LinkManagementTable
-        linkSlots={mockLinkSlots}
-        onAssignProduct={mockOnAssignProduct}
-        isLoading={false}
-      />
+      <BrowserRouter>
+        <LinkManagementTable products={[]} />
+      </BrowserRouter>
     );
-
-    const featuredBadge = screen.getByText("Featured");
-    expect(featuredBadge).toBeInTheDocument();
+    expect(screen.getByText('No products found')).toBeInTheDocument();
   });
 
-  it("disables assign button when isAssigning is true", () => {
+  it('formats dates correctly', () => {
     render(
-      <LinkManagementTable
-        linkSlots={mockLinkSlots}
-        onAssignProduct={mockOnAssignProduct}
-        isLoading={false}
-        isAssigning={true}
-      />
+      <BrowserRouter>
+        <LinkManagementTable products={[mockProduct]} />
+      </BrowserRouter>
     );
-
-    const assignButton = screen.getByText("Replace");
-    expect(assignButton).toBeDisabled();
+    const formattedDate = screen.getByText('Dec 31, 2024');
+    expect(formattedDate).toBeInTheDocument();
   });
 });
