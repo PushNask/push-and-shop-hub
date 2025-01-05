@@ -59,30 +59,16 @@ const adminLinks: SidebarLink[] = [
   },
 ];
 
-export function DashboardSidebar() {
-  const [isMobile, setIsMobile] = useState(false);
+function SidebarContent() {
   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    
-    return () => {
-      window.removeEventListener("resize", checkScreenSize);
-    };
-  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
   };
 
-  const SidebarContent = () => (
+  return (
     <div className="h-full flex flex-col">
       <div className="space-y-4 py-4 flex flex-col h-full">
         <div className="px-3 py-2">
@@ -123,6 +109,23 @@ export function DashboardSidebar() {
       </div>
     </div>
   );
+}
+
+export function DashboardSidebar() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    
+    return () => {
+      window.removeEventListener("resize", checkScreenSize);
+    };
+  }, []);
 
   if (isMobile) {
     return (

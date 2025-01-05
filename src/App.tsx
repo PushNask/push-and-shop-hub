@@ -37,7 +37,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          {/* Admin routes */}
+          {/* Admin routes - all wrapped in AdminLayout */}
           <Route path="/admin/analytics" element={<AdminAnalytics />} />
           <Route path="/admin/users" element={<AdminManagement />} />
           <Route path="/admin/links" element={<LinkManagement />} />
