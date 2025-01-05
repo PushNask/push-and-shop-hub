@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
+import { SellerLayout } from "@/components/layouts/SellerLayout";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
@@ -16,6 +17,10 @@ import AdminAnalytics from "@/pages/AdminAnalytics";
 import AdminManagement from "@/pages/AdminManagement";
 import TransactionHistory from "@/pages/TransactionHistory";
 import LinkManagement from "@/pages/LinkManagement";
+import MyProducts from "@/pages/MyProducts";
+import AddNewProduct from "@/pages/AddNewProduct";
+import PaymentHistory from "@/pages/PaymentHistory";
+import SellerAnalytics from "@/pages/SellerAnalytics";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,7 +37,7 @@ const queryClient = new QueryClient({
 });
 
 // Auth wrapper component to handle protected routes
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+const ProtectedRoute = ({ children, allowedRole }: { children: React.ReactNode; allowedRole: string }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,13 +54,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         .eq("id", user.id)
         .single();
 
-      if (!profile || profile.role !== "admin") {
+      if (!profile || profile.role !== allowedRole) {
         navigate("/login");
       }
     };
 
     checkAuth();
-  }, [navigate]);
+  }, [navigate, allowedRole]);
 
   return <>{children}</>;
 };
@@ -83,11 +88,11 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
-            {/* Admin routes - all wrapped in ProtectedRoute */}
+            {/* Admin routes */}
             <Route
               path="/admin"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRole="admin">
                   <AdminLayout />
                 </ProtectedRoute>
               }
@@ -102,8 +107,22 @@ function App() {
             </Route>
 
             {/* Seller routes */}
-            <Route path="/seller/profile" element={<SellerProfile />} />
-            
+            <Route
+              path="/seller"
+              element={
+                <ProtectedRoute allowedRole="seller">
+                  <SellerLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="/seller/products" replace />} />
+              <Route path="products" element={<MyProducts />} />
+              <Route path="add-product" element={<AddNewProduct />} />
+              <Route path="transactions" element={<PaymentHistory />} />
+              <Route path="analytics" element={<SellerAnalytics />} />
+              <Route path="profile" element={<SellerProfile />} />
+            </Route>
+
             {/* User routes */}
             <Route path="/profile" element={<UserProfile />} />
 
