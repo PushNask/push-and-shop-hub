@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -21,16 +21,26 @@ vi.mock('@/integrations/supabase/client', () => ({
       getUser: vi.fn(),
     },
     storage: {
-      from: vi.fn(),
+      from: vi.fn(() => ({
+        upload: vi.fn(),
+        getPublicUrl: vi.fn(),
+      })),
     },
-    from: vi.fn(),
+    from: vi.fn(() => ({
+      insert: vi.fn(() => ({
+        select: vi.fn(() => ({
+          single: vi.fn(),
+        })),
+      })),
+    })),
   },
 }));
 
 describe('AddNewProduct', () => {
+  const user = userEvent.setup();
+
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock authenticated user with complete User type
     vi.mocked(supabase.auth.getUser).mockResolvedValue({
       data: {
         user: {
@@ -62,40 +72,54 @@ describe('AddNewProduct', () => {
     expect(screen.getByText('Listing Type')).toBeInTheDocument();
   });
 
-  it('handles image upload', async () => {
+  it('handles form submission with valid data', async () => {
     render(
       <BrowserRouter>
         <AddNewProduct />
       </BrowserRouter>
     );
 
+    // Fill in form fields
+    await user.type(screen.getByLabelText('Title'), 'Test Product');
+    await user.type(screen.getByLabelText('Description'), 'Test Description of the product');
+    await user.type(screen.getByLabelText('Price (XAF)'), '1000');
+    
+    // Upload test image
     const file = new File(['test'], 'test.png', { type: 'image/png' });
     const input = screen.getByTestId('image-upload') as HTMLInputElement;
+    await user.upload(input, file);
 
-    await userEvent.upload(input, file);
+    // Select delivery option
+    await user.click(screen.getByLabelText('Pickup Available'));
 
-    expect(input.files).toHaveLength(1);
-    expect(input.files?.[0]).toBe(file);
+    // Submit form
+    await user.click(screen.getByRole('button', { name: /add product/i }));
+
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Product submitted for approval!');
+    });
   });
 
-  it('enforces maximum image limit', async () => {
+  it('validates file size and type', async () => {
     render(
       <BrowserRouter>
         <AddNewProduct />
       </BrowserRouter>
     );
 
-    const files = Array(8).fill(null).map((_, i) => 
-      new File(['test'], `test${i}.png`, { type: 'image/png' })
-    );
+    const largeFile = new File(['test'.repeat(1024 * 1024 * 6)], 'large.png', { type: 'image/png' });
+    const invalidFile = new File(['test'], 'test.txt', { type: 'text/plain' });
+    
     const input = screen.getByTestId('image-upload') as HTMLInputElement;
+    
+    await user.upload(input, largeFile);
+    expect(screen.getByText('Each file must be less than 5MB')).toBeInTheDocument();
 
-    await userEvent.upload(input, files);
-
-    expect(toast.error).toHaveBeenCalledWith('Maximum 7 images allowed');
+    await user.upload(input, invalidFile);
+    expect(screen.getByText('Only .jpg, .jpeg, .png and .webp formats are supported')).toBeInTheDocument();
   });
 
-  it('handles delivery options selection', async () => {
+  it('handles delivery options correctly', async () => {
     render(
       <BrowserRouter>
         <AddNewProduct />
@@ -106,16 +130,14 @@ describe('AddNewProduct', () => {
     const shippingCheckbox = screen.getByLabelText('Shipping Available');
     const bothCheckbox = screen.getByLabelText('Both Options Available');
 
-    await userEvent.click(bothCheckbox);
+    await user.click(bothCheckbox);
     expect(bothCheckbox).toBeChecked();
     expect(pickupCheckbox).not.toBeChecked();
     expect(shippingCheckbox).not.toBeChecked();
 
-    await userEvent.click(bothCheckbox);
-    await userEvent.click(pickupCheckbox);
+    await user.click(bothCheckbox);
+    await user.click(pickupCheckbox);
     expect(pickupCheckbox).toBeChecked();
     expect(bothCheckbox).not.toBeChecked();
   });
-
-  // Add more test cases as needed
 });
