@@ -125,9 +125,9 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
             seller={product.seller}
             expiry={product.expiry}
             deliveryOptions={{
-              pickup: product.pickup || false,
-              shipping: product.shipping || false,
-              both: product.both || false
+              pickup: product.pickup ?? false,
+              shipping: product.shipping ?? false,
+              both: product.both ?? false
             }}
             category={product.category}
             className={viewMode === 'list' ? "flex flex-row" : ""}

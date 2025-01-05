@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { Product } from '@/types/product';
+import { LinkManagementTable } from '@/pages/LinkManagement/LinkManagementTable';
 
 const mockProduct: Product = {
   id: '1',
@@ -14,6 +15,7 @@ const mockProduct: Product = {
   status: 'pending',
   expiry: '2024-12-31',
   link_slot: 1,
+  images: [],
   listingType: 'featured',
   seller: {
     email: 'seller@example.com',

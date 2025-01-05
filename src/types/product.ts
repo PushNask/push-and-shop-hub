@@ -6,7 +6,7 @@ export interface Product {
   price: number;
   currency: string;
   category: string;
-  images?: string[];
+  images: string[];
   status: string;
   expiry: string;
   link_slot: number;
@@ -17,6 +17,10 @@ export interface Product {
     country: string;
     phone?: string;
   };
+  // Add delivery options
+  pickup?: boolean;
+  shipping?: boolean;
+  both?: boolean;
 }
 
 export type ProductRow = Omit<Product, 'seller'>;
