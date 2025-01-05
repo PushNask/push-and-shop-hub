@@ -8,8 +8,16 @@ describe("LinkManagementTable", () => {
     {
       id: "1",
       title: "Test Product",
-      link_slot: 1,
+      description: "Test Description",
+      price: 100,
+      currency: "XAF",
+      category: "Electronics",
+      images: ["test.jpg"],
       status: "approved",
+      link_slot: 1,
+      seller_id: "test-seller",
+      created_at: "2024-01-01",
+      expiry: "2024-12-31"
     },
   ];
 

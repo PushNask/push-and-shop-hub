@@ -22,7 +22,8 @@ export const useLinkSlots = () => {
           status,
           expiry,
           link_slot,
-          seller:profiles(name:email, location:country)
+          created_at,
+          seller_id
         `)
         .not("link_slot", "is", null)
         .order("link_slot", { ascending: true });
@@ -64,7 +65,8 @@ export const useLinkSlots = () => {
     linkSlots,
     isLoading,
     error,
-    assignProduct: assignProductMutation.mutate,
+    assignProduct: (slot: number, productId: string) => 
+      assignProductMutation.mutate({ slot, productId }),
     isAssigning: assignProductMutation.isPending,
   };
 };

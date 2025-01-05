@@ -25,7 +25,10 @@ export const AdminList = ({ onRemoveAdmin }: AdminListProps) => {
         throw error;
       }
       
-      return data as Admin[];
+      return data.map(profile => ({
+        ...profile,
+        status: profile.is_verified ? "active" : "inactive"
+      })) as Admin[];
     },
   });
 
@@ -90,12 +93,12 @@ export const AdminList = ({ onRemoveAdmin }: AdminListProps) => {
                 <td className="p-4">
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      admin.is_verified
+                      admin.status === "active"
                         ? "bg-green-100 text-green-800"
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {admin.is_verified ? "Verified" : "Pending"}
+                    {admin.status}
                   </span>
                 </td>
                 <td className="p-4 text-right">

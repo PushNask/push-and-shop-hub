@@ -8,6 +8,7 @@ export interface Admin {
   created_at?: string;
   country?: string;
   phone?: string;
+  status: "active" | "inactive";
 }
 
 export interface NewAdmin {
