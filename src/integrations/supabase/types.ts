@@ -178,7 +178,21 @@ export type Database = {
             foreignKeyName: "transactions_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
+            referencedRelation: "featured_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "standard_products"
             referencedColumns: ["id"]
           },
           {
@@ -199,7 +213,60 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      featured_products: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          expiry: string | null
+          id: string | null
+          images: string[] | null
+          link_slot: number | null
+          price: number | null
+          seller_country: string | null
+          seller_email: string | null
+          seller_id: string | null
+          status: string | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      standard_products: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          expiry: string | null
+          id: string | null
+          images: string[] | null
+          link_slot: number | null
+          price: number | null
+          seller_country: string | null
+          seller_email: string | null
+          seller_id: string | null
+          status: string | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
