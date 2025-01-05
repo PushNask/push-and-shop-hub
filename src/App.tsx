@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { AdminLayout } from "@/components/layouts/AdminLayout";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import SignUp from "@/pages/SignUp";
@@ -37,13 +38,15 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          {/* Admin routes - all wrapped in AdminLayout */}
-          <Route path="/admin/analytics" element={<AdminAnalytics />} />
-          <Route path="/admin/users" element={<AdminManagement />} />
-          <Route path="/admin/links" element={<LinkManagement />} />
-          <Route path="/product-approvals" element={<ProductApprovals />} />
-          <Route path="/admin/transactions" element={<TransactionHistory />} />
-          <Route path="/admin/profile" element={<AdminProfile />} />
+          {/* Admin routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="users" element={<AdminManagement />} />
+            <Route path="links" element={<LinkManagement />} />
+            <Route path="product-approvals" element={<ProductApprovals />} />
+            <Route path="transactions" element={<TransactionHistory />} />
+            <Route path="profile" element={<AdminProfile />} />
+          </Route>
 
           {/* Seller routes */}
           <Route path="/seller/profile" element={<SellerProfile />} />
