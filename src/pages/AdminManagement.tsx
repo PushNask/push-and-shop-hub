@@ -4,7 +4,7 @@ import { AddAdminForm } from "@/components/admin/AddAdminForm";
 import { useAdminManagement } from "@/hooks/useAdminManagement";
 
 const AdminManagement = () => {
-  const { admins, newAdmin, setNewAdmin, handleAddAdmin, handleRemoveAdmin } = useAdminManagement();
+  const { newAdmin, setNewAdmin, handleAddAdmin, handleRemoveAdmin } = useAdminManagement();
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -20,10 +20,7 @@ const AdminManagement = () => {
           onAddAdmin={handleAddAdmin}
         />
 
-        <AdminList
-          admins={admins}
-          onRemoveAdmin={handleRemoveAdmin}
-        />
+        <AdminList onRemoveAdmin={handleRemoveAdmin} />
       </div>
     </div>
   );

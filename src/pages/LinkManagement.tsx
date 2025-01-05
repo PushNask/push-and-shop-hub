@@ -8,6 +8,10 @@ import { AlertCircle } from "lucide-react";
 export default function LinkManagement() {
   const { linkSlots, isLoading, error, assignProduct, isAssigning } = useLinkSlots();
 
+  const handleAssignProduct = async (slot: number, productId: string) => {
+    await assignProduct(slot, productId);
+  };
+
   return (
     <DashboardLayout title="Link Management" navItems={adminNavItems}>
       <div className="space-y-4">
@@ -29,7 +33,7 @@ export default function LinkManagement() {
 
         <LinkManagementTable
           linkSlots={linkSlots || []}
-          onAssignProduct={assignProduct}
+          onAssignProduct={handleAssignProduct}
           isLoading={isLoading}
           isAssigning={isAssigning}
         />

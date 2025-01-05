@@ -10,6 +10,7 @@ const INITIAL_ADMINS: Admin[] = [
     role: "super_admin",
     region: "cm-center",
     status: "active",
+    is_verified: true
   },
   {
     id: "2",
@@ -18,6 +19,7 @@ const INITIAL_ADMINS: Admin[] = [
     role: "admin",
     region: "cm-littoral",
     status: "active",
+    is_verified: true
   },
 ];
 
@@ -45,6 +47,7 @@ export const useAdminManagement = () => {
       ...newAdmin,
       role: newAdmin.role as "admin" | "super_admin",
       status: "active",
+      is_verified: true
     };
 
     setAdmins([...admins, admin]);
