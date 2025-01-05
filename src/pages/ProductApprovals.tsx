@@ -5,9 +5,11 @@ import { useProductApprovals } from "@/hooks/useProductApprovals";
 import { useProductList } from "@/hooks/useProductList";
 import { Loader2 } from "lucide-react";
 import { Product } from "@/types/product";
+import { useAdminAudit } from "@/hooks/useAdminAudit";
 
 const ProductApprovals = () => {
-  const { data: products, isLoading, error } = useProductList();
+  const { data: products, isLoading, error, refetch } = useProductList();
+  const { logAdminAction } = useAdminAudit();
   const {
     selectedProduct,
     setSelectedProduct,
@@ -17,6 +19,19 @@ const ProductApprovals = () => {
     setIsDialogOpen,
     handleAction,
   } = useProductApprovals();
+
+  const onReviewComplete = async (action: "approve" | "reject") => {
+    try {
+      await handleAction(action);
+      await logAdminAction(`product_${action}`, {
+        product_id: selectedProduct?.id,
+        feedback: feedback
+      });
+      await refetch();
+    } catch (error) {
+      console.error(`Error ${action}ing product:`, error);
+    }
+  };
 
   if (error) {
     return (
@@ -68,7 +83,7 @@ const ProductApprovals = () => {
         onOpenChange={setIsDialogOpen}
         feedback={feedback}
         onFeedbackChange={setFeedback}
-        onAction={handleAction}
+        onAction={onReviewComplete}
       />
     </div>
   );

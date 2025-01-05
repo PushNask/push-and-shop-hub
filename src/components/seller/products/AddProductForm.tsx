@@ -3,143 +3,92 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { useAddProduct } from "@/hooks/seller/useAddProduct";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { ProductDetailsSection } from "@/components/forms/ProductDetailsSection";
-import { CategorySection } from "@/components/forms/CategorySection";
 import { ImageUploadSection } from "@/components/forms/ImageUploadSection";
+import { CategorySection } from "@/components/forms/CategorySection";
 import { DeliveryOptionsSection } from "@/components/forms/DeliveryOptionsSection";
 import { ListingFeeSection } from "@/components/forms/ListingFeeSection";
-import { PaymentMethodSection } from "@/components/forms/PaymentMethodSection";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useAddProduct } from "@/hooks/seller/useAddProduct";
+import { useSession } from "@supabase/auth-helpers-react";
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-
-export const formSchema = z.object({
+const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-    message: "Price must be a valid number greater than 0",
-  }),
-  category: z.string({
-    required_error: "Please select a category",
-  }),
-  images: z.array(z.custom<File>())
-    .min(1, "At least one image is required")
-    .max(7, "Maximum 7 images allowed")
-    .refine(
-      (files) => files.every((file) => file.size <= MAX_FILE_SIZE),
-      `Each file must be less than 2MB`
-    )
-    .refine(
-      (files) => files.every((file) => ACCEPTED_IMAGE_TYPES.includes(file.type)),
-      "Only .jpg, .jpeg, .png and .webp formats are supported"
-    ),
+  price: z.number().positive("Price must be greater than 0"),
+  category: z.string().min(1, "Please select a category"),
+  images: z.array(z.string()).min(1, "At least one image is required"),
   pickup: z.boolean().optional(),
   shipping: z.boolean().optional(),
   both: z.boolean().optional(),
-  paymentMethod: z.enum(["cash", "online"]),
   listingType: z.enum(["standard", "featured"]),
-  duration: z.string(),
-}).refine((data) => data.pickup || data.shipping || data.both, {
-  message: "Select at least one delivery option",
-  path: ["delivery"],
+  duration: z.string()
 });
 
-export type AddProductFormValues = z.infer<typeof formSchema>;
-
 export function AddProductForm() {
-  const { mutate: addProduct, isPending } = useAddProduct();
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const navigate = useNavigate();
+  const session = useSession();
+  const { mutate: addProduct, isLoading } = useAddProduct();
 
-  const form = useForm<AddProductFormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
+    resolver: zodResolver(productSchema),
     defaultValues: {
       title: "",
       description: "",
-      price: "",
+      price: 0,
       category: "",
       images: [],
       pickup: false,
       shipping: false,
       both: false,
-      paymentMethod: "cash",
       listingType: "standard",
-      duration: "24",
-    },
+      duration: "24"
+    }
   });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const totalImages = imageFiles.length + files.length;
-
-    if (totalImages > 7) {
-      toast.error("Maximum 7 images allowed");
+  const onSubmit = async (data: z.infer<typeof productSchema>) => {
+    if (!session?.user?.id) {
+      toast.error("You must be logged in to add a product");
       return;
     }
 
-    // Validate file size and type
-    const invalidFiles = files.filter(
-      file => file.size > MAX_FILE_SIZE || !ACCEPTED_IMAGE_TYPES.includes(file.type)
-    );
-
-    if (invalidFiles.length > 0) {
-      toast.error(`Some files were rejected. Please ensure all files are images under 2MB`);
+    if (!data.pickup && !data.shipping && !data.both) {
+      toast.error("Please select at least one delivery option");
       return;
     }
 
-    // Create URLs for preview
-    const newImageUrls = files.map(file => URL.createObjectURL(file));
-    const updatedImageFiles = [...imageFiles, ...files];
-    
-    setImageUrls(prev => [...prev, ...newImageUrls]);
-    setImageFiles(updatedImageFiles);
-    form.setValue('images', updatedImageFiles);
-  };
+    try {
+      await addProduct({
+        ...data,
+        seller_id: session.user.id,
+        currency: "XAF",
+        status: "pending"
+      });
 
-  const handleImageRemove = (index: number) => {
-    URL.revokeObjectURL(imageUrls[index]); // Clean up the URL
-    setImageUrls(prev => prev.filter((_, i) => i !== index));
-    const updatedImageFiles = imageFiles.filter((_, i) => i !== index);
-    setImageFiles(updatedImageFiles);
-    form.setValue('images', updatedImageFiles);
-  };
-
-  const onSubmit = (data: AddProductFormValues) => {
-    if (imageFiles.length === 0) {
-      toast.error("Please upload at least one image");
-      return;
+      toast.success("Product submitted for approval!");
+      navigate("/seller/products");
+    } catch (error) {
+      console.error("Error adding product:", error);
+      toast.error("Failed to add product. Please try again.");
     }
-    addProduct({ ...data, images: imageFiles });
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <ProductDetailsSection form={form} />
+        <ImageUploadSection form={form} />
         <CategorySection form={form} />
-        <ImageUploadSection 
-          form={form}
-          imageUrls={imageUrls}
-          onImageChange={handleImageChange}
-          onImageRemove={handleImageRemove}
-        />
         <DeliveryOptionsSection form={form} />
         <ListingFeeSection form={form} />
-        <PaymentMethodSection form={form} />
-
-        <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Adding Product...
-            </>
-          ) : (
-            "Add Product"
-          )}
+        
+        <Button 
+          type="submit" 
+          className="w-full" 
+          disabled={isLoading}
+        >
+          {isLoading ? "Submitting..." : "Add Product"}
         </Button>
       </form>
     </Form>
