@@ -7,6 +7,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
+    detectSessionInUrl: true,
+  },
+  headers: {
+    'X-Client-Info': 'pushnshop-web',
+  },
+  global: {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  },
 });

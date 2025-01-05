@@ -52,20 +52,30 @@ export default function UserProfile() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError) throw authError;
         
         if (!user) {
           navigate("/login");
           return;
         }
 
-        const { data: profile, error } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", user.id)
           .single();
 
-        if (error) throw error;
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          toast({
+            title: "Error",
+            description: "Failed to load profile. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
 
         if (profile) {
           form.reset({
@@ -92,14 +102,16 @@ export default function UserProfile() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) throw authError;
       
       if (!user) {
         navigate("/login");
         return;
       }
 
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from("profiles")
         .update({
           phone: values.phone,
@@ -107,7 +119,7 @@ export default function UserProfile() {
         })
         .eq("id", user.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
       toast({
         title: "Profile Updated",
@@ -243,4 +255,4 @@ export default function UserProfile() {
       </div>
     </div>
   );
-}
+};
