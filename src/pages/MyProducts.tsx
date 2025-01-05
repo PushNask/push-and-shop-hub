@@ -6,57 +6,77 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { ProductCard } from "@/components/ProductCard";
 import { Loader2 } from "lucide-react";
-
-// Mock data - replace with actual data fetching
-const MOCK_PRODUCTS = [
-  {
-    id: "1",
-    title: "Premium Smartphone",
-    price: 750000,
-    image: "/placeholder.svg",
-    status: "active",
-    expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
-  },
-  {
-    id: "2",
-    title: "Laptop",
-    price: 450000,
-    image: "/placeholder.svg",
-    status: "expired",
-    expiresAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-  },
-  {
-    id: "3",
-    title: "Wireless Earbuds",
-    price: 25000,
-    image: "/placeholder.svg",
-    status: "pending",
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-  },
-];
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import type { Product } from "@/types/product";
 
 const MyProducts = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [products, setProducts] = useState(MOCK_PRODUCTS);
+  const queryClient = useQueryClient();
+
+  // Fetch products
+  const { data: products = [], isLoading: isLoadingProducts } = useQuery({
+    queryKey: ['seller-products'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('seller_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as Product[];
+    }
+  });
+
+  // Relist product mutation
+  const { mutate: relistProduct } = useMutation({
+    mutationFn: async (productId: string) => {
+      const { error } = await supabase
+        .from('products')
+        .update({ 
+          status: 'pending',
+          expiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() 
+        })
+        .eq('id', productId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['seller-products'] });
+      toast.success("Product relisted successfully!");
+    },
+    onError: () => {
+      toast.error("Failed to relist product");
+    }
+  });
+
+  // Remove product mutation
+  const { mutate: removeProduct } = useMutation({
+    mutationFn: async (productId: string) => {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['seller-products'] });
+      toast.success("Product removed successfully!");
+    },
+    onError: () => {
+      toast.error("Failed to remove product");
+    }
+  });
 
   const handleRelist = async (productId: string) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update product status
-      setProducts(prevProducts =>
-        prevProducts.map(product =>
-          product.id === productId
-            ? { ...product, status: "active", expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }
-            : product
-        )
-      );
-      
-      toast.success("Product relisted successfully!");
-    } catch (error) {
-      toast.error("Failed to relist product");
+      await relistProduct(productId);
     } finally {
       setIsLoading(false);
     }
@@ -65,17 +85,7 @@ const MyProducts = () => {
   const handleRemove = async (productId: string) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Remove product from list
-      setProducts(prevProducts =>
-        prevProducts.filter(product => product.id !== productId)
-      );
-      
-      toast.success("Product removed successfully!");
-    } catch (error) {
-      toast.error("Failed to remove product");
+      await removeProduct(productId);
     } finally {
       setIsLoading(false);
     }
@@ -94,6 +104,14 @@ const MyProducts = () => {
       </Badge>
     );
   };
+
+  if (isLoadingProducts) {
+    return (
+      <div className="container py-6 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="container py-6 space-y-6">
@@ -120,10 +138,10 @@ const MyProducts = () => {
                         <ProductCard
                           title={product.title}
                           price={product.price}
-                          image={product.image}
+                          image={product.images?.[0] || '/placeholder.svg'}
                         />
                         <div className="absolute top-2 right-2">
-                          {getStatusBadge(product.status)}
+                          {getStatusBadge(product.status || 'pending')}
                         </div>
                         <div className="mt-2 flex gap-2 justify-end">
                           {product.status === "expired" && (
