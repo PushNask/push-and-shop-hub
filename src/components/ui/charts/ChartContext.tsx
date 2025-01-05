@@ -1,9 +1,5 @@
 import * as React from "react"
-import { ChartConfig } from "./types"
-
-type ChartContextProps = {
-  config: ChartConfig
-}
+import { ChartConfig, ChartContextProps } from "./types"
 
 export const ChartContext = React.createContext<ChartContextProps | null>(null)
 

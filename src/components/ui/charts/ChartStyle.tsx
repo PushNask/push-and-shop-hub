@@ -1,7 +1,5 @@
 import * as React from "react"
-import { ChartConfig } from "./types"
-
-const THEMES = { light: "", dark: ".dark" } as const
+import { ChartConfig, THEMES } from "./types"
 
 export const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(

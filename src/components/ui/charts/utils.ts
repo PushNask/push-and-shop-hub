@@ -1,5 +1,6 @@
 import { ChartConfig } from "./types"
 
+// Helper to extract item config from a payload.
 export function getPayloadConfigFromPayload(
   config: ChartConfig,
   payload: unknown,

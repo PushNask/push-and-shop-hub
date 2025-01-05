@@ -1,11 +1,5 @@
-import { ChartContainer } from "./ChartContainer"
-import { ChartTooltip, ChartTooltipContent } from "./ChartTooltip"
-import { ChartLegend, ChartLegendContent } from "./ChartLegend"
-
-export {
-  ChartContainer as Chart,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-}
+export * from "./ChartContainer"
+export * from "./ChartTooltip"
+export * from "./ChartLegend"
+export * from "./ChartStyle"
+export * from "./types"
