@@ -6,15 +6,16 @@ import matchers from '@testing-library/jest-dom/matchers';
 // Extend Vitest's expect method with methods from react-testing-library
 expect.extend(matchers);
 
-// Make Vitest's test runners available globally
+// Extend the global type with Vitest's test runners
 declare global {
-  export const describe: typeof import('vitest')['describe'];
-  export const it: typeof import('vitest')['it'];
-  export const expect: typeof import('vitest')['expect'];
-  export const beforeEach: typeof import('vitest')['beforeEach'];
-  export const vi: typeof import('vitest')['vi'];
+  var describe: typeof import('vitest')['describe'];
+  var it: typeof import('vitest')['it'];
+  var expect: typeof import('vitest')['expect'];
+  var beforeEach: typeof import('vitest')['beforeEach'];
+  var vi: typeof import('vitest')['vi'];
 }
 
+// Assign test runners to global scope
 globalThis.describe = describe;
 globalThis.it = it;
 globalThis.expect = expect;
