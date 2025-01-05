@@ -1,14 +1,9 @@
-import { useState } from "react";
 import { useProducts } from "@/hooks/useProducts";
-import { ProductCard } from "@/components/ProductCard";
+import { ProductDisplay } from "@/components/ProductDisplay";
 import { ProductCarousel } from "@/components/ProductCarousel";
-import { Pagination } from "@/components/ui/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
-import { transformProduct } from "@/types/product";
 
 export default function Index() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const { data: products, isLoading, error } = useProducts(currentPage);
+  const { data: products, isLoading, error } = useProducts();
 
   if (error) {
     return (
@@ -21,55 +16,20 @@ export default function Index() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Featured Products Section */}
-      <section>
-        <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-[300px] w-full" />
-            ))}
-          </div>
-        ) : (
-          <ProductCarousel 
-            products={products?.featured.map(transformProduct) || []} 
-          />
-        )}
-      </section>
+      {products?.featured && products.featured.length > 0 && (
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
+          <ProductCarousel products={products.featured} />
+        </section>
+      )}
 
       {/* Standard Products Section */}
       <section>
         <h2 className="text-2xl font-bold mb-4">All Products</h2>
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(12)].map((_, i) => (
-              <Skeleton key={i} className="h-[300px] w-full" />
-            ))}
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {products?.standard.map(transformProduct).map((product) => (
-                <ProductCard
-                  key={product.id}
-                  title={product.title}
-                  price={product.price}
-                  images={product.images}
-                />
-              ))}
-            </div>
-            
-            {products?.totalPages > 1 && (
-              <div className="mt-8">
-                <Pagination
-                  className="justify-center"
-                  count={products.totalPages}
-                  page={currentPage}
-                  onPageChange={(page) => setCurrentPage(page)}
-                />
-              </div>
-            )}
-          </>
-        )}
+        <ProductDisplay 
+          products={products?.standard || []} 
+          isLoading={isLoading}
+        />
       </section>
     </div>
   );
