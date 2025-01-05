@@ -42,7 +42,6 @@ export const ProductActions = ({ status, isLoading, onRelist, onRemove }: Produc
             disabled={isLoading}
             className="flex-1"
           >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Remove
           </Button>
         </AlertDialogTrigger>
@@ -55,7 +54,16 @@ export const ProductActions = ({ status, isLoading, onRelist, onRemove }: Produc
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onRemove}>Remove</AlertDialogAction>
+            <AlertDialogAction 
+              onClick={onRemove}
+              disabled={isLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              Remove
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
