@@ -1,30 +1,9 @@
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Admin, NewAdmin } from "@/types/admin";
-
-const INITIAL_ADMINS: Admin[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    role: "super_admin",
-    region: "cm-center",
-    status: "active",
-    is_verified: true
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "admin",
-    region: "cm-littoral",
-    status: "active",
-    is_verified: true
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export const useAdminManagement = () => {
-  const [admins, setAdmins] = useState<Admin[]>(INITIAL_ADMINS);
   const [newAdmin, setNewAdmin] = useState<NewAdmin>({
     name: "",
     email: "",
@@ -32,42 +11,67 @@ export const useAdminManagement = () => {
     region: "",
   });
 
-  const handleAddAdmin = () => {
-    if (!newAdmin.name || !newAdmin.email || !newAdmin.region) {
+  const handleAddAdmin = async () => {
+    try {
+      if (!newAdmin.name || !newAdmin.email || !newAdmin.region) {
+        toast({
+          title: "Missing Information",
+          description: "Please fill in all required fields.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .insert([
+          {
+            ...newAdmin,
+            role: newAdmin.role as "admin" | "super_admin",
+            is_verified: true,
+          },
+        ]);
+
+      if (error) throw error;
+
+      setNewAdmin({ name: "", email: "", role: "admin", region: "" });
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
+        title: "Admin Added",
+        description: `${newAdmin.name} has been added as an admin.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add admin",
         variant: "destructive",
       });
-      return;
     }
-
-    const admin: Admin = {
-      id: (admins.length + 1).toString(),
-      ...newAdmin,
-      role: newAdmin.role as "admin" | "super_admin",
-      status: "active",
-      is_verified: true
-    };
-
-    setAdmins([...admins, admin]);
-    setNewAdmin({ name: "", email: "", role: "admin", region: "" });
-    toast({
-      title: "Admin Added",
-      description: `${admin.name} has been added as an admin.`,
-    });
   };
 
-  const handleRemoveAdmin = (adminId: string) => {
-    setAdmins(admins.filter((admin) => admin.id !== adminId));
-    toast({
-      title: "Admin Removed",
-      description: "The admin has been removed successfully.",
-    });
+  const handleRemoveAdmin = async (adminId: string) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", adminId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Admin Removed",
+        description: "The admin has been removed successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove admin",
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
   return {
-    admins,
     newAdmin,
     setNewAdmin,
     handleAddAdmin,

@@ -9,6 +9,70 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_audit_logs: {
+        Row: {
+          action: string
+          admin_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_audit_logs_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_permissions: {
+        Row: {
+          admin_id: string | null
+          created_at: string | null
+          id: string
+          permission: string
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string | null
+          id?: string
+          permission: string
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string | null
+          id?: string
+          permission?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_permissions_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analytics: {
         Row: {
           active_products: number | null
@@ -108,29 +172,41 @@ export type Database = {
       }
       profiles: {
         Row: {
+          assigned_regions: string[] | null
           country: string | null
           created_at: string | null
           email: string
+          failed_login_attempts: number | null
           id: string
           is_verified: boolean | null
+          last_login: string | null
+          password_changed_at: string | null
           phone: string | null
           role: string
         }
         Insert: {
+          assigned_regions?: string[] | null
           country?: string | null
           created_at?: string | null
           email: string
+          failed_login_attempts?: number | null
           id: string
           is_verified?: boolean | null
+          last_login?: string | null
+          password_changed_at?: string | null
           phone?: string | null
           role?: string
         }
         Update: {
+          assigned_regions?: string[] | null
           country?: string | null
           created_at?: string | null
           email?: string
+          failed_login_attempts?: number | null
           id?: string
           is_verified?: boolean | null
+          last_login?: string | null
+          password_changed_at?: string | null
           phone?: string | null
           role?: string
         }
