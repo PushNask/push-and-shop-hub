@@ -3,7 +3,7 @@ import { ChartTooltip, ChartTooltipContent } from "./ChartTooltip"
 import { ChartLegend, ChartLegendContent } from "./ChartLegend"
 
 export {
-  ChartContainer,
+  ChartContainer as Chart,
   ChartTooltip,
   ChartTooltipContent,
   ChartLegend,
