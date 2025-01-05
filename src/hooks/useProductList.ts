@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ProductRow } from "@/types/product";
+import type { ProductRow } from "@/types/product";
 
 export const useProductList = () => {
   return useQuery({
@@ -9,15 +9,7 @@ export const useProductList = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select(`
-          *,
-          seller:profiles(
-            name:email,
-            location:country,
-            rating:is_verified,
-            joinedDate:created_at
-          )
-        `)
+        .select("*, profiles(email, country)")
         .eq("status", "pending")
         .order("created_at", { ascending: false });
 

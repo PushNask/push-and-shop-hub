@@ -10,16 +10,20 @@ export const useProducts = (page = 1, limit = 12) => {
       
       // Fetch featured products (slots 1-12)
       const { data: featuredProducts, error: featuredError } = await supabase
-        .from("featured_products")
-        .select("*")
+        .from("products")
+        .select("*, profiles(email, country)")
+        .eq("status", "approved")
+        .lte("link_slot", 12)
         .order("link_slot", { ascending: true });
 
       if (featuredError) throw featuredError;
 
       // Fetch standard products with pagination (slots 13-120)
       const { data: standardProducts, error: standardError, count } = await supabase
-        .from("standard_products")
-        .select("*", { count: "exact" })
+        .from("products")
+        .select("*, profiles(email, country)", { count: "exact" })
+        .eq("status", "approved")
+        .gt("link_slot", 12)
         .range(offset, offset + limit - 1)
         .order("created_at", { ascending: false });
 
