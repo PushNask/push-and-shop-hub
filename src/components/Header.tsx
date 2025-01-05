@@ -65,7 +65,7 @@ export function Header() {
       case "admin":
         return "/admin/analytics";
       case "seller":
-        return "/seller/profile";
+        return "/seller/products";
       default:
         return "/profile";
     }

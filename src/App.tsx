@@ -22,11 +22,7 @@ import AddNewProduct from "@/pages/AddNewProduct";
 import PaymentHistory from "@/pages/PaymentHistory";
 import SellerAnalytics from "@/pages/SellerAnalytics";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
-// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -35,35 +31,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-// Auth wrapper component to handle protected routes
-const ProtectedRoute = ({ children, allowedRole }: { children: React.ReactNode; allowedRole: string }) => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/login");
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-
-      if (!profile || profile.role !== allowedRole) {
-        navigate("/login");
-      }
-    };
-
-    checkAuth();
-  }, [navigate, allowedRole]);
-
-  return <>{children}</>;
-};
 
 function App() {
   return (
@@ -89,15 +56,8 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
             {/* Admin routes */}
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute allowedRole="admin">
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/admin/product-approvals" replace />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Navigate to="/admin/analytics" replace />} />
               <Route path="analytics" element={<AdminAnalytics />} />
               <Route path="users" element={<AdminManagement />} />
               <Route path="links" element={<LinkManagement />} />
@@ -107,14 +67,7 @@ function App() {
             </Route>
 
             {/* Seller routes */}
-            <Route
-              path="/seller"
-              element={
-                <ProtectedRoute allowedRole="seller">
-                  <SellerLayout />
-                </ProtectedRoute>
-              }
-            >
+            <Route path="/seller" element={<SellerLayout />}>
               <Route index element={<Navigate to="/seller/products" replace />} />
               <Route path="products" element={<MyProducts />} />
               <Route path="add-product" element={<AddNewProduct />} />

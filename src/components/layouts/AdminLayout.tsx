@@ -1,48 +1,18 @@
-import { Outlet, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { Outlet } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { AdminAuthGuard } from "@/components/admin/AdminAuthGuard";
+import { adminNavItems } from "@/components/admin/navigation/AdminNav";
 
 export function AdminLayout() {
-  const navigate = useNavigate();
-  
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("Not authenticated");
-      }
-      
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-        
-      if (error || !profile || profile.role !== "admin") {
-        throw new Error("Not authorized");
-      }
-        
-      return profile;
-    },
-  });
-
-  useEffect(() => {
-    if (!isLoading && (!profile || profile.role !== "admin")) {
-      navigate("/login");
-    }
-  }, [profile, isLoading, navigate]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <DashboardLayout title={getTitleFromPath(window.location.pathname)}>
-      <Outlet />
-    </DashboardLayout>
+    <AdminAuthGuard>
+      <DashboardLayout 
+        title={getTitleFromPath(window.location.pathname)}
+        navItems={adminNavItems}
+      >
+        <Outlet />
+      </DashboardLayout>
+    </AdminAuthGuard>
   );
 }
 
