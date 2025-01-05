@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { ProfileCard } from "@/components/profile/ProfileCard";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useSession } from "@supabase/auth-helpers-react";
-import { ProfileCard } from "@/components/profile/ProfileCard";
 
 export default function SellerProfile() {
+  const session = useSession();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const session = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Default values for the form
   const defaultValues = {
     email: session?.user?.email || "",
     phone: "",
