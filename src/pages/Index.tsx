@@ -53,7 +53,7 @@ export default function Index() {
                   key={product.id}
                   title={product.title}
                   price={product.price}
-                  image={product.images?.[0] || "/placeholder.svg"}
+                  images={product.images}
                 />
               ))}
             </div>

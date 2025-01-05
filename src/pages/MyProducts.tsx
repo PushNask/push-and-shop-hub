@@ -138,7 +138,7 @@ const MyProducts = () => {
                         <ProductCard
                           title={product.title}
                           price={product.price}
-                          image={product.images?.[0] || '/placeholder.svg'}
+                          images={product.images}
                         />
                         <div className="absolute top-2 right-2">
                           {getStatusBadge(product.status || 'pending')}

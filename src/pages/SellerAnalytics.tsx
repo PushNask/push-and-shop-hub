@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/charts";
+import { Chart, ChartTooltip } from "@/components/ui/charts";
 import { LineChart, Line, XAxis, YAxis } from "recharts";
 import { Eye, MessageCircle, Package, TrendingUp } from "lucide-react";
 
@@ -102,7 +102,7 @@ const SellerAnalytics = () => {
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
-            <ChartContainer config={chartConfig}>
+            <Chart config={chartConfig}>
               <LineChart data={analyticsData.weeklyStats}>
                 <XAxis dataKey="date" />
                 <YAxis />
@@ -149,7 +149,7 @@ const SellerAnalytics = () => {
                   dot={false}
                 />
               </LineChart>
-            </ChartContainer>
+            </Chart>
           </div>
         </CardContent>
       </Card>
