@@ -36,12 +36,21 @@ export const PendingProductCard = ({ product, onReview }: PendingProductCardProp
     });
   };
 
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "XAF",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardContent className="p-4">
         <div className="aspect-square mb-4 overflow-hidden rounded-lg bg-gray-100">
           <img
-            src={product.images[0]}
+            src={product.images?.[0] || "/placeholder.svg"}
             alt={product.title}
             className="h-full w-full object-cover"
           />
@@ -71,12 +80,12 @@ export const PendingProductCard = ({ product, onReview }: PendingProductCardProp
           
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
-            <span>Submitted: {formatDate(product.submittedAt)}</span>
+            <span>Submitted: {formatDate(product.submittedAt || product.created_at)}</span>
           </div>
           
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Package className="h-4 w-4" />
-            <span>XAF {product.price.toLocaleString()}</span>
+            <span>{formatPrice(product.price)}</span>
           </div>
           
           <Button 

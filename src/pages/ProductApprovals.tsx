@@ -1,70 +1,70 @@
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { PendingProductCard } from "@/components/admin/PendingProductCard";
 import { ProductReviewDialog } from "@/components/admin/ProductReviewDialog";
-import { useProductApprovals } from "@/hooks/useProductApprovals";
+import { useProductApproval } from "@/hooks/useProductApproval";
+import { useProductList } from "@/hooks/useProductList";
 import { adminNavItems } from "@/components/admin/navigation/AdminNav";
-
-// Mock data with proper UUID format
-const MOCK_PENDING_PRODUCTS = [
-  {
-    id: "123e4567-e89b-12d3-a456-426614174000",
-    title: "iPhone 13 Pro",
-    description: "Latest model with advanced features",
-    price: 750000,
-    category: "Electronics",
-    images: ["/placeholder.svg"],
-    listingType: "featured" as const,
-    seller: {
-      name: "Tech Store",
-      rating: 4.5,
-      location: "Douala, Cameroon",
-      joinedDate: "2023-12-01"
-    },
-    submittedAt: "2024-02-20T10:00:00Z"
-  },
-  {
-    id: "223e4567-e89b-12d3-a456-426614174001",
-    title: "Samsung TV",
-    description: "50-inch Smart TV",
-    price: 450000,
-    category: "Electronics",
-    images: ["/placeholder.svg"],
-    listingType: "standard" as const,
-    seller: {
-      name: "Electronics Hub",
-      rating: 4.2,
-      location: "Yaoundé, Cameroon",
-      joinedDate: "2023-11-15"
-    },
-    submittedAt: "2024-02-19T15:30:00Z"
-  }
-];
+import { Loader2 } from "lucide-react";
 
 const ProductApprovals = () => {
-  const {
-    selectedProduct,
-    setSelectedProduct,
-    feedback,
-    setFeedback,
-    isDialogOpen,
-    setIsDialogOpen,
-    handleAction
-  } = useProductApprovals();
+  const { data: products, isLoading, error } = useProductList();
+  const { mutate: handleApproval } = useProductApproval();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [feedback, setFeedback] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleAction = (action: "approve" | "reject") => {
+    if (!selectedProduct?.id) return;
+
+    handleApproval({
+      productId: selectedProduct.id,
+      action,
+      feedback: feedback.trim() || undefined,
+    });
+    
+    setIsDialogOpen(false);
+    setFeedback("");
+    setSelectedProduct(null);
+  };
+
+  if (error) {
+    return (
+      <DashboardLayout title="Product Approvals" navItems={adminNavItems}>
+        <div className="flex flex-col items-center justify-center h-[50vh] text-center">
+          <p className="text-red-500 mb-2">Failed to load pending products</p>
+          <p className="text-sm text-muted-foreground">Please try again later</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout title="Product Approvals" navItems={adminNavItems}>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-fadeIn">
-        {MOCK_PENDING_PRODUCTS.map((product) => (
-          <PendingProductCard
-            key={product.id}
-            product={product}
-            onReview={(product) => {
-              setSelectedProduct(product);
-              setIsDialogOpen(true);
-            }}
-          />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : products?.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-[50vh] text-center">
+          <p className="text-lg font-semibold mb-2">No pending approvals</p>
+          <p className="text-sm text-muted-foreground">
+            All product submissions have been reviewed
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-fadeIn">
+          {products?.map((product) => (
+            <PendingProductCard
+              key={product.id}
+              product={product}
+              onReview={(product) => {
+                setSelectedProduct(product);
+                setIsDialogOpen(true);
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       <ProductReviewDialog
         product={selectedProduct}
