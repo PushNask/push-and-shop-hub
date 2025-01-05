@@ -10,11 +10,6 @@ import {
   SidebarNavLink,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuContent,
-  SidebarMenuHeader,
-  SidebarMenuTrigger,
 } from "@/components/ui/sidebar";
 
 export function SellerSidebar() {

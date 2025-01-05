@@ -18,6 +18,13 @@ import {
   SidebarInput,
   SidebarSeparator,
 } from "./sidebar-layout"
+import {
+  SidebarNav,
+  SidebarNavHeader,
+  SidebarNavHeaderTitle,
+  SidebarNavMain,
+  SidebarNavLink,
+} from "./sidebar-nav"
 
 function SidebarTrigger({
   className,
@@ -56,6 +63,11 @@ export {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarNav,
+  SidebarNavHeader,
+  SidebarNavHeaderTitle,
+  SidebarNavMain,
+  SidebarNavLink,
   SidebarProvider,
   SidebarSeparator,
   SidebarTrigger,
