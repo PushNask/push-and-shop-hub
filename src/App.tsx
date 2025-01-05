@@ -38,26 +38,9 @@ function App() {
       <Router>
         <div className="min-h-screen flex flex-col">
           <Routes>
-            {/* Public routes */}
-            <Route
-              path="/"
-              element={
-                <>
-                  <Header />
-                  <main className="flex-1">
-                    <Index />
-                  </main>
-                  <Footer />
-                </>
-              }
-            />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-
-            {/* Admin routes */}
+            {/* Admin routes - placing these first for correct route precedence */}
             <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Navigate to="/admin/analytics" replace />} />
+              <Route index element={<Navigate to="/admin/product-approvals" replace />} />
               <Route path="analytics" element={<AdminAnalytics />} />
               <Route path="users" element={<AdminManagement />} />
               <Route path="links" element={<LinkManagement />} />
@@ -76,7 +59,24 @@ function App() {
               <Route path="profile" element={<SellerProfile />} />
             </Route>
 
-            {/* User routes */}
+            {/* Public routes */}
+            <Route
+              path="/"
+              element={
+                <>
+                  <Header />
+                  <main className="flex-1">
+                    <Index />
+                  </main>
+                  <Footer />
+                </>
+              }
+            />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+
+            {/* User routes - placing this after admin/seller routes */}
             <Route path="/profile" element={<UserProfile />} />
 
             {/* Catch-all redirect */}
