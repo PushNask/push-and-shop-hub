@@ -21,7 +21,7 @@ export function ProductCarousel({ products }: ProductCarouselProps) {
             <ProductCard
               title={product.title}
               price={product.price}
-              image={product.image}
+              images={product.images}
             />
           </CarouselItem>
         ))}

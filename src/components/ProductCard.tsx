@@ -7,17 +7,17 @@ import { toast } from "sonner";
 interface ProductCardProps {
   title: string;
   price: number;
-  image?: string; // Made optional to match database type
+  images?: string[]; // Changed from image to images
   className?: string;
 }
 
-export function ProductCard({ title, price, image, className }: ProductCardProps) {
+export function ProductCard({ title, price, images, className }: ProductCardProps) {
   const shareUrl = window.location.href;
   const shareText = `Check out ${title} on PushNshop!`;
 
   const shareHandlers = {
     message: (e: React.MouseEvent) => {
-      e.preventDefault(); // Prevent navigation
+      e.preventDefault();
       window.open(`sms:?body=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, '_blank');
       toast.success("Opening messaging app...");
     },
@@ -51,7 +51,7 @@ export function ProductCard({ title, price, image, className }: ProductCardProps
       <Link to={`/p/${title.toLowerCase().replace(/\s+/g, '-')}/details`}>
         <div className="aspect-square overflow-hidden bg-gray-100">
           <img
-            src={image}
+            src={images?.[0] || "/placeholder.svg"}
             alt={title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
