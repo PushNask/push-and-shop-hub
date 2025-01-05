@@ -68,8 +68,16 @@ const ProductApprovals = () => {
                   joinedDate: product.seller?.joinedDate || product.created_at || new Date().toISOString()
                 }
               }}
-              onReview={(product) => {
-                setSelectedProduct(product);
+              onReview={(p) => {
+                setSelectedProduct({
+                  ...p,
+                  currency: product.currency,
+                  expiry: product.expiry,
+                  link_slot: product.link_slot,
+                  seller_id: product.seller_id,
+                  status: product.status,
+                  created_at: product.created_at
+                });
                 setIsDialogOpen(true);
               }}
             />
