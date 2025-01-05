@@ -42,11 +42,11 @@ const ProductApprovals = () => {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-fadeIn">
-          {products?.map((product) => (
+          {products?.map((product: Product) => (
             <PendingProductCard
               key={product.id}
               product={product}
-              onReview={(p) => {
+              onReview={(p: Product) => {
                 setSelectedProduct(p);
                 setIsDialogOpen(true);
               }}

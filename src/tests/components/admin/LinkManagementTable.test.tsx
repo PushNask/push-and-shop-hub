@@ -4,6 +4,10 @@ import { BrowserRouter } from 'react-router-dom';
 import { Product } from '@/types/product';
 import { LinkManagementTable } from '@/pages/LinkManagement/LinkManagementTable';
 
+interface LinkManagementTableProps {
+  products: Product[];
+}
+
 const mockProduct: Product = {
   id: '1',
   seller_id: '123',

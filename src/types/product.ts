@@ -11,13 +11,12 @@ export interface Product {
   expiry: string;
   link_slot: number;
   created_at?: string;
-  listingType?: "featured" | "standard";
+  listingType: "featured" | "standard";
   seller?: {
     email: string;
     country: string;
     phone?: string;
   };
-  // Add delivery options
   pickup?: boolean;
   shipping?: boolean;
   both?: boolean;
