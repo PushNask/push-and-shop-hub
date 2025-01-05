@@ -126,8 +126,6 @@ export function AddProductForm() {
           imageUrls={imageUrls}
           onImageChange={handleImageChange}
           onImageRemove={handleImageRemove}
-          maxSize={MAX_FILE_SIZE}
-          acceptedTypes={ACCEPTED_IMAGE_TYPES}
         />
         <DeliveryOptionsSection form={form} />
         <ListingFeeSection form={form} />
