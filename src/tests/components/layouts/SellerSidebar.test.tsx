@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { describe, it, expect } from 'vitest';
 import { SellerSidebar } from "@/components/layouts/SellerSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
