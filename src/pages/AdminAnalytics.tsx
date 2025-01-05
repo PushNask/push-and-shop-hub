@@ -1,179 +1,127 @@
-import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, LineChart, Line } from "recharts";
-import { AlertCircle, BarChart3, CircleDollarSign, Users } from "lucide-react";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { adminNavItems } from "@/components/admin/navigation/AdminNav";
+import { Chart } from "@/components/ui/chart";
+import { Users, DollarSign, ShoppingBag, Clock } from "lucide-react";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
-// Mock data - replace with real API calls later
-const mockAnalytics = {
-  activeVisitors: 342,
-  weeklyRevenue: 1500,
-  pendingApprovals: 12,
-  topCategories: [
-    { name: 'Electronics', value: 45 },
-    { name: 'Fashion', value: 35 },
-    { name: 'Home & Furniture', value: 25 },
-    { name: 'Beauty', value: 20 },
-    { name: 'Sports', value: 15 }
-  ],
-  recentActivity: [
-    { action: 'Approved', product: 'iPhone 13 Pro', timestamp: '2024-01-01 10:00' },
-    { action: 'Rejected', product: 'Samsung Galaxy S24', timestamp: '2024-01-01 09:30' },
-    { action: 'New Listing', product: 'Nike Air Max', timestamp: '2024-01-01 09:00' },
-    { action: 'Approved', product: 'Sony PlayStation 5', timestamp: '2024-01-01 08:45' },
-  ],
-  weeklyTrends: [
-    { date: 'Mon', revenue: 200, visitors: 150 },
-    { date: 'Tue', revenue: 300, visitors: 200 },
-    { date: 'Wed', revenue: 400, visitors: 300 },
-    { date: 'Thu', revenue: 500, visitors: 250 },
-    { date: 'Fri', revenue: 600, visitors: 400 },
-    { date: 'Sat', revenue: 800, visitors: 500 },
-    { date: 'Sun', revenue: 1000, visitors: 600 }
-  ]
-};
+export default function AdminAnalytics() {
+  const { data: analyticsData, isLoading } = useAnalytics();
 
-const MetricCard = ({ title, value, icon: Icon, bgColor }: {
-  title: string;
-  value: string | number;
-  icon: React.ElementType;
-  bgColor: string;
-}) => (
-  <Card>
-    <CardContent className="pt-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-2xl font-bold mt-1">{value}</p>
+  const latestAnalytics = analyticsData?.[0] || {
+    total_views: 0,
+    total_revenue: 0,
+    pending_approvals: 0,
+    active_products: 0,
+  };
+
+  const weeklyData = analyticsData?.slice(0, 7).reverse() || [];
+
+  const weeklyChartData = weeklyData.map((data) => ({
+    name: new Date(data.date).toLocaleDateString('en-US', { weekday: 'short' }),
+    revenue: data.total_revenue,
+    views: data.total_views,
+  }));
+
+  if (isLoading) {
+    return (
+      <DashboardLayout title="Analytics Dashboard" navItems={adminNavItems}>
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
         </div>
-        <div className={`p-3 ${bgColor} rounded-full`}>
-          <Icon className="h-6 w-6" />
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
+      </DashboardLayout>
+    );
+  }
 
-const AdminAnalytics = () => {
   return (
-    <div className="container mx-auto p-6 space-y-8 animate-fadeIn">
-      <h1 className="text-3xl font-bold mb-8">Analytics Dashboard</h1>
-
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <MetricCard
-          title="Active Visitors"
-          value={mockAnalytics.activeVisitors}
-          icon={Users}
-          bgColor="bg-blue-100"
-        />
-        <MetricCard
-          title="Weekly Revenue"
-          value={`$${mockAnalytics.weeklyRevenue}`}
-          icon={CircleDollarSign}
-          bgColor="bg-green-100"
-        />
-        <MetricCard
-          title="Pending Approvals"
-          value={mockAnalytics.pendingApprovals}
-          icon={AlertCircle}
-          bgColor="bg-yellow-100"
-        />
-        <MetricCard
-          title="Total Products"
-          value="120"
-          icon={BarChart3}
-          bgColor="bg-purple-100"
-        />
-      </div>
-
-      {/* Weekly Trends Chart */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Weekly Trends</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[400px] w-full">
-            <ChartContainer
-              config={{
-                revenue: {
-                  label: "Revenue",
-                  color: "hsl(142, 76%, 36%)",
-                },
-                visitors: {
-                  label: "Visitors",
-                  color: "hsl(221, 83%, 53%)",
-                },
-              }}
-            >
-              <LineChart data={mockAnalytics.weeklyTrends}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip content={<ChartTooltipContent />} />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="hsl(142, 76%, 36%)"
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="visitors"
-                  stroke="hsl(221, 83%, 53%)"
-                  strokeWidth={2}
-                />
-              </LineChart>
-            </ChartContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Top Categories */}
+    <DashboardLayout title="Analytics Dashboard" navItems={adminNavItems}>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Top Categories</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Visitors</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="h-[400px] w-full">
-              <ChartContainer
-                config={{
-                  value: {
-                    label: "Products",
-                    color: "hsl(221, 83%, 53%)",
-                  },
-                }}
-              >
-                <BarChart data={mockAnalytics.topCategories}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="value" fill="hsl(221, 83%, 53%)" />
-                </BarChart>
-              </ChartContainer>
+            <div className="text-2xl font-bold">{latestAnalytics.total_views}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Weekly Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'XAF'
+              }).format(latestAnalytics.total_revenue)}
             </div>
           </CardContent>
         </Card>
-
-        {/* Recent Activity */}
         <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{latestAnalytics.pending_approvals}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Products</CardTitle>
+            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{latestAnalytics.active_products}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-4">
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>Weekly Trends</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Chart
+              type="line"
+              data={weeklyChartData}
+              categories={['revenue', 'views']}
+              index="name"
+              colors={['blue', 'green']}
+              valueFormatter={(value: number) => 
+                value.toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'XAF',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })
+              }
+              className="h-[300px]"
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-3">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 max-h-[400px] overflow-y-auto">
-              {mockAnalytics.recentActivity.map((activity, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between py-2 border-b last:border-0"
-                >
-                  <div>
-                    <p className="font-medium">
-                      {activity.action} - {activity.product}
+            <div className="space-y-4">
+              {weeklyData.map((data, index) => (
+                <div key={data.id} className="flex items-center">
+                  <div className="ml-4 space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {new Date(data.date).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {activity.timestamp}
+                      {data.total_views} views • {data.total_chats} chats
                     </p>
                   </div>
                 </div>
@@ -182,8 +130,6 @@ const AdminAnalytics = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
-};
-
-export default AdminAnalytics;
+}

@@ -1,11 +1,13 @@
+import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, DollarSign } from "lucide-react";
-import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { adminNavItems } from "@/components/admin/navigation/AdminNav";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 interface Transaction {
   id: string;
@@ -16,31 +18,41 @@ interface Transaction {
   payment_method: string;
   status: string;
   created_at: string;
+  seller?: {
+    email: string;
+    country: string;
+  };
 }
 
 export default function TransactionHistory() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
+  const { data: transactions, isLoading, error } = useQuery({
+    queryKey: ['transactions'],
+    queryFn: async () => {
       const { data, error } = await supabase
-        .from("transactions")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .from('transactions')
+        .select(`
+          *,
+          seller:profiles(email, country)
+        `)
+        .order('created_at', { ascending: false });
 
       if (error) {
-        console.error("Error fetching transactions:", error);
-        return;
+        toast({
+          variant: "destructive",
+          title: "Error fetching transactions",
+          description: error.message,
+        });
+        throw error;
       }
 
-      setTransactions(data || []);
-    };
-
-    fetchTransactions();
-  }, []);
+      return data as Transaction[];
+    },
+  });
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "completed":
         return "bg-green-500";
       case "pending":
@@ -60,12 +72,22 @@ export default function TransactionHistory() {
     });
   };
 
-  const formatAmount = (amount: number) => {
+  const formatAmount = (amount: number, currency: string = "XAF") => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "XAF",
+      currency: currency,
     }).format(amount);
   };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout title="Transaction History" navItems={adminNavItems}>
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout title="Transaction History" navItems={adminNavItems}>
@@ -83,20 +105,22 @@ export default function TransactionHistory() {
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Transaction ID</TableHead>
+                  <TableHead>Seller</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Method</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((transaction) => (
+                {transactions?.map((transaction) => (
                   <TableRow key={transaction.id}>
                     <TableCell className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-gray-500" />
                       {formatDate(transaction.created_at)}
                     </TableCell>
                     <TableCell className="font-mono">{transaction.id}</TableCell>
-                    <TableCell>{formatAmount(transaction.amount)}</TableCell>
+                    <TableCell>{transaction.seller?.email || 'Unknown'}</TableCell>
+                    <TableCell>{formatAmount(transaction.amount, transaction.currency)}</TableCell>
                     <TableCell>
                       <Badge variant="secondary">
                         {transaction.payment_method}
