@@ -7,6 +7,7 @@ import { DeliveryBadges } from "./product/DeliveryBadges";
 import { ShareButtons } from "./product/ShareButtons";
 
 interface ProductCardProps {
+  id: string; // Add ID to props
   title: string;
   price: number;
   images?: string[];
@@ -25,6 +26,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ 
+  id,  // Add ID to destructuring
   title, 
   price, 
   images, 
@@ -80,7 +82,7 @@ export function ProductCard({
       "transition-all duration-300 hover:shadow-lg",
       className
     )}>
-      <Link to={`/p/${title.toLowerCase().replace(/\s+/g, '-')}/details`}>
+      <Link to={`/products/${id}`}>
         <div className="aspect-square overflow-hidden bg-gray-100">
           <img
             src={images?.[0] || "/placeholder.svg"}
@@ -119,7 +121,6 @@ export function ProductCard({
         </div>
       </Link>
       
-      {/* Action buttons - Appear on hover */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/90 to-background/0 p-3 translate-y-full transition-transform duration-300 group-hover:translate-y-0">
         <ShareButtons title={title} seller={seller} />
       </div>
