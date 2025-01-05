@@ -7,6 +7,7 @@ import {
   CreditCard,
   LogOut,
   Menu,
+  Link as LinkIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +35,11 @@ const adminLinks: SidebarLink[] = [
     href: "/admin/users",
     label: "User Management",
     icon: Users,
+  },
+  {
+    href: "/admin/links",
+    label: "Link Management",
+    icon: LinkIcon,
   },
   {
     href: "/product-approvals",

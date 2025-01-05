@@ -13,6 +13,7 @@ import UserProfile from "@/pages/UserProfile";
 import AdminAnalytics from "@/pages/AdminAnalytics";
 import AdminManagement from "@/pages/AdminManagement";
 import TransactionHistory from "@/pages/TransactionHistory";
+import LinkManagement from "@/pages/LinkManagement";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           {/* Admin routes */}
           <Route path="/admin/analytics" element={<AdminAnalytics />} />
           <Route path="/admin/users" element={<AdminManagement />} />
+          <Route path="/admin/links" element={<LinkManagement />} />
           <Route path="/product-approvals" element={<ProductApprovals />} />
           <Route path="/admin/transactions" element={<TransactionHistory />} />
           <Route path="/admin/profile" element={<AdminProfile />} />
