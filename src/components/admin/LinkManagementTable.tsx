@@ -5,6 +5,8 @@ import { AdminPagination } from "./pagination/AdminPagination";
 import { LinkManagementTableHeader } from "./table/LinkManagementTableHeader";
 import { LinkManagementTableRow } from "./table/LinkManagementTableRow";
 import { LinkManagementTableSkeleton } from "./table/LinkManagementTableSkeleton";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import type { Product } from "@/types/product";
 
 interface LinkManagementTableProps {
@@ -25,6 +27,7 @@ export function LinkManagementTable({
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleAssignProduct = async (productId: string) => {
     if (selectedSlot !== null) {
@@ -44,31 +47,51 @@ export function LinkManagementTable({
 
   return (
     <>
-      <div className="rounded-md border">
-        <Table>
-          <LinkManagementTableHeader />
-          <TableBody>
-            {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => {
-              const slot = startIndex + index + 1;
-              if (slot > 120) return null;
-              
-              const product = linkSlots?.find((p) => p.link_slot === slot);
+      <div className="space-y-4">
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search products in link slots..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
-              return (
-                <LinkManagementTableRow
-                  key={slot}
-                  slot={slot}
-                  product={product}
-                  onAssign={(slot) => {
-                    setSelectedSlot(slot);
-                    setIsDialogOpen(true);
-                  }}
-                  isAssigning={isAssigning}
-                />
-              );
-            })}
-          </TableBody>
-        </Table>
+        <div className="rounded-md border">
+          <Table>
+            <LinkManagementTableHeader />
+            <TableBody>
+              {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => {
+                const slot = startIndex + index + 1;
+                if (slot > 120) return null;
+                
+                const product = linkSlots?.find((p) => p.link_slot === slot);
+                
+                // Filter based on search query
+                if (
+                  searchQuery &&
+                  product?.title.toLowerCase().includes(searchQuery.toLowerCase()) === false
+                ) {
+                  return null;
+                }
+
+                return (
+                  <LinkManagementTableRow
+                    key={slot}
+                    slot={slot}
+                    product={product}
+                    onAssign={(slot) => {
+                      setSelectedSlot(slot);
+                      setIsDialogOpen(true);
+                    }}
+                    isAssigning={isAssigning}
+                  />
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       <AdminPagination
