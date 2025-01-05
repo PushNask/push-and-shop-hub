@@ -28,10 +28,11 @@ const formSchema = z.object({
   images: z.array(z.instanceof(File)).min(1, "At least one image is required").max(7, "Maximum 7 images allowed"),
   pickup: z.boolean().optional(),
   shipping: z.boolean().optional(),
+  both: z.boolean().optional(),
   paymentMethod: z.enum(["cash", "online"]),
   listingType: z.enum(["standard", "featured"]),
   duration: z.string(),
-}).refine((data) => data.pickup || data.shipping, {
+}).refine((data) => data.pickup || data.shipping || data.both, {
   message: "Select at least one delivery option",
   path: ["delivery"],
 });
@@ -47,6 +48,7 @@ export default function AddNewProduct() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -56,8 +58,9 @@ export default function AddNewProduct() {
       price: "",
       category: "",
       images: [],
-      pickup: true,
+      pickup: false,
       shipping: false,
+      both: false,
       paymentMethod: "cash",
       listingType: "standard",
       duration: "24",
@@ -66,21 +69,35 @@ export default function AddNewProduct() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length > 7) {
+    const totalImages = imageFiles.length + files.length;
+    
+    if (totalImages > 7) {
       toast.error("Maximum 7 images allowed");
       return;
     }
 
-    // Clear previous preview URLs
-    imageUrls.forEach(url => URL.revokeObjectURL(url));
-    
-    const urls = files.map(file => URL.createObjectURL(file));
-    setImageUrls(urls);
-    form.setValue("images", files);
+    const newImageFiles = [...imageFiles, ...files];
+    setImageFiles(newImageFiles);
+    form.setValue("images", newImageFiles);
+
+    const newImageUrls = files.map(file => URL.createObjectURL(file));
+    setImageUrls([...imageUrls, ...newImageUrls]);
+  };
+
+  const handleImageRemove = (index: number) => {
+    const newImageFiles = [...imageFiles];
+    newImageFiles.splice(index, 1);
+    setImageFiles(newImageFiles);
+    form.setValue("images", newImageFiles);
+
+    const newImageUrls = [...imageUrls];
+    URL.revokeObjectURL(newImageUrls[index]);
+    newImageUrls.splice(index, 1);
+    setImageUrls(newImageUrls);
   };
 
   const onSubmit = async (data: FormValues) => {
-    if (!data.pickup && !data.shipping) {
+    if (!data.pickup && !data.shipping && !data.both) {
       toast.error("Please select at least one delivery option");
       return;
     }
@@ -96,6 +113,7 @@ export default function AddNewProduct() {
         data.images.map(async (file) => {
           const fileExt = file.name.split('.').pop();
           const fileName = `${crypto.randomUUID()}.${fileExt}`;
+          
           const { error: uploadError, data: uploadData } = await supabase.storage
             .from('product-images')
             .upload(fileName, file);

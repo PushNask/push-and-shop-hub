@@ -10,6 +10,7 @@ interface DeliveryOptionsSectionProps {
 export function DeliveryOptionsSection({ form }: DeliveryOptionsSectionProps) {
   const pickup = form.watch("pickup");
   const shipping = form.watch("shipping");
+  const both = form.watch("both");
 
   return (
     <div className="space-y-3">
@@ -22,8 +23,13 @@ export function DeliveryOptionsSection({ form }: DeliveryOptionsSectionProps) {
             <FormItem className="flex flex-row items-start space-x-3 space-y-0">
               <FormControl>
                 <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
+                  checked={field.value || both}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    if (both) {
+                      form.setValue("both", false);
+                    }
+                  }}
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
@@ -44,8 +50,13 @@ export function DeliveryOptionsSection({ form }: DeliveryOptionsSectionProps) {
             <FormItem className="flex flex-row items-start space-x-3 space-y-0">
               <FormControl>
                 <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
+                  checked={field.value || both}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    if (both) {
+                      form.setValue("both", false);
+                    }
+                  }}
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
@@ -59,9 +70,38 @@ export function DeliveryOptionsSection({ form }: DeliveryOptionsSectionProps) {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="both"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    if (checked) {
+                      form.setValue("pickup", false);
+                      form.setValue("shipping", false);
+                    }
+                  }}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  Both Options Available
+                </FormLabel>
+                <FormDescription>
+                  Offer both pickup and shipping options to buyers
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
       </div>
-      {!pickup && !shipping && (
+      {!pickup && !shipping && !both && (
         <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Please select at least one delivery option
           </AlertDescription>
