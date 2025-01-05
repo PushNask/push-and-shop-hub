@@ -4,11 +4,10 @@ type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
 export interface Product extends ProductRow {
   listingType: "featured" | "standard";
-  seller?: {
+  seller: {
     name: string;
     location: string;
     rating: number;
     joinedDate: string;
   };
-  submittedAt?: string;
 }

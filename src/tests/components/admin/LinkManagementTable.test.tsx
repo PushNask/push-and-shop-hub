@@ -18,7 +18,14 @@ describe("LinkManagementTable", () => {
       link_slot: 1,
       seller_id: "test-seller",
       created_at: "2024-01-01",
-      expiry: "2024-12-31"
+      expiry: "2024-12-31",
+      listingType: "featured",
+      seller: {
+        name: "Test Seller",
+        location: "Test Location",
+        rating: 5,
+        joinedDate: "2024-01-01"
+      }
     },
   ];
 
