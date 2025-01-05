@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { ProductRow } from "@/types/product";
 
 export const useProductList = () => {
   return useQuery({
@@ -25,15 +26,7 @@ export const useProductList = () => {
         throw error;
       }
 
-      return data.map(product => ({
-        ...product,
-        seller: {
-          name: product.seller.name,
-          location: product.seller.location || "Unknown",
-          rating: product.seller.rating ? 5 : 3,
-          joinedDate: product.seller.joinedDate
-        }
-      }));
+      return data as ProductRow[];
     },
   });
 };
