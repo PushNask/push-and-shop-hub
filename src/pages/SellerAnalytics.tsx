@@ -1,57 +1,83 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Chart, ChartTooltip } from "@/components/ui/charts";
+import { Chart, ChartTooltip, ChartTooltipContent } from "@/components/ui/charts";
 import { LineChart, Line, XAxis, YAxis } from "recharts";
-import { Eye, MessageCircle, Package, TrendingUp } from "lucide-react";
-
-// Mock data - replace with actual data fetching
-const analyticsData = {
-  totalViews: 1250,
-  activeProducts: 8,
-  totalChats: 45,
-  conversionRate: 3.6,
-  weeklyStats: [
-    { date: "Mon", views: 150, chats: 5, sales: 1 },
-    { date: "Tue", views: 230, chats: 8, sales: 2 },
-    { date: "Wed", views: 180, chats: 6, sales: 1 },
-    { date: "Thu", views: 290, chats: 12, sales: 3 },
-    { date: "Fri", views: 340, chats: 15, sales: 4 },
-    { date: "Sat", views: 270, chats: 10, sales: 2 },
-    { date: "Sun", views: 200, chats: 7, sales: 1 }
-  ]
-};
-
-const chartConfig = {
-  views: {
-    label: "Views",
-    color: "#3b82f6"
-  },
-  chats: {
-    label: "Chats",
-    color: "#10b981"
-  },
-  sales: {
-    label: "Sales",
-    color: "#6366f1"
-  }
-};
+import { Eye, MessageCircle, Package, TrendingUp, Loader2 } from "lucide-react";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const SellerAnalytics = () => {
+  const [sellerId, setSellerId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const getSellerProfile = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        setSellerId(session.user.id);
+      }
+    };
+    
+    getSellerProfile();
+  }, []);
+
+  const { data: analyticsData, isLoading, error } = useAnalytics(sellerId);
+
+  if (error) {
+    return (
+      <div className="container py-6 space-y-6">
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center space-y-4">
+            <p className="text-red-500">Failed to load analytics data</p>
+            <p className="text-sm text-muted-foreground">Please try again later</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const latestAnalytics = analyticsData?.[0] || {
+    total_views: 0,
+    total_chats: 0,
+    active_products: 0,
+    total_revenue: 0
+  };
+
+  const weeklyData = analyticsData?.slice(0, 7).reverse() || [];
+
+  const chartConfig = {
+    views: {
+      label: "Views",
+      color: "#3b82f6"
+    },
+    chats: {
+      label: "Chats",
+      color: "#10b981"
+    },
+    revenue: {
+      label: "Revenue",
+      color: "#6366f1"
+    }
+  };
+
   return (
     <div className="container py-6 space-y-6 animate-fadeIn">
       <h1 className="text-2xl font-semibold">Analytics Dashboard</h1>
       
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ${isLoading ? 'opacity-50' : ''}`}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Views</CardTitle>
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analyticsData.totalViews}</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last week
-            </p>
+            <div className="text-2xl font-bold">
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                latestAnalytics.total_views.toLocaleString()
+              )}
+            </div>
           </CardContent>
         </Card>
 
@@ -61,10 +87,13 @@ const SellerAnalytics = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analyticsData.activeProducts}</div>
-            <p className="text-xs text-muted-foreground">
-              {analyticsData.activeProducts} products live
-            </p>
+            <div className="text-2xl font-bold">
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                latestAnalytics.active_products.toLocaleString()
+              )}
+            </div>
           </CardContent>
         </Card>
 
@@ -74,82 +103,82 @@ const SellerAnalytics = () => {
             <MessageCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analyticsData.totalChats}</div>
-            <p className="text-xs text-muted-foreground">
-              +12.5% from last week
-            </p>
+            <div className="text-2xl font-bold">
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                latestAnalytics.total_chats.toLocaleString()
+              )}
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analyticsData.conversionRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              +2.1% from last week
-            </p>
+            <div className="text-2xl font-bold">
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'XAF'
+                }).format(latestAnalytics.total_revenue)
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Weekly Trends Chart */}
       <Card>
         <CardHeader>
           <CardTitle>Weekly Trends</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
-            <Chart config={chartConfig}>
-              <LineChart data={analyticsData.weeklyStats}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <ChartTooltip
-                  content={({ active, payload }) => {
-                    if (!active || !payload) return null;
-                    return (
-                      <div className="rounded-lg border bg-background p-2 shadow-sm">
-                        <div className="grid grid-cols-2 gap-2">
-                          {payload.map((entry) => (
-                            <div key={entry.name} className="flex flex-col">
-                              <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                {entry.name}
-                              </span>
-                              <span className="font-bold text-muted-foreground">
-                                {entry.value}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="views"
-                  stroke={chartConfig.views.color}
-                  strokeWidth={2}
-                  dot={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="chats"
-                  stroke={chartConfig.chats.color}
-                  strokeWidth={2}
-                  dot={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="sales"
-                  stroke={chartConfig.sales.color}
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </Chart>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader2 className="h-8 w-8 animate-spin" />
+              </div>
+            ) : (
+              <Chart config={chartConfig}>
+                <LineChart data={weeklyData}>
+                  <XAxis 
+                    dataKey="date" 
+                    tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { weekday: 'short' })}
+                  />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Line
+                    type="monotone"
+                    dataKey="total_views"
+                    name="Views"
+                    stroke={chartConfig.views.color}
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="total_chats"
+                    name="Chats"
+                    stroke={chartConfig.chats.color}
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="total_revenue"
+                    name="Revenue"
+                    stroke={chartConfig.revenue.color}
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </Chart>
+            )}
           </div>
         </CardContent>
       </Card>
