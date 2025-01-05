@@ -10,4 +10,5 @@ export interface Product extends ProductRow {
     rating: number;
     joinedDate: string;
   };
+  submittedAt?: string;
 }
