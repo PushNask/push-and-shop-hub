@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/charts";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis } from "recharts";
 import { Eye, MessageCircle, Package, TrendingUp } from "lucide-react";
 
 // Mock data - replace with actual data fetching
