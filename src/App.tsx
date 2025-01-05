@@ -17,6 +17,9 @@ import AdminManagement from "@/pages/AdminManagement";
 import TransactionHistory from "@/pages/TransactionHistory";
 import LinkManagement from "@/pages/LinkManagement";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -28,52 +31,89 @@ const queryClient = new QueryClient({
   },
 });
 
+// Auth wrapper component to handle protected routes
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile || profile.role !== "admin") {
+        navigate("/login");
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  return <>{children}</>;
+};
+
 function App() {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <div className="min-h-screen flex flex-col">
-            <Routes>
-              {/* Public routes */}
-              <Route
-                path="/"
-                element={
-                  <>
-                    <Header />
-                    <main className="flex-1">
-                      <Index />
-                    </main>
-                    <Footer />
-                  </>
-                }
-              />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <div className="min-h-screen flex flex-col">
+          <Routes>
+            {/* Public routes */}
+            <Route
+              path="/"
+              element={
+                <>
+                  <Header />
+                  <main className="flex-1">
+                    <Index />
+                  </main>
+                  <Footer />
+                </>
+              }
+            />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
 
-              {/* Admin routes */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<Navigate to="/admin/product-approvals" replace />} />
-                <Route path="analytics" element={<AdminAnalytics />} />
-                <Route path="users" element={<AdminManagement />} />
-                <Route path="links" element={<LinkManagement />} />
-                <Route path="product-approvals" element={<ProductApprovals />} />
-                <Route path="transactions" element={<TransactionHistory />} />
-                <Route path="profile" element={<AdminProfile />} />
-              </Route>
+            {/* Admin routes - all wrapped in ProtectedRoute */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="/admin/product-approvals" replace />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="users" element={<AdminManagement />} />
+              <Route path="links" element={<LinkManagement />} />
+              <Route path="product-approvals" element={<ProductApprovals />} />
+              <Route path="transactions" element={<TransactionHistory />} />
+              <Route path="profile" element={<AdminProfile />} />
+            </Route>
 
-              {/* Seller routes */}
-              <Route path="/seller/profile" element={<SellerProfile />} />
-              
-              {/* User routes */}
-              <Route path="/profile" element={<UserProfile />} />
-            </Routes>
-          </div>
+            {/* Seller routes */}
+            <Route path="/seller/profile" element={<SellerProfile />} />
+            
+            {/* User routes */}
+            <Route path="/profile" element={<UserProfile />} />
+
+            {/* Catch-all redirect */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
           <Toaster />
-        </Router>
-      </QueryClientProvider>
-    </React.StrictMode>
+        </div>
+      </Router>
+    </QueryClientProvider>
   );
 }
 

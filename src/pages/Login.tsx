@@ -28,14 +28,6 @@ export default function Login() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<LoginForm>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
   useEffect(() => {
     const checkSession = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -59,22 +51,32 @@ export default function Login() {
     checkSession();
   }, [navigate]);
 
+  const form = useForm<LoginForm>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
   const onSubmit = async (values: LoginForm) => {
     try {
       setIsLoading(true);
       
-      const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
 
       if (signInError) throw signInError;
 
+      const { data: { user } } = await supabase.auth.getUser();
+      
       if (user) {
         const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
           .single();
 
         toast({
@@ -82,12 +84,12 @@ export default function Login() {
           description: "You have successfully logged in.",
         });
 
-        if (profile?.role === 'admin') {
-          navigate('/admin/product-approvals');
-        } else if (profile?.role === 'seller') {
-          navigate('/seller/profile');
+        if (profile?.role === "admin") {
+          navigate("/admin/product-approvals");
+        } else if (profile?.role === "seller") {
+          navigate("/seller/profile");
         } else {
-          navigate('/profile');
+          navigate("/profile");
         }
       }
     } catch (error) {

@@ -11,13 +11,19 @@ export function AdminLayout() {
     queryKey: ["profile"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) {
+        throw new Error("Not authenticated");
+      }
       
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user.id)
         .single();
+        
+      if (error || !profile || profile.role !== "admin") {
+        throw new Error("Not authorized");
+      }
         
       return profile;
     },
@@ -29,8 +35,8 @@ export function AdminLayout() {
     }
   }, [profile, isLoading, navigate]);
 
-  if (isLoading || !profile) {
-    return null;
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
   return (
