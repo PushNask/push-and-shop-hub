@@ -1,11 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { BarChart3, Package, CreditCard, Settings } from "lucide-react";
+import { BarChart3, Package, CreditCard, Settings, Plus } from "lucide-react";
 import {
   Sidebar,
   SidebarHeader,
   SidebarNav,
-  SidebarNavHeader,
-  SidebarNavHeaderTitle,
   SidebarNavMain,
   SidebarNavLink,
   SidebarGroup,
@@ -31,6 +29,12 @@ export function SellerSidebar() {
                 <Link to="/seller/products">
                   <Package className="h-4 w-4" />
                   Products
+                </Link>
+              </SidebarNavLink>
+              <SidebarNavLink asChild active={isActive("/seller/add-product")}>
+                <Link to="/seller/add-product">
+                  <Plus className="h-4 w-4" />
+                  Add Product
                 </Link>
               </SidebarNavLink>
               <SidebarNavLink asChild active={isActive("/seller/transactions")}>
