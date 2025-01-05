@@ -17,7 +17,8 @@ interface Product {
     rating: number;
     joinedDate: string;
   };
-  submittedAt: string;
+  submittedAt?: string;
+  created_at?: string;
 }
 
 interface PendingProductCardProps {
@@ -80,7 +81,7 @@ export const PendingProductCard = ({ product, onReview }: PendingProductCardProp
           
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
-            <span>Submitted: {formatDate(product.submittedAt || product.created_at)}</span>
+            <span>Submitted: {formatDate(product.submittedAt || product.created_at || new Date().toISOString())}</span>
           </div>
           
           <div className="flex items-center gap-2 text-sm font-semibold">

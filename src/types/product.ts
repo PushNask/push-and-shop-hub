@@ -1,3 +1,12 @@
 import type { Database } from "@/integrations/supabase/types";
 
-export type Product = Database["public"]["Tables"]["products"]["Row"];
+export interface Product extends Database["public"]["Tables"]["products"]["Row"] {
+  listingType?: "featured" | "standard";
+  seller?: {
+    name: string;
+    location: string;
+    rating: number;
+    joinedDate: string;
+  };
+  submittedAt?: string;
+}

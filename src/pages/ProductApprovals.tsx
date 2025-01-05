@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { PendingProductCard } from "@/components/admin/PendingProductCard";
 import { ProductReviewDialog } from "@/components/admin/ProductReviewDialog";
@@ -5,6 +6,7 @@ import { useProductApproval } from "@/hooks/useProductApproval";
 import { useProductList } from "@/hooks/useProductList";
 import { adminNavItems } from "@/components/admin/navigation/AdminNav";
 import { Loader2 } from "lucide-react";
+import type { Product } from "@/types/product";
 
 const ProductApprovals = () => {
   const { data: products, isLoading, error } = useProductList();
