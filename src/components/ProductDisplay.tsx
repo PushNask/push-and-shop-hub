@@ -18,7 +18,7 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<'price' | 'date' | 'popularity'>('date');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState({ min: 0, max: Infinity });
 
@@ -27,7 +27,7 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
   // Filter and sort products
   const filteredProducts = products
     .filter(product => 
-      (!selectedCategory || product.category === selectedCategory) &&
+      (selectedCategory === 'all' || product.category === selectedCategory) &&
       (product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
        product.description?.toLowerCase().includes(searchQuery.toLowerCase())) &&
       (product.price >= priceRange.min && product.price <= priceRange.max)
@@ -101,7 +101,7 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
               <SelectValue placeholder="Category..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               <SelectItem value="Electronics">Electronics</SelectItem>
               <SelectItem value="Fashion">Fashion</SelectItem>
               <SelectItem value="Home">Home & Garden</SelectItem>
