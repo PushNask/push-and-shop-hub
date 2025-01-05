@@ -8,6 +8,7 @@ import {
   LogOut,
   Menu,
   Link as LinkIcon,
+  UserCog,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +36,11 @@ const adminLinks: SidebarLink[] = [
     href: "/admin/users",
     label: "User Management",
     icon: Users,
+  },
+  {
+    href: "/admin/admin-management",
+    label: "Admin Management",
+    icon: UserCog,
   },
   {
     href: "/admin/links",
