@@ -2,24 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, MapPin, Clock, Package } from "lucide-react";
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  images: string[];
-  listingType: "featured" | "standard";
-  seller: {
-    name: string;
-    location: string;
-    rating: number;
-    joinedDate: string;
-  };
-  submittedAt?: string;
-  created_at?: string;
-}
+import { Product } from "@/types/product";
 
 interface PendingProductCardProps {
   product: Product;
@@ -71,17 +54,17 @@ export const PendingProductCard = ({ product, onReview }: PendingProductCardProp
           
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <User className="h-4 w-4" />
-            <span>{product.seller.name}</span>
+            <span>{product.seller?.email || "Unknown Seller"}</span>
           </div>
           
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4" />
-            <span>{product.seller.location}</span>
+            <span>{product.seller?.country || "Unknown Location"}</span>
           </div>
           
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
-            <span>Submitted: {formatDate(product.submittedAt || product.created_at || new Date().toISOString())}</span>
+            <span>Submitted: {formatDate(product.created_at || new Date().toISOString())}</span>
           </div>
           
           <div className="flex items-center gap-2 text-sm font-semibold">

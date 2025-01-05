@@ -18,18 +18,20 @@ export interface Product {
   };
 }
 
-export type ProductRow = Omit<Product, 'listingType'>;
+export type ProductRow = Product;
 
 export const transformProduct = (product: ProductRow & { 
-  seller_email?: string; 
-  seller_country?: string; 
+  profiles?: { 
+    email: string;
+    country: string;
+  } 
 }): Product => {
   return {
     ...product,
     listingType: product.link_slot && product.link_slot <= 12 ? "featured" : "standard",
-    seller: product.seller_email ? {
-      email: product.seller_email,
-      country: product.seller_country || "Unknown"
+    seller: product.profiles ? {
+      email: product.profiles.email,
+      country: product.profiles.country
     } : undefined
   };
 };
