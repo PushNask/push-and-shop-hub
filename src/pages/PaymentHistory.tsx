@@ -157,7 +157,10 @@ export default function PaymentHistory() {
                   <SelectItem value="failed">Failed</SelectItem>
                 </SelectContent>
               </Select>
-              <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+              <DatePickerWithRange 
+                date={dateRange} 
+                setDate={setDateRange as (date: DateRange | undefined) => void}
+              />
             </div>
 
             <div className="rounded-md border">

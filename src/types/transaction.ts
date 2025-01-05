@@ -1,4 +1,5 @@
 import { Product } from "./product";
+import { DateRange as DayPickerDateRange } from "react-day-picker";
 
 export interface Transaction {
   id: string;
@@ -14,7 +15,5 @@ export interface Transaction {
   };
 }
 
-export interface DateRange {
-  from: Date | undefined;
-  to: Date | undefined;
-}
+// Use the DateRange type from react-day-picker
+export type DateRange = DayPickerDateRange;
