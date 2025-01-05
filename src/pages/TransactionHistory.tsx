@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, DollarSign } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { adminNavItems } from "@/components/admin/navigation/AdminNav";
 
 interface Transaction {
   id: string;
@@ -67,7 +68,7 @@ export default function TransactionHistory() {
   };
 
   return (
-    <DashboardLayout title="Transaction History">
+    <DashboardLayout title="Transaction History" navItems={adminNavItems}>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-bold flex items-center gap-2">

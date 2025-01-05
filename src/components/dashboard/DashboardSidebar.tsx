@@ -2,12 +2,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Link, useLocation } from "react-router-dom";
-
-interface NavItem {
-  title: string;
-  href: string;
-  icon: React.ComponentType<any>;
-}
+import { NavItem } from "./DashboardLayout";
 
 interface DashboardSidebarProps {
   navItems: NavItem[];
@@ -26,7 +21,7 @@ export function DashboardSidebar({ navItems }: DashboardSidebarProps) {
         </div>
         <ScrollArea className="flex-1 px-3">
           <div className="space-y-1 p-2">
-            {navItems.map((item) => (
+            {navItems?.map((item) => (
               <Button
                 key={item.href}
                 variant={location.pathname === item.href ? "secondary" : "ghost"}

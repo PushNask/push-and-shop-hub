@@ -1,10 +1,11 @@
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardSidebar } from "./DashboardSidebar";
+import { LucideIcon } from "lucide-react";
 
-interface NavItem {
+export interface NavItem {
   title: string;
   href: string;
-  icon: React.ComponentType<any>;
+  icon: LucideIcon;
 }
 
 interface DashboardLayoutProps {
@@ -18,7 +19,7 @@ export function DashboardLayout({ children, title, navItems }: DashboardLayoutPr
     <div className="min-h-screen flex">
       <DashboardSidebar navItems={navItems} />
       <div className="flex-1">
-        <DashboardHeader title={title} />
+        <DashboardHeader title={title} navItems={navItems} />
         <main className="container py-6">
           {children}
         </main>

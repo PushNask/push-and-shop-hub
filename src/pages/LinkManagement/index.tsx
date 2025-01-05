@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LinkManagementTable } from "./LinkManagementTable";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useToast } from "@/hooks/use-toast";
+import { adminNavItems } from "@/components/admin/navigation/AdminNav";
 import type { Product } from "@/types/product";
 
 export default function LinkManagement() {
@@ -63,7 +64,7 @@ export default function LinkManagement() {
   };
 
   return (
-    <DashboardLayout title="Link Management">
+    <DashboardLayout title="Link Management" navItems={adminNavItems}>
       <div className="space-y-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Link Slots</h2>

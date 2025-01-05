@@ -2,6 +2,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { PendingProductCard } from "@/components/admin/PendingProductCard";
 import { ProductReviewDialog } from "@/components/admin/ProductReviewDialog";
 import { useProductApprovals } from "@/hooks/useProductApprovals";
+import { adminNavItems } from "@/components/admin/navigation/AdminNav";
 
 // Mock data - replace with actual data fetching
 const MOCK_PENDING_PRODUCTS = [
@@ -51,7 +52,7 @@ const ProductApprovals = () => {
   } = useProductApprovals();
 
   return (
-    <DashboardLayout title="Product Approvals">
+    <DashboardLayout title="Product Approvals" navItems={adminNavItems}>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-fadeIn">
         {MOCK_PENDING_PRODUCTS.map((product) => (
           <PendingProductCard
