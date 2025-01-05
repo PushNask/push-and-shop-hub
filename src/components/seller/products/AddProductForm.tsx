@@ -69,7 +69,7 @@ export function AddProductForm() {
     form.setValue("images", newUrls);
   };
 
-  const onSubmit = async (data: z.infer<typeof productSchema>) => {
+  const onSubmit = async (data: AddProductFormValues) => {
     if (!session?.user?.id) {
       toast.error("You must be logged in to add a product");
       return;

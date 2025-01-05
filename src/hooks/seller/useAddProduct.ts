@@ -1,8 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { AddProductFormValues } from "@/types/product";
+
+type AddProductInput = AddProductFormValues & {
+  seller_id: string;
+  currency: string;
+  status: string;
+};
 
 async function uploadImages(images: string[]) {
   const uploadPromises = images.map(async (url) => {
@@ -27,7 +31,7 @@ async function uploadImages(images: string[]) {
   return Promise.all(uploadPromises);
 }
 
-async function addProduct(data: AddProductFormValues & { seller_id: string; currency: string; status: string }) {
+async function addProduct(data: AddProductInput) {
   // Upload images first
   const imageUrls = await uploadImages(data.images);
 
