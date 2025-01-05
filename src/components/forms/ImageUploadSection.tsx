@@ -17,7 +17,7 @@ export function ImageUploadSection({
   imageUrls, 
   onImageChange, 
   onImageRemove,
-  maxSize = 5 * 1024 * 1024, // Default 5MB
+  maxSize = 2 * 1024 * 1024, // Default 2MB
   acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
 }: ImageUploadSectionProps) {
   return (

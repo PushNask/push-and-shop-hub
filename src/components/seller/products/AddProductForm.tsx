@@ -14,7 +14,7 @@ import { PaymentMethodSection } from "@/components/forms/PaymentMethodSection";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export const formSchema = z.object({
@@ -31,7 +31,7 @@ export const formSchema = z.object({
     .max(7, "Maximum 7 images allowed")
     .refine(
       (files) => files.every((file) => file.size <= MAX_FILE_SIZE),
-      "Each file must be less than 5MB"
+      `Each file must be less than 2MB`
     )
     .refine(
       (files) => files.every((file) => ACCEPTED_IMAGE_TYPES.includes(file.type)),
@@ -87,22 +87,25 @@ export function AddProductForm() {
     );
 
     if (invalidFiles.length > 0) {
-      toast.error(`Some files were rejected. Please ensure all files are images under ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
+      toast.error(`Some files were rejected. Please ensure all files are images under 2MB`);
       return;
     }
 
     // Create URLs for preview
     const newImageUrls = files.map(file => URL.createObjectURL(file));
+    const updatedImageFiles = [...imageFiles, ...files];
     
     setImageUrls(prev => [...prev, ...newImageUrls]);
-    setImageFiles(prev => [...prev, ...files]);
-    form.setValue('images', [...imageFiles, ...files]);
+    setImageFiles(updatedImageFiles);
+    form.setValue('images', updatedImageFiles);
   };
 
   const handleImageRemove = (index: number) => {
+    URL.revokeObjectURL(imageUrls[index]); // Clean up the URL
     setImageUrls(prev => prev.filter((_, i) => i !== index));
-    setImageFiles(prev => prev.filter((_, i) => i !== index));
-    form.setValue('images', imageFiles.filter((_, i) => i !== index));
+    const updatedImageFiles = imageFiles.filter((_, i) => i !== index);
+    setImageFiles(updatedImageFiles);
+    form.setValue('images', updatedImageFiles);
   };
 
   const onSubmit = (data: AddProductFormValues) => {
