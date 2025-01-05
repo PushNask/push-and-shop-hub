@@ -11,24 +11,16 @@ interface ProductGridProps {
 }
 
 export const ProductGrid = ({ products, isLoading, onRelist, onRemove }: ProductGridProps) => {
-  if (products.length === 0) {
-    return (
-      <div className="text-center py-12 text-muted-foreground">
-        No products found
-      </div>
-    );
-  }
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product) => (
-        <div key={product.id} className="relative">
+        <div key={product.id} className="relative group">
           <ProductCard
             id={product.id}
             title={product.title}
             price={product.price}
             images={product.images}
-            seller={product.seller}
+            seller={product.profiles}
             expiry={product.expiry}
             deliveryOptions={{
               pickup: product.pickup ?? false,
@@ -36,16 +28,19 @@ export const ProductGrid = ({ products, isLoading, onRelist, onRemove }: Product
               both: product.both ?? false
             }}
             category={product.category}
+            className="transition-transform duration-200 group-hover:scale-[1.02]"
           />
           <div className="absolute top-2 right-2">
             <ProductStatusBadge status={product.status || 'pending'} />
           </div>
-          <ProductActions
-            status={product.status || 'pending'}
-            isLoading={isLoading}
-            onRelist={() => onRelist(product.id)}
-            onRemove={() => onRemove(product.id)}
-          />
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+            <ProductActions
+              status={product.status || 'pending'}
+              isLoading={isLoading}
+              onRelist={() => onRelist(product.id)}
+              onRemove={() => onRemove(product.id)}
+            />
+          </div>
         </div>
       ))}
     </div>

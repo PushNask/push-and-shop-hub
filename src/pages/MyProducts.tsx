@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductGrid } from "@/components/seller/ProductGrid";
+import { EmptyState } from "@/components/product/EmptyState";
 import type { Product } from "@/types/product";
 
 const MyProducts = () => {
@@ -20,7 +21,15 @@ const MyProducts = () => {
 
       const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          profiles:seller_id (
+            email,
+            country,
+            phone,
+            name
+          )
+        `)
         .eq('seller_id', user.id)
         .order('created_at', { ascending: false });
 
@@ -88,7 +97,7 @@ const MyProducts = () => {
 
   if (isLoadingProducts) {
     return (
-      <div className="container py-6 flex items-center justify-center">
+      <div className="container py-6 flex items-center justify-center min-h-[50vh]">
         <Loader2 className="h-6 w-6 animate-spin" />
       </div>
     );
@@ -97,8 +106,11 @@ const MyProducts = () => {
   return (
     <div className="container py-6 space-y-6">
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle>My Products</CardTitle>
+          <span className="text-sm text-muted-foreground">
+            {products.length} total products
+          </span>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="all" className="w-full">
@@ -111,12 +123,16 @@ const MyProducts = () => {
 
             {["all", "active", "pending", "expired"].map((tab) => (
               <TabsContent key={tab} value={tab} className="mt-6">
-                <ProductGrid
-                  products={products.filter(product => tab === "all" || product.status === tab)}
-                  isLoading={isLoading}
-                  onRelist={handleRelist}
-                  onRemove={handleRemove}
-                />
+                {products.filter(product => tab === "all" || product.status === tab).length === 0 ? (
+                  <EmptyState />
+                ) : (
+                  <ProductGrid
+                    products={products.filter(product => tab === "all" || product.status === tab)}
+                    isLoading={isLoading}
+                    onRelist={handleRelist}
+                    onRemove={handleRemove}
+                  />
+                )}
               </TabsContent>
             ))}
           </Tabs>
