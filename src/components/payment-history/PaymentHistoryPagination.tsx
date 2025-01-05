@@ -13,11 +13,19 @@ export function PaymentHistoryPagination({
   isLoading,
   hasMore,
 }: PaymentHistoryPaginationProps) {
+  const handlePrevious = () => {
+    setPage(Math.max(1, page - 1));
+  };
+
+  const handleNext = () => {
+    setPage(page + 1);
+  };
+
   return (
     <div className="flex justify-between items-center">
       <Button
         variant="outline"
-        onClick={() => setPage(p => Math.max(1, p - 1))}
+        onClick={handlePrevious}
         disabled={page === 1 || isLoading}
       >
         Previous
@@ -27,7 +35,7 @@ export function PaymentHistoryPagination({
       </span>
       <Button
         variant="outline"
-        onClick={() => setPage(p => p + 1)}
+        onClick={handleNext}
         disabled={!hasMore || isLoading}
       >
         Next
