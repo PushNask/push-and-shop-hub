@@ -2,22 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, XCircle } from "lucide-react";
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  images: string[];
-  listingType: "featured" | "standard";
-  seller: {
-    name: string;
-    location: string;
-    rating: number;
-    joinedDate: string;
-  };
-}
+import { Product } from "@/types/product";
 
 interface ProductReviewDialogProps {
   product: Product | null;
@@ -65,10 +50,10 @@ export const ProductReviewDialog = ({
           <div className="grid gap-2">
             <h4 className="font-semibold">Seller Information</h4>
             <div className="text-sm space-y-1">
-              <p>Name: {product.seller.name}</p>
-              <p>Location: {product.seller.location}</p>
-              <p>Rating: {product.seller.rating}/5</p>
-              <p>Member since: {formatDate(product.seller.joinedDate)}</p>
+              <p>Email: {product.seller?.email || 'Unknown'}</p>
+              <p>Location: {product.seller?.location || product.seller?.country || 'Unknown'}</p>
+              <p>Rating: {product.seller?.rating || 0}/5</p>
+              <p>Member since: {formatDate(product.seller?.joinedDate || product.created_at || new Date().toISOString())}</p>
             </div>
           </div>
           

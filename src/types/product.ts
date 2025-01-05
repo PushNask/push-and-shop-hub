@@ -16,6 +16,10 @@ export interface Product {
     email: string;
     country: string;
     phone?: string;
+    name?: string;
+    location?: string;
+    rating?: number;
+    joinedDate?: string;
   };
   pickup?: boolean;
   shipping?: boolean;
@@ -37,7 +41,12 @@ export const transformProduct = (product: ProductRow & {
     seller: product.profiles ? {
       email: product.profiles.email,
       country: product.profiles.country,
-      phone: product.profiles.phone
+      phone: product.profiles.phone,
+      // Add default values for the new seller properties
+      name: "Unknown Seller",
+      location: product.profiles.country || "Unknown Location",
+      rating: 0,
+      joinedDate: product.created_at || new Date().toISOString()
     } : undefined
   };
 };

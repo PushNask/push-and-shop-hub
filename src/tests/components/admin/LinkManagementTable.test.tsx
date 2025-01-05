@@ -24,7 +24,11 @@ const mockProduct: Product = {
   seller: {
     email: 'seller@example.com',
     country: 'Cameroon',
-    phone: '+237123456789'
+    phone: '+237123456789',
+    name: 'Tech Store',
+    location: 'Cameroon',
+    rating: 4.5,
+    joinedDate: '2024-01-01'
   }
 };
 
