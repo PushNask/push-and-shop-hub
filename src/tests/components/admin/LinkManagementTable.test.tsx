@@ -21,10 +21,8 @@ describe("LinkManagementTable", () => {
       expiry: "2024-12-31",
       listingType: "featured",
       seller: {
-        name: "Test Seller",
-        location: "Test Location",
-        rating: 5,
-        joinedDate: "2024-01-01"
+        email: "test@example.com",
+        country: "Test Location"
       }
     },
   ];

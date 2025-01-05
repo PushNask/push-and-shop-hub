@@ -1,51 +1,64 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { ButtonProps, buttonVariants } from "@/components/ui/button"
 
-const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
-  <nav
-    role="navigation"
-    aria-label="pagination"
-    className={cn("mx-auto flex w-full justify-center", className)}
-    {...props}
-  />
-)
-Pagination.displayName = "Pagination"
+interface PaginationProps extends React.ComponentProps<"nav"> {
+  count: number;
+  page: number;
+  onPageChange: (page: number) => void;
+}
 
-const PaginationContent = React.forwardRef<
-  HTMLUListElement,
-  React.ComponentProps<"ul">
->(({ className, ...props }, ref) => (
-  <ul
-    ref={ref}
-    className={cn("flex flex-row items-center gap-1", className)}
-    {...props}
-  />
-))
-PaginationContent.displayName = "PaginationContent"
+const Pagination = ({ className, count, page, onPageChange, ...props }: PaginationProps) => {
+  const pages = Array.from({ length: count }, (_, i) => i + 1);
 
-const PaginationItem = React.forwardRef<
-  HTMLLIElement,
-  React.ComponentProps<"li">
->(({ className, ...props }, ref) => (
-  <li ref={ref} className={cn("", className)} {...props} />
-))
-PaginationItem.displayName = "PaginationItem"
-
-type PaginationLinkProps = {
-  isActive?: boolean
-} & Pick<ButtonProps, "size"> &
-  React.ComponentProps<"a">
+  return (
+    <nav
+      role="navigation"
+      aria-label="pagination"
+      className={cn("mx-auto flex w-full justify-center", className)}
+      {...props}
+    >
+      <ul className="flex flex-row items-center gap-1">
+        <li>
+          <PaginationPrevious 
+            onClick={() => page > 1 && onPageChange(page - 1)}
+            disabled={page <= 1}
+          />
+        </li>
+        
+        {pages.map((pageNum) => (
+          <li key={pageNum}>
+            <PaginationLink
+              isActive={pageNum === page}
+              onClick={() => onPageChange(pageNum)}
+            >
+              {pageNum}
+            </PaginationLink>
+          </li>
+        ))}
+        
+        <li>
+          <PaginationNext 
+            onClick={() => page < count && onPageChange(page + 1)}
+            disabled={page >= count}
+          />
+        </li>
+      </ul>
+    </nav>
+  )
+}
 
 const PaginationLink = ({
   className,
   isActive,
   size = "icon",
   ...props
-}: PaginationLinkProps) => (
-  <a
+}: {
+  isActive?: boolean
+} & Pick<ButtonProps, "size"> &
+  React.ComponentProps<"button">) => (
+  <button
     aria-current={isActive ? "page" : undefined}
     className={cn(
       buttonVariants({
@@ -57,7 +70,6 @@ const PaginationLink = ({
     {...props}
   />
 )
-PaginationLink.displayName = "PaginationLink"
 
 const PaginationPrevious = ({
   className,
@@ -73,7 +85,6 @@ const PaginationPrevious = ({
     <span>Previous</span>
   </PaginationLink>
 )
-PaginationPrevious.displayName = "PaginationPrevious"
 
 const PaginationNext = ({
   className,
@@ -89,29 +100,5 @@ const PaginationNext = ({
     <ChevronRight className="h-4 w-4" />
   </PaginationLink>
 )
-PaginationNext.displayName = "PaginationNext"
 
-const PaginationEllipsis = ({
-  className,
-  ...props
-}: React.ComponentProps<"span">) => (
-  <span
-    aria-hidden
-    className={cn("flex h-9 w-9 items-center justify-center", className)}
-    {...props}
-  >
-    <MoreHorizontal className="h-4 w-4" />
-    <span className="sr-only">More pages</span>
-  </span>
-)
-PaginationEllipsis.displayName = "PaginationEllipsis"
-
-export {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-}
+export { Pagination }

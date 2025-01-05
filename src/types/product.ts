@@ -2,7 +2,7 @@ export interface Product {
   id: string;
   seller_id: string;
   title: string;
-  description?: string;
+  description?: string;  // Made optional to match database schema
   price: number;
   currency: string;
   category: string;
@@ -10,12 +10,12 @@ export interface Product {
   status: string;
   expiry: string;
   link_slot: number;
+  created_at?: string;
+  listingType?: "featured" | "standard";
   seller?: {
     email: string;
     country: string;
   };
-  created_at?: string;
-  listingType?: "featured" | "standard";
 }
 
 export type ProductRow = Omit<Product, 'listingType'>;
