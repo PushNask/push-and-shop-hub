@@ -9,12 +9,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     detectSessionInUrl: true,
   },
-  headers: {
-    'X-Client-Info': 'pushnshop-web',
-  },
-  global: {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
-  },
+  db: {
+    schema: 'public'
+  }
 });
