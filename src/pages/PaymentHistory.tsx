@@ -19,22 +19,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Transaction, DateRange } from "@/types/transaction";
 
-interface Transaction {
-  id: string;
-  seller_id: string;
-  product_id: string;
-  amount: number;
-  currency: string;
-  payment_method: string;
-  status: string;
-  created_at: string;
-}
-
-interface DateRange {
-  from?: Date;
-  to?: Date;
-}
+// Navigation items for the dashboard
+const navItems = [
+  {
+    title: "Payment History",
+    href: "/payment-history",
+    icon: DollarSign
+  }
+];
 
 export default function PaymentHistory() {
   const { toast } = useToast();
@@ -117,7 +111,7 @@ export default function PaymentHistory() {
 
   if (error) {
     return (
-      <DashboardLayout title="Payment History">
+      <DashboardLayout title="Payment History" navItems={navItems}>
         <Card className="mt-6">
           <CardContent className="pt-6">
             <div className="text-center text-red-500">
@@ -130,7 +124,7 @@ export default function PaymentHistory() {
   }
 
   return (
-    <DashboardLayout title="Payment History">
+    <DashboardLayout title="Payment History" navItems={navItems}>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-bold flex items-center gap-2">
