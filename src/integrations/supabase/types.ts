@@ -180,6 +180,7 @@ export type Database = {
           id: string
           is_verified: boolean | null
           last_login: string | null
+          name: string | null
           password_changed_at: string | null
           phone: string | null
           role: string
@@ -193,6 +194,7 @@ export type Database = {
           id: string
           is_verified?: boolean | null
           last_login?: string | null
+          name?: string | null
           password_changed_at?: string | null
           phone?: string | null
           role?: string
@@ -206,6 +208,7 @@ export type Database = {
           id?: string
           is_verified?: boolean | null
           last_login?: string | null
+          name?: string | null
           password_changed_at?: string | null
           phone?: string | null
           role?: string
