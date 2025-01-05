@@ -49,7 +49,7 @@ export const formSchema = z.object({
 export type AddProductFormValues = z.infer<typeof formSchema>;
 
 export function AddProductForm() {
-  const { mutate: addProduct, isLoading } = useAddProduct();
+  const { mutate: addProduct, isPending } = useAddProduct();
   const form = useForm<AddProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -78,15 +78,16 @@ export function AddProductForm() {
         <CategorySection form={form} />
         <ImageUploadSection 
           form={form}
-          maxSize={MAX_FILE_SIZE}
-          acceptedTypes={ACCEPTED_IMAGE_TYPES}
+          imageUrls={[]} // This should be managed with state in this component
+          onImageChange={() => {}} // Implement image change handler
+          onImageRemove={() => {}} // Implement image remove handler
         />
         <DeliveryOptionsSection form={form} />
         <ListingFeeSection form={form} />
         <PaymentMethodSection form={form} />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? (
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Adding Product...

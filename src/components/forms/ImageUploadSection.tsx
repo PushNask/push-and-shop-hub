@@ -8,9 +8,18 @@ interface ImageUploadSectionProps {
   imageUrls: string[];
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onImageRemove: (index: number) => void;
+  maxSize?: number;
+  acceptedTypes?: string[];
 }
 
-export function ImageUploadSection({ form, imageUrls, onImageChange, onImageRemove }: ImageUploadSectionProps) {
+export function ImageUploadSection({ 
+  form, 
+  imageUrls, 
+  onImageChange, 
+  onImageRemove,
+  maxSize = 5 * 1024 * 1024, // Default 5MB
+  acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
+}: ImageUploadSectionProps) {
   return (
     <FormField
       control={form.control}
@@ -39,7 +48,7 @@ export function ImageUploadSection({ form, imageUrls, onImageChange, onImageRemo
               <input
                 id="image-upload"
                 type="file"
-                accept="image/*"
+                accept={acceptedTypes.join(",")}
                 multiple
                 className="hidden"
                 onChange={onImageChange}
@@ -68,7 +77,7 @@ export function ImageUploadSection({ form, imageUrls, onImageChange, onImageRemo
             </div>
           </FormControl>
           <FormDescription>
-            Upload up to 7 images of your product. Supported formats: JPG, PNG, GIF
+            Upload up to 7 images of your product. Maximum size: {Math.round(maxSize / (1024 * 1024))}MB
           </FormDescription>
           <FormMessage />
         </FormItem>
