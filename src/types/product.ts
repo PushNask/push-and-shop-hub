@@ -54,3 +54,16 @@ export const transformProduct = (product: ProductRow & {
     } : undefined
   };
 };
+
+export interface AddProductFormValues {
+  title: string;
+  description: string;
+  price: number;
+  category: string;
+  images: string[];
+  pickup: boolean;
+  shipping: boolean;
+  both: boolean;
+  listingType: "standard" | "featured";
+  duration: string;
+}

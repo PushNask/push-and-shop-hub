@@ -12,6 +12,8 @@ import { DeliveryOptionsSection } from "@/components/forms/DeliveryOptionsSectio
 import { ListingFeeSection } from "@/components/forms/ListingFeeSection";
 import { useAddProduct } from "@/hooks/seller/useAddProduct";
 import { useSession } from "@supabase/auth-helpers-react";
+import { useState } from "react";
+import type { AddProductFormValues } from "@/types/product";
 
 const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -29,9 +31,10 @@ const productSchema = z.object({
 export function AddProductForm() {
   const navigate = useNavigate();
   const session = useSession();
-  const { mutate: addProduct, isLoading } = useAddProduct();
+  const { mutateAsync: addProduct, isPending } = useAddProduct();
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
-  const form = useForm({
+  const form = useForm<AddProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       title: "",
@@ -46,6 +49,25 @@ export function AddProductForm() {
       duration: "24"
     }
   });
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const urls = [...imageUrls];
+    
+    for (const file of files) {
+      const url = URL.createObjectURL(file);
+      urls.push(url);
+    }
+    
+    setImageUrls(urls);
+    form.setValue("images", urls);
+  };
+
+  const handleImageRemove = (index: number) => {
+    const newUrls = imageUrls.filter((_, i) => i !== index);
+    setImageUrls(newUrls);
+    form.setValue("images", newUrls);
+  };
 
   const onSubmit = async (data: z.infer<typeof productSchema>) => {
     if (!session?.user?.id) {
@@ -78,7 +100,12 @@ export function AddProductForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <ProductDetailsSection form={form} />
-        <ImageUploadSection form={form} />
+        <ImageUploadSection 
+          form={form}
+          imageUrls={imageUrls}
+          onImageChange={handleImageChange}
+          onImageRemove={handleImageRemove}
+        />
         <CategorySection form={form} />
         <DeliveryOptionsSection form={form} />
         <ListingFeeSection form={form} />
@@ -86,9 +113,9 @@ export function AddProductForm() {
         <Button 
           type="submit" 
           className="w-full" 
-          disabled={isLoading}
+          disabled={isPending}
         >
-          {isLoading ? "Submitting..." : "Add Product"}
+          {isPending ? "Submitting..." : "Add Product"}
         </Button>
       </form>
     </Form>

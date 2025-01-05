@@ -2,16 +2,18 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import type { AddProductFormValues } from "@/components/seller/products/AddProductForm";
+import type { AddProductFormValues } from "@/types/product";
 
-async function uploadImages(images: File[]) {
-  const uploadPromises = images.map(async (file) => {
-    const fileExt = file.name.split('.').pop();
+async function uploadImages(images: string[]) {
+  const uploadPromises = images.map(async (url) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const fileExt = blob.type.split('/')[1];
     const fileName = `${crypto.randomUUID()}.${fileExt}`;
     
     const { error: uploadError, data } = await supabase.storage
       .from('product-images')
-      .upload(fileName, file);
+      .upload(fileName, blob);
 
     if (uploadError) throw uploadError;
     
@@ -25,10 +27,7 @@ async function uploadImages(images: File[]) {
   return Promise.all(uploadPromises);
 }
 
-async function addProduct(data: AddProductFormValues) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("User not authenticated");
-
+async function addProduct(data: AddProductFormValues & { seller_id: string; currency: string; status: string }) {
   // Upload images first
   const imageUrls = await uploadImages(data.images);
 
@@ -48,13 +47,13 @@ async function addProduct(data: AddProductFormValues) {
   const { error: productError, data: productData } = await supabase
     .from('products')
     .insert({
-      seller_id: user.id,
+      seller_id: data.seller_id,
       title: data.title,
       description: data.description,
-      price: parseFloat(data.price),
+      price: data.price,
       category: data.category,
       images: imageUrls,
-      status: 'pending',
+      status: data.status,
       expiry: expiryDate.toISOString(),
     })
     .select()
@@ -66,10 +65,11 @@ async function addProduct(data: AddProductFormValues) {
   const { error: transactionError } = await supabase
     .from('transactions')
     .insert({
-      seller_id: user.id,
+      seller_id: data.seller_id,
       product_id: productData.id,
       amount: listingFee,
-      payment_method: data.paymentMethod,
+      currency: data.currency,
+      payment_method: 'cash',
       status: 'pending'
     });
 
@@ -79,17 +79,7 @@ async function addProduct(data: AddProductFormValues) {
 }
 
 export function useAddProduct() {
-  const navigate = useNavigate();
-
   return useMutation({
     mutationFn: addProduct,
-    onSuccess: () => {
-      toast.success("Product submitted for approval!");
-      navigate("/seller/products");
-    },
-    onError: (error) => {
-      console.error('Error adding product:', error);
-      toast.error("Failed to add product. Please try again.");
-    },
   });
 }
