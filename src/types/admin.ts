@@ -1,10 +1,13 @@
 export interface Admin {
   id: string;
-  name: string;
+  name?: string;
   email: string;
   role: "admin" | "super_admin";
-  region: string;
-  status: "active" | "inactive";
+  region?: string;
+  is_verified: boolean;
+  created_at?: string;
+  country?: string;
+  phone?: string;
 }
 
 export interface NewAdmin {
