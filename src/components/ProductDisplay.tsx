@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Product } from "@/types/product";
 import { Pagination } from "./ui/pagination";
 import { SkeletonCard } from "./SkeletonCard";
