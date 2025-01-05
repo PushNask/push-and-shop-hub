@@ -16,24 +16,39 @@ export default function UserProfile() {
   });
 
   useEffect(() => {
-    loadProfile();
-  }, []);
-
-  async function loadProfile() {
-    try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Check session status first
+    const checkSession = async () => {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (authError) throw authError;
-      
-      if (!user) {
+      if (sessionError) {
+        console.error("Session error:", sessionError);
         navigate("/login");
         return;
       }
 
+      if (!session) {
+        toast({
+          title: "Session Expired",
+          description: "Please log in again to continue.",
+          variant: "destructive",
+        });
+        navigate("/login");
+        return;
+      }
+
+      // If session exists, proceed to load profile
+      await loadProfile(session.user.id);
+    };
+
+    checkSession();
+  }, [navigate, toast]);
+
+  async function loadProfile(userId: string) {
+    try {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", user.id)
+        .eq("id", userId)
         .single();
 
       if (profileError) {
@@ -74,11 +89,14 @@ export default function UserProfile() {
   const handleSubmit = async (values: any) => {
     try {
       setIsLoading(true);
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (authError) throw authError;
-      
-      if (!user) {
+      if (sessionError || !session) {
+        toast({
+          title: "Session Expired",
+          description: "Please log in again to continue.",
+          variant: "destructive",
+        });
         navigate("/login");
         return;
       }
@@ -89,7 +107,7 @@ export default function UserProfile() {
           phone: values.phone,
           country: values.country,
         })
-        .eq("id", user.id);
+        .eq("id", session.user.id);
 
       if (updateError) throw updateError;
 
@@ -111,20 +129,15 @@ export default function UserProfile() {
 
   const handleLogout = async () => {
     try {
-      // First clear any existing session
       const { error } = await supabase.auth.signOut({ scope: 'local' });
       if (error) {
         console.error("Error signing out:", error);
         throw error;
       }
       
-      // Clear any local storage or state
       localStorage.clear();
-      
-      // Navigate to login page
       navigate("/login");
       
-      // Show success toast after navigation
       toast({
         title: "Logged Out",
         description: "You have been successfully logged out.",
