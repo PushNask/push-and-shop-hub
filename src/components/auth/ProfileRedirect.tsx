@@ -2,29 +2,35 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSessionContext } from '@supabase/auth-helpers-react';
 
 export function ProfileRedirect() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { session, isLoading } = useSessionContext();
 
   useEffect(() => {
     const checkUserRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        console.log("Current user:", user.email); // Debug log
-        
+      if (isLoading) return;
+
+      if (!session) {
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "Please log in to view your profile",
+        });
+        navigate("/login");
+        return;
+      }
+
+      try {
         const { data: profile, error } = await supabase
           .from("profiles")
           .select("role")
-          .eq("id", user.id)
+          .eq("id", session.user.id)
           .single();
 
-        console.log("User profile:", profile); // Debug log
-        
-        if (error) {
-          console.error("Error fetching profile:", error);
-        }
+        if (error) throw error;
 
         if (profile) {
           if (profile.role === "admin") {
@@ -34,18 +40,18 @@ export function ProfileRedirect() {
           }
           // Regular users stay on the profile page
         }
-      } else {
+      } catch (error) {
+        console.error("Error fetching profile:", error);
         toast({
           variant: "destructive",
-          title: "Access Denied",
-          description: "Please log in to view your profile",
+          title: "Error",
+          description: "Failed to load profile. Please try again.",
         });
-        navigate("/login");
       }
     };
 
     checkUserRole();
-  }, [navigate, toast]);
+  }, [navigate, toast, session, isLoading]);
 
   return null;
 }

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useSessionContext } from '@supabase/auth-helpers-react';
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -27,6 +28,7 @@ export function LoginForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { session } = useSessionContext();
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(formSchema),
@@ -39,16 +41,15 @@ export function LoginForm() {
   const onSubmit = async (values: LoginForm) => {
     try {
       setIsLoading(true);
-      
-      // Clear any existing session first
-      await supabase.auth.signOut();
-      
+
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
 
-      if (signInError) throw signInError;
+      if (signInError) {
+        throw signInError;
+      }
 
       if (!data.session) {
         throw new Error("No session created after login");
@@ -61,12 +62,9 @@ export function LoginForm() {
         .eq("id", data.user.id)
         .single();
 
-      if (profileError) throw profileError;
-
-      toast({
-        title: "Success",
-        description: "You have successfully logged in.",
-      });
+      if (profileError) {
+        throw profileError;
+      }
 
       // Redirect based on user role
       if (profile?.role === "admin") {
@@ -76,12 +74,19 @@ export function LoginForm() {
       } else {
         navigate("/profile");
       }
+
+      toast({
+        title: "Success",
+        description: "You have successfully logged in.",
+      });
     } catch (error) {
       console.error('Login error:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Invalid email or password.",
+        description: error.message === "Invalid login credentials" 
+          ? "Invalid email or password"
+          : error.message || "An error occurred during login",
       });
     } finally {
       setIsLoading(false);
