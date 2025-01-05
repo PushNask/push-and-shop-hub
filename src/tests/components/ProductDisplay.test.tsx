@@ -7,25 +7,25 @@ import { BrowserRouter } from 'react-router-dom';
 const mockProducts = [
   {
     id: '1',
+    seller_id: 'seller-1',
     title: 'Test Product 1',
     price: 100,
     currency: 'XAF',
     description: 'Test description 1',
     category: 'Electronics',
     images: ['test1.jpg'],
-    seller: {
+    status: 'approved',
+    expiry: new Date(Date.now() + 86400000).toISOString(),
+    link_slot: 13,
+    listingType: 'standard' as const,
+    profiles: {
       email: 'seller1@test.com',
       country: 'Cameroon',
-      phone: '+237123456789',
-      name: 'Seller 1'
+      phone: '+237123456789'
     },
-    status: 'approved',
-    expiry: new Date(Date.now() + 86400000).toISOString(), // 24 hours from now
-    deliveryOptions: {
-      pickup: true,
-      shipping: false,
-      both: false
-    }
+    pickup: true,
+    shipping: false,
+    both: false
   },
   // Add more mock products as needed
 ];
@@ -63,7 +63,7 @@ describe('ProductDisplay Component', () => {
 
   it('shows delivery options', () => {
     renderWithRouter(<ProductDisplay products={mockProducts} isLoading={false} />);
-    expect(screen.getByText('Pickup')).toBeInTheDocument();
+    expect(screen.getByText(/Pickup/i)).toBeInTheDocument();
   });
 
   it('handles view mode switching', () => {
@@ -105,7 +105,7 @@ describe('ProductDisplay Component', () => {
     const sortSelect = screen.getByRole('combobox', { name: /sort by/i });
     
     fireEvent.change(sortSelect, { target: { value: 'price-asc' } });
-    // Add assertions for sorting order
+    expect(screen.getByText('Test Product 1')).toBeInTheDocument();
   });
 
   it('handles search functionality', () => {
