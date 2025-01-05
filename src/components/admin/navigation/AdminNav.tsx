@@ -1,4 +1,4 @@
-import { BarChart3, Users, ClipboardCheck, CreditCard, Link as LinkIcon } from "lucide-react";
+import { BarChart3, Users, ClipboardCheck, CreditCard, Link as LinkIcon, UserCog } from "lucide-react";
 
 export const adminNavItems = [
   {
@@ -25,5 +25,10 @@ export const adminNavItems = [
     title: "Transactions",
     href: "/admin/transactions",
     icon: CreditCard,
+  },
+  {
+    title: "Profile",
+    href: "/admin/profile",
+    icon: UserCog,
   },
 ];

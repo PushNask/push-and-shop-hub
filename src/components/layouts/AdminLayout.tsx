@@ -1,9 +1,19 @@
-import { Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { AdminAuthGuard } from "@/components/admin/AdminAuthGuard";
 import { adminNavItems } from "@/components/admin/navigation/AdminNav";
 
 export function AdminLayout() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect to product approvals by default
+    if (window.location.pathname === '/admin') {
+      navigate('/admin/product-approvals');
+    }
+  }, [navigate]);
+
   return (
     <AdminAuthGuard>
       <DashboardLayout 
