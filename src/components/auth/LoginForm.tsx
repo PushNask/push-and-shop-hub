@@ -61,6 +61,7 @@ export function LoginForm() {
           description: "You have successfully logged in.",
         });
 
+        // Redirect based on user role
         if (profile?.role === "admin") {
           navigate("/admin/product-approvals");
         } else if (profile?.role === "seller") {
