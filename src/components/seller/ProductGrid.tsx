@@ -28,6 +28,7 @@ export const ProductGrid = ({ products, isLoading, onRelist, onRemove }: Product
               both: product.both ?? false
             }}
             category={product.category}
+            status={product.status}
             className="transition-transform duration-200 group-hover:scale-[1.02]"
           />
           <div className="absolute top-2 right-2">

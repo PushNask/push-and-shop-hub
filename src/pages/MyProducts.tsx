@@ -44,7 +44,7 @@ const MyProducts = () => {
         .from('products')
         .update({ 
           status: 'pending',
-          expiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() 
+          expiry: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
         })
         .eq('id', productId);
 
@@ -52,7 +52,7 @@ const MyProducts = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['seller-products'] });
-      toast.success("Product relisted successfully!");
+      toast.success("Product submitted for approval!");
     },
     onError: () => {
       toast.error("Failed to relist product");
@@ -116,12 +116,12 @@ const MyProducts = () => {
           <Tabs defaultValue="all" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="approved">Active</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
               <TabsTrigger value="expired">Expired</TabsTrigger>
             </TabsList>
 
-            {["all", "active", "pending", "expired"].map((tab) => (
+            {["all", "approved", "pending", "expired"].map((tab) => (
               <TabsContent key={tab} value={tab} className="mt-6">
                 {products.filter(product => tab === "all" || product.status === tab).length === 0 ? (
                   <EmptyState />
