@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "lucide-react";
 import { useState } from "react";
 import { ProductAssignmentDialog } from "./ProductAssignmentDialog";
+import { AdminPagination } from "./pagination/AdminPagination";
 import type { Product } from "@/types/product";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -21,6 +22,8 @@ interface LinkManagementTableProps {
   isAssigning?: boolean;
 }
 
+const ITEMS_PER_PAGE = 20;
+
 export function LinkManagementTable({
   linkSlots,
   onAssignProduct,
@@ -29,6 +32,7 @@ export function LinkManagementTable({
 }: LinkManagementTableProps) {
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleAssignProduct = async (productId: string) => {
     if (selectedSlot !== null) {
@@ -37,6 +41,10 @@ export function LinkManagementTable({
       setSelectedSlot(null);
     }
   };
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const totalPages = Math.ceil(120 / ITEMS_PER_PAGE);
 
   if (isLoading) {
     return (
@@ -68,8 +76,10 @@ export function LinkManagementTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array.from({ length: 120 }).map((_, index) => {
-              const slot = index + 1;
+            {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => {
+              const slot = startIndex + index + 1;
+              if (slot > 120) return null;
+              
               const product = linkSlots?.find((p) => p.link_slot === slot);
               const isFeatured = slot <= 12;
 
@@ -120,11 +130,18 @@ export function LinkManagementTable({
         </Table>
       </div>
 
+      <AdminPagination
+        page={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+
       <ProductAssignmentDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onAssign={handleAssignProduct}
         slot={selectedSlot}
+        isAssigning={isAssigning}
       />
     </>
   );
