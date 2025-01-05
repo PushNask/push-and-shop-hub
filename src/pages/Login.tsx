@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -28,6 +28,36 @@ export default function Login() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        redirectToDashboard(session.user.id);
+      }
+    });
+  }, []);
+
+  const redirectToDashboard = async (userId: string) => {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .single();
+
+    if (profile) {
+      switch (profile.role) {
+        case "admin":
+          navigate("/admin/analytics");
+          break;
+        case "seller":
+          navigate("/seller/profile");
+          break;
+        default:
+          navigate("/profile");
+      }
+    }
+  };
+
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -39,7 +69,7 @@ export default function Login() {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
@@ -51,7 +81,9 @@ export default function Login() {
         description: "You have successfully logged in.",
       });
       
-      navigate("/");
+      if (authData.user) {
+        await redirectToDashboard(authData.user.id);
+      }
     } catch (error) {
       console.error("Login error:", error);
       toast({
