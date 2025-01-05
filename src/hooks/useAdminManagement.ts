@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Admin, NewAdmin } from "@/types/admin";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminAudit } from "./useAdminAudit";
 
 export const useAdminManagement = () => {
   const [newAdmin, setNewAdmin] = useState<NewAdmin>({
@@ -10,6 +11,8 @@ export const useAdminManagement = () => {
     role: "admin",
     region: "",
   });
+
+  const { logAdminAction } = useAdminAudit();
 
   const handleAddAdmin = async () => {
     try {
@@ -22,7 +25,7 @@ export const useAdminManagement = () => {
         return;
       }
 
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from("profiles")
         .insert([
           {
@@ -30,9 +33,17 @@ export const useAdminManagement = () => {
             role: newAdmin.role as "admin" | "super_admin",
             is_verified: true,
           },
-        ]);
+        ])
+        .select()
+        .single();
 
       if (error) throw error;
+
+      await logAdminAction('create_admin', {
+        admin_email: newAdmin.email,
+        admin_role: newAdmin.role,
+        admin_region: newAdmin.region
+      });
 
       setNewAdmin({ name: "", email: "", role: "admin", region: "" });
       toast({
@@ -50,12 +61,25 @@ export const useAdminManagement = () => {
 
   const handleRemoveAdmin = async (adminId: string) => {
     try {
+      const { data: adminData } = await supabase
+        .from("profiles")
+        .select("email, role, region")
+        .eq("id", adminId)
+        .single();
+
       const { error } = await supabase
         .from("profiles")
         .delete()
         .eq("id", adminId);
 
       if (error) throw error;
+
+      await logAdminAction('remove_admin', {
+        admin_id: adminId,
+        admin_email: adminData?.email,
+        admin_role: adminData?.role,
+        admin_region: adminData?.region
+      });
 
       toast({
         title: "Admin Removed",

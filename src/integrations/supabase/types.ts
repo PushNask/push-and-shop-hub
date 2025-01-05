@@ -184,6 +184,8 @@ export type Database = {
           password_changed_at: string | null
           phone: string | null
           role: string
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           assigned_regions?: string[] | null
@@ -198,6 +200,8 @@ export type Database = {
           password_changed_at?: string | null
           phone?: string | null
           role?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           assigned_regions?: string[] | null
@@ -212,8 +216,18 @@ export type Database = {
           password_changed_at?: string | null
           phone?: string | null
           role?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
