@@ -6,12 +6,12 @@ import { useProductApproval } from "@/hooks/useProductApproval";
 import { useProductList } from "@/hooks/useProductList";
 import { adminNavItems } from "@/components/admin/navigation/AdminNav";
 import { Loader2 } from "lucide-react";
-import type { Product } from "@/types/product";
+import { transformProduct } from "@/types/product";
 
 const ProductApprovals = () => {
   const { data: products, isLoading, error } = useProductList();
   const { mutate: handleApproval } = useProductApproval();
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [feedback, setFeedback] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -58,26 +58,9 @@ const ProductApprovals = () => {
           {products?.map((product) => (
             <PendingProductCard
               key={product.id}
-              product={{
-                ...product,
-                listingType: product.link_slot && product.link_slot <= 12 ? "featured" : "standard",
-                seller: {
-                  name: product.seller?.name || "Unknown",
-                  location: product.seller?.location || "Unknown",
-                  rating: product.seller?.rating || 0,
-                  joinedDate: product.seller?.joinedDate || product.created_at || new Date().toISOString()
-                }
-              }}
+              product={transformProduct(product)}
               onReview={(p) => {
-                setSelectedProduct({
-                  ...p,
-                  currency: product.currency,
-                  expiry: product.expiry,
-                  link_slot: product.link_slot,
-                  seller_id: product.seller_id,
-                  status: product.status,
-                  created_at: product.created_at
-                });
+                setSelectedProduct(p);
                 setIsDialogOpen(true);
               }}
             />

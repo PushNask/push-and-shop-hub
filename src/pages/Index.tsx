@@ -4,6 +4,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { ProductCarousel } from "@/components/ProductCarousel";
 import { Pagination } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import { transformProduct } from "@/types/product";
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,6 +18,10 @@ export default function Index() {
     );
   }
 
+  const handlePageChange = (_: any, page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Featured Products Section */}
@@ -29,7 +34,9 @@ export default function Index() {
             ))}
           </div>
         ) : (
-          <ProductCarousel products={products?.featured || []} />
+          <ProductCarousel 
+            products={products?.featured.map(transformProduct) || []} 
+          />
         )}
       </section>
 
@@ -45,7 +52,7 @@ export default function Index() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {products?.standard.map((product) => (
+              {products?.standard.map(transformProduct).map((product) => (
                 <ProductCard
                   key={product.id}
                   title={product.title}
@@ -61,7 +68,7 @@ export default function Index() {
                   className="justify-center"
                   count={products.totalPages}
                   page={currentPage}
-                  onChange={(_, page) => setCurrentPage(page)}
+                  onChange={handlePageChange}
                 />
               </div>
             )}
