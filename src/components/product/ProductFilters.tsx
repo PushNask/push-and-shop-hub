@@ -12,6 +12,8 @@ interface ProductFiltersProps {
   setSortBy: (sort: 'price' | 'date' | 'popularity') => void;
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
+  priceRange: { min: number; max: number };
+  setPriceRange: (range: { min: number; max: number }) => void;
 }
 
 export function ProductFilters({
@@ -23,7 +25,19 @@ export function ProductFilters({
   setSortBy,
   selectedCategory,
   setSelectedCategory,
+  priceRange,
+  setPriceRange,
 }: ProductFiltersProps) {
+  const handlePriceChange = (type: 'min' | 'max', value: string) => {
+    const numValue = value === '' ? (type === 'min' ? 0 : Infinity) : Number(value);
+    if (!isNaN(numValue)) {
+      setPriceRange({
+        ...priceRange,
+        [type]: numValue
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
       <div className="flex items-center gap-2">
@@ -50,6 +64,24 @@ export function ProductFilters({
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full sm:w-auto"
         />
+        
+        <div className="flex gap-2 items-center">
+          <Input
+            type="number"
+            placeholder="Min price"
+            value={priceRange.min === 0 ? '' : priceRange.min}
+            onChange={(e) => handlePriceChange('min', e.target.value)}
+            className="w-24"
+          />
+          <span>-</span>
+          <Input
+            type="number"
+            placeholder="Max price"
+            value={priceRange.max === Infinity ? '' : priceRange.max}
+            onChange={(e) => handlePriceChange('max', e.target.value)}
+            className="w-24"
+          />
+        </div>
         
         <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
           <SelectTrigger className="w-[180px]">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProductCard } from "./ProductCard";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/product";
@@ -6,6 +6,7 @@ import { Pagination } from "./ui/pagination";
 import { SkeletonCard } from "./SkeletonCard";
 import { ProductFilters } from "./product/ProductFilters";
 import { useToast } from "@/hooks/use-toast";
+import { useUrlParams } from "@/hooks/useUrlParams";
 
 interface ProductDisplayProps {
   products: Product[];
@@ -14,12 +15,35 @@ interface ProductDisplayProps {
 
 export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
   const { toast } = useToast();
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState<'price' | 'date' | 'popularity'>('date');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [priceRange, setPriceRange] = useState({ min: 0, max: Infinity });
+  const { updateParams, getParam } = useUrlParams();
+
+  // Initialize state from URL parameters
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(
+    (getParam('view') as 'grid' | 'list') || 'grid'
+  );
+  const [currentPage, setCurrentPage] = useState(Number(getParam('page')) || 1);
+  const [sortBy, setSortBy] = useState<'price' | 'date' | 'popularity'>(
+    (getParam('sort') as 'price' | 'date' | 'popularity') || 'date'
+  );
+  const [selectedCategory, setSelectedCategory] = useState(getParam('category') || 'all');
+  const [searchQuery, setSearchQuery] = useState(getParam('search') || '');
+  const [priceRange, setPriceRange] = useState({
+    min: Number(getParam('minPrice')) || 0,
+    max: Number(getParam('maxPrice')) || Infinity
+  });
+
+  // Update URL when filters change
+  useEffect(() => {
+    updateParams({
+      view: viewMode,
+      page: currentPage.toString(),
+      sort: sortBy,
+      category: selectedCategory,
+      search: searchQuery,
+      minPrice: priceRange.min.toString(),
+      maxPrice: priceRange.max === Infinity ? '' : priceRange.max.toString()
+    });
+  }, [viewMode, currentPage, sortBy, selectedCategory, searchQuery, priceRange]);
 
   const productsPerPage = 12;
 
@@ -60,6 +84,11 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
     currentPage * productsPerPage
   );
 
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sortBy, selectedCategory, searchQuery, priceRange]);
+
   if (isLoading) {
     return (
       <div className={cn(
@@ -84,6 +113,8 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
         setSortBy={setSortBy}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
+        priceRange={priceRange}
+        setPriceRange={setPriceRange}
       />
 
       {filteredProducts.length === 0 ? (
