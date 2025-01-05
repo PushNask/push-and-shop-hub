@@ -1,22 +1,9 @@
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 import { cn } from "@/lib/utils"
-import { ChartStyle } from "./ChartStyle"
 import { ChartConfig } from "./types"
-
-type ChartContextProps = {
-  config: ChartConfig
-}
-
-const ChartContext = React.createContext<ChartContextProps | null>(null)
-
-export function useChart() {
-  const context = React.useContext(ChartContext)
-  if (!context) {
-    throw new Error("useChart must be used within a <ChartContainer />")
-  }
-  return context
-}
+import { ChartContext } from "./ChartContext"
+import { ChartStyle } from "./ChartStyle"
 
 const ChartContainer = React.forwardRef<
   HTMLDivElement,

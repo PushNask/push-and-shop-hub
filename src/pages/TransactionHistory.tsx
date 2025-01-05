@@ -34,7 +34,7 @@ export default function TransactionHistory() {
         .from('transactions')
         .select(`
           *,
-          seller:profiles(email, country)
+          seller:profiles!transactions_seller_id_fkey(email, country)
         `)
         .order('created_at', { ascending: false });
 

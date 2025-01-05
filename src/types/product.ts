@@ -12,10 +12,9 @@ export interface Product extends ProductRow {
     rating: number;
     joinedDate: string;
   };
-  image?: string; // For backward compatibility
+  image?: string;
 }
 
-// Helper function to transform database product to component product
 export const transformProduct = (product: ProductRow & { 
   seller_email?: string; 
   seller_country?: string; 
@@ -23,12 +22,12 @@ export const transformProduct = (product: ProductRow & {
   return {
     ...product,
     listingType: product.link_slot && product.link_slot <= 12 ? "featured" : "standard",
-    image: product.images?.[0], // Use first image as main image
-    seller: {
-      name: product.seller_email || "Unknown",
+    image: product.images?.[0],
+    seller: product.seller_email ? {
+      name: product.seller_email,
       location: product.seller_country || "Unknown",
       rating: 0,
       joinedDate: product.created_at || new Date().toISOString()
-    }
+    } : undefined
   };
 };

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { adminNavItems } from "@/components/admin/navigation/AdminNav";
-import { Chart } from "@/components/ui/chart";
+import { Chart } from "@/components/ui/charts";
 import { Users, DollarSign, ShoppingBag, Clock } from "lucide-react";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
