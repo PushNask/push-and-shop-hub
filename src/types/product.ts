@@ -12,6 +12,11 @@ export interface Product {
   link_slot: number;
   created_at?: string;
   listingType: "featured" | "standard";
+  profiles?: {
+    email: string;
+    country: string;
+    phone?: string;
+  };
   seller?: {
     email: string;
     country: string;
@@ -42,7 +47,6 @@ export const transformProduct = (product: ProductRow & {
       email: product.profiles.email,
       country: product.profiles.country,
       phone: product.profiles.phone,
-      // Add default values for the new seller properties
       name: "Unknown Seller",
       location: product.profiles.country || "Unknown Location",
       rating: 0,

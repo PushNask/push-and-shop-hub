@@ -136,9 +136,18 @@ const MyProducts = () => {
                     .map((product) => (
                       <div key={product.id} className="relative">
                         <ProductCard
+                          id={product.id}
                           title={product.title}
                           price={product.price}
                           images={product.images}
+                          seller={product.seller}
+                          expiry={product.expiry}
+                          deliveryOptions={{
+                            pickup: product.pickup ?? false,
+                            shipping: product.shipping ?? false,
+                            both: product.both ?? false
+                          }}
+                          category={product.category}
                         />
                         <div className="absolute top-2 right-2">
                           {getStatusBadge(product.status || 'pending')}

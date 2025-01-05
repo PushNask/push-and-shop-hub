@@ -19,9 +19,18 @@ export function ProductCarousel({ products }: ProductCarouselProps) {
         {products.map((product) => (
           <CarouselItem key={product.id} className="md:basis-1/2 lg:basis-1/3">
             <ProductCard
+              id={product.id}
               title={product.title}
               price={product.price}
               images={product.images}
+              seller={product.seller}
+              expiry={product.expiry}
+              deliveryOptions={{
+                pickup: product.pickup ?? false,
+                shipping: product.shipping ?? false,
+                both: product.both ?? false
+              }}
+              category={product.category}
             />
           </CarouselItem>
         ))}
