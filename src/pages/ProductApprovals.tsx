@@ -58,7 +58,10 @@ const ProductApprovals = () => {
           {products?.map((product) => (
             <PendingProductCard
               key={product.id}
-              product={product}
+              product={{
+                ...product,
+                listingType: product.link_slot && product.link_slot <= 12 ? "featured" : "standard"
+              }}
               onReview={(product) => {
                 setSelectedProduct(product);
                 setIsDialogOpen(true);
