@@ -1,23 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  images: string[];
-  listingType: "featured" | "standard";
-  seller: {
-    name: string;
-    location: string;
-    rating: number;
-    joinedDate: string;
-  };
-  submittedAt: string;
-}
+import { Product } from "@/types/product";
 
 export const useProductApprovals = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);

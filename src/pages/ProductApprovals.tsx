@@ -6,7 +6,7 @@ import { useProductApproval } from "@/hooks/useProductApproval";
 import { useProductList } from "@/hooks/useProductList";
 import { adminNavItems } from "@/components/admin/navigation/AdminNav";
 import { Loader2 } from "lucide-react";
-import { transformProduct, type Product } from "@/types/product";
+import { Product, transformProduct } from "@/types/product";
 
 const ProductApprovals = () => {
   const { data: products, isLoading, error } = useProductList();
@@ -60,7 +60,7 @@ const ProductApprovals = () => {
               key={product.id}
               product={transformProduct(product)}
               onReview={(p) => {
-                setSelectedProduct(p);
+                setSelectedProduct(transformProduct(p));
                 setIsDialogOpen(true);
               }}
             />
