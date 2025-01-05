@@ -188,6 +188,7 @@ export default function AddNewProduct() {
             form={form}
             imageUrls={imageUrls}
             onImageChange={handleImageChange}
+            onImageRemove={handleImageRemove}
           />
           <DeliveryOptionsSection form={form} />
           <ListingFeeSection form={form} />
