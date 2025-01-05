@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { ProductCard } from "./ProductCard";
-import { cn } from "@/lib/utils";
 import { Product } from "@/types/product";
 import { Pagination } from "./ui/pagination";
 import { SkeletonCard } from "./SkeletonCard";
 import { ProductFilters } from "./product/ProductFilters";
-import { useToast } from "@/hooks/use-toast";
+import { ProductList } from "./product/ProductList";
+import { EmptyState } from "./product/EmptyState";
+import { useProductFilter, useProductSort } from "./product/ProductFilterLogic";
 import { useUrlParams } from "@/hooks/useUrlParams";
+import { cn } from "@/lib/utils";
 
 interface ProductDisplayProps {
   products: Product[];
@@ -14,7 +15,6 @@ interface ProductDisplayProps {
 }
 
 export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
-  const { toast } = useToast();
   const { updateParams, getParam } = useUrlParams();
 
   // Initialize state from URL parameters
@@ -47,39 +47,16 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
 
   const productsPerPage = 12;
 
-  // Filter and sort products
-  const filteredProducts = products
-    .filter(product => {
-      try {
-        const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-        const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            product.description?.toLowerCase().includes(searchQuery.toLowerCase());
-        const price = Number(product.price);
-        const matchesPrice = !isNaN(price) && price >= priceRange.min && price <= priceRange.max;
-        
-        return matchesCategory && matchesSearch && matchesPrice;
-      } catch (error) {
-        console.error('Error filtering product:', error);
-        toast({
-          title: "Error",
-          description: "There was a problem filtering the products",
-          variant: "destructive",
-        });
-        return false;
-      }
-    })
-    .sort((a, b) => {
-      try {
-        if (sortBy === 'price') return Number(a.price) - Number(b.price);
-        if (sortBy === 'date') return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
-        return 0;
-      } catch (error) {
-        console.error('Error sorting products:', error);
-        return 0;
-      }
-    });
+  // Apply filters and sorting
+  const filteredProducts = useProductFilter(products, {
+    selectedCategory,
+    searchQuery,
+    priceRange
+  });
+  const sortedProducts = useProductSort(filteredProducts, sortBy);
 
-  const paginatedProducts = filteredProducts.slice(
+  // Paginate products
+  const paginatedProducts = sortedProducts.slice(
     (currentPage - 1) * productsPerPage,
     currentPage * productsPerPage
   );
@@ -118,36 +95,10 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
       />
 
       {filteredProducts.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">No products found matching your criteria</p>
-        </div>
+        <EmptyState />
       ) : (
         <>
-          <div className={cn(
-            "grid gap-4",
-            viewMode === 'grid' 
-              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" 
-              : "grid-cols-1"
-          )}>
-            {paginatedProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                title={product.title}
-                price={product.price}
-                images={product.images}
-                seller={product.seller}
-                expiry={product.expiry}
-                deliveryOptions={{
-                  pickup: product.pickup ?? false,
-                  shipping: product.shipping ?? false,
-                  both: product.both ?? false
-                }}
-                category={product.category}
-                className={viewMode === 'list' ? "flex flex-row" : ""}
-              />
-            ))}
-          </div>
+          <ProductList products={paginatedProducts} viewMode={viewMode} />
 
           {filteredProducts.length > productsPerPage && (
             <Pagination
