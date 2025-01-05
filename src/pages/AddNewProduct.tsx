@@ -12,6 +12,8 @@ import { ImageUploadSection } from "@/components/forms/ImageUploadSection";
 import { DeliveryOptionsSection } from "@/components/forms/DeliveryOptionsSection";
 import { ProductDetailsSection } from "@/components/forms/ProductDetailsSection";
 import { CategorySection } from "@/components/forms/CategorySection";
+import { PaymentMethodSection } from "@/components/forms/PaymentMethodSection";
+import { ListingFeeSection } from "@/components/forms/ListingFeeSection";
 import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
@@ -26,6 +28,9 @@ const formSchema = z.object({
   images: z.array(z.instanceof(File)).min(1, "At least one image is required").max(7, "Maximum 7 images allowed"),
   pickup: z.boolean().optional(),
   shipping: z.boolean().optional(),
+  paymentMethod: z.enum(["cash", "online"]),
+  listingType: z.enum(["standard", "featured"]),
+  duration: z.string(),
 }).refine((data) => data.pickup || data.shipping, {
   message: "Select at least one delivery option",
   path: ["delivery"],
@@ -48,6 +53,9 @@ export default function AddNewProduct() {
       images: [],
       pickup: true,
       shipping: false,
+      paymentMethod: "cash",
+      listingType: "standard",
+      duration: "24",
     },
   });
 
@@ -58,11 +66,12 @@ export default function AddNewProduct() {
       return;
     }
 
-    const urls = files.map(file => URL.createObjectURL(file));
-    setImageUrls(prev => [...prev, ...urls]);
+    // Clear previous preview URLs
+    imageUrls.forEach(url => URL.revokeObjectURL(url));
     
-    const currentImages = form.getValues("images");
-    form.setValue("images", [...currentImages, ...files]);
+    const urls = files.map(file => URL.createObjectURL(file));
+    setImageUrls(urls);
+    form.setValue("images", files);
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -92,11 +101,17 @@ export default function AddNewProduct() {
         })
       );
 
-      // Calculate expiry date (7 days from now) in ISO string format
-      const expiryDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      // Calculate expiry date based on selected duration
+      const durationHours = parseInt(data.duration);
+      const expiryDate = new Date(Date.now() + durationHours * 60 * 60 * 1000).toISOString();
+
+      // Get user profile for seller_id
+      const { data: profile } = await supabase.auth.getUser();
+      if (!profile.user) throw new Error("User not authenticated");
 
       // Insert product data into Supabase
       const { error } = await supabase.from('products').insert({
+        seller_id: profile.user.id,
         title: data.title,
         description: data.description,
         price: parseFloat(data.price),
@@ -104,18 +119,36 @@ export default function AddNewProduct() {
         images: imageUrls,
         status: 'pending',
         expiry: expiryDate,
+        link_slot: data.listingType === 'featured' ? null : null, // Will be assigned by admin
       });
 
       if (error) throw error;
+
+      // Create transaction record for listing fee
+      const listingFee = calculateListingFee(data.listingType, data.duration);
+      const { error: transactionError } = await supabase.from('transactions').insert({
+        seller_id: profile.user.id,
+        amount: listingFee,
+        payment_method: data.paymentMethod,
+        status: 'pending'
+      });
+
+      if (transactionError) throw transactionError;
       
-      toast.success("Product added successfully!");
+      toast.success("Product submitted for approval!");
       navigate("/seller/products");
     } catch (error) {
       console.error('Error:', error);
-      toast.error("Failed to add product");
+      toast.error("Failed to add product. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const calculateListingFee = (listingType: string, duration: string): number => {
+    const durationHours = parseInt(duration);
+    const baseRate = listingType === 'featured' ? 25 : 10;
+    return baseRate * (durationHours / 24);
   };
 
   return (
@@ -130,16 +163,15 @@ export default function AddNewProduct() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <ProductDetailsSection form={form} />
-          
           <CategorySection form={form} />
-          
           <ImageUploadSection 
             form={form}
             imageUrls={imageUrls}
             onImageChange={handleImageChange}
           />
-
           <DeliveryOptionsSection form={form} />
+          <ListingFeeSection form={form} />
+          <PaymentMethodSection form={form} />
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? (
