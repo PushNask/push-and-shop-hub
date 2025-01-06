@@ -37,19 +37,6 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
     updateParams({ currentPage: 1 });
   }, [params.sortBy, params.selectedCategory, params.searchQuery, params.priceRange]);
 
-  if (isLoading) {
-    return (
-      <div className={cn(
-        "grid gap-4",
-        params.viewMode === 'grid' ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"
-      )}>
-        {Array.from({ length: productsPerPage }).map((_, i) => (
-          <SkeletonCard key={i} />
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <ProductFilters
@@ -65,7 +52,18 @@ export function ProductDisplay({ products, isLoading }: ProductDisplayProps) {
         setPriceRange={(range) => updateParams({ priceRange: range })}
       />
 
-      {filteredProducts.length === 0 ? (
+      {isLoading ? (
+        <div className={cn(
+          "grid gap-4",
+          params.viewMode === 'grid' 
+            ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" 
+            : "grid-cols-1"
+        )}>
+          {Array.from({ length: productsPerPage }).map((_, i) => (
+            <SkeletonCard key={i} viewMode={params.viewMode} />
+          ))}
+        </div>
+      ) : filteredProducts.length === 0 ? (
         <EmptyState />
       ) : (
         <>

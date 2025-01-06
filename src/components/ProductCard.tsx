@@ -9,7 +9,8 @@ import { DeliveryBadges } from "./product/DeliveryBadges";
 import { ProductContactButton } from "./product/ProductContactButton";
 import { ProductCardErrorBoundary } from "./product/ProductCardErrorBoundary";
 import { useTimeLeft } from "@/hooks/useTimeLeft";
-import { Clock } from "lucide-react";
+import { Clock, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { DeliveryOption } from "@/types/product";
 
 interface ProductCardProps {
@@ -29,6 +30,7 @@ interface ProductCardProps {
   category?: string;
   description?: string;
   status?: 'pending' | 'approved' | 'rejected';
+  isLoading?: boolean;
 }
 
 export function ProductCard({ 
@@ -41,12 +43,26 @@ export function ProductCard({
   expiry,
   delivery_option,
   category,
-  status = 'pending'
+  status = 'pending',
+  isLoading = false
 }: ProductCardProps) {
   const timeLeft = useTimeLeft(expiry);
 
+  if (isLoading) {
+    return <SkeletonCard />;
+  }
+
   return (
-    <ProductCardErrorBoundary>
+    <ProductCardErrorBoundary
+      fallback={
+        <Alert variant="destructive" className="h-full">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Failed to load product information
+          </AlertDescription>
+        </Alert>
+      }
+    >
       <div 
         className={cn(
           "group relative overflow-hidden rounded-lg hover-lift glass-card h-full",
