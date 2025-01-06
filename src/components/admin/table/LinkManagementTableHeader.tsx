@@ -8,11 +8,11 @@ export function LinkManagementTableHeader() {
   return (
     <TableHeader>
       <TableRow>
-        <TableHead>Slot</TableHead>
-        <TableHead>Type</TableHead>
-        <TableHead>Current Product</TableHead>
-        <TableHead>Status</TableHead>
-        <TableHead>Actions</TableHead>
+        <TableHead className="w-[100px]">Slot</TableHead>
+        <TableHead className="w-[150px]">Type</TableHead>
+        <TableHead className="w-[300px]">Current Product</TableHead>
+        <TableHead className="w-[150px]">Status</TableHead>
+        <TableHead className="w-[200px]">Actions</TableHead>
       </TableRow>
     </TableHeader>
   );

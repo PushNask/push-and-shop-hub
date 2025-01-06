@@ -1,5 +1,6 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@/types/product";
 
@@ -17,6 +18,7 @@ export function LinkManagementTableRow({
   isAssigning,
 }: LinkManagementTableRowProps) {
   const { toast } = useToast();
+  const isFeatured = slot <= 12;
   
   const handleCopyLink = () => {
     const link = `${window.location.origin}/P${slot}`;
@@ -29,10 +31,25 @@ export function LinkManagementTableRow({
 
   return (
     <TableRow>
-      <TableCell>P{slot}</TableCell>
-      <TableCell>{product?.title || "Available"}</TableCell>
-      <TableCell>{product?.status || "N/A"}</TableCell>
+      <TableCell className="font-medium">P{slot}</TableCell>
       <TableCell>
+        <Badge variant={isFeatured ? "default" : "secondary"}>
+          {isFeatured ? "Featured" : "Standard"}
+        </Badge>
+      </TableCell>
+      <TableCell>{product?.title || "Available"}</TableCell>
+      <TableCell>
+        {product?.status ? (
+          <Badge 
+            variant={product.status === "approved" ? "default" : "secondary"}
+          >
+            {product.status}
+          </Badge>
+        ) : (
+          "N/A"
+        )}
+      </TableCell>
+      <TableCell className="space-x-2">
         <Button
           variant="outline"
           size="sm"
@@ -41,8 +58,6 @@ export function LinkManagementTableRow({
         >
           Copy Link
         </Button>
-      </TableCell>
-      <TableCell>
         <Button
           variant="outline"
           size="sm"
