@@ -11,16 +11,20 @@ import { ShareButtons } from "@/components/product/ShareButtons";
 import { DeliveryBadges } from "@/components/product/DeliveryBadges";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
+import { useTimeLeft } from "@/hooks/useTimeLeft";
 
 const ProductPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const timeLeft = useTimeLeft(product?.expiry);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        if (!id) return;
+        
         const { data, error } = await supabase
           .from('products')
           .select(`
@@ -91,7 +95,7 @@ const ProductPage = () => {
           <ProductImages images={product.images} title={product.title} />
         </div>
         <div className="space-y-6">
-          <ProductInfo product={product} />
+          <ProductInfo product={product} timeLeft={timeLeft || ''} />
           
           <div className="flex flex-col gap-4">
             <Button 
@@ -116,6 +120,6 @@ const ProductPage = () => {
       </div>
     </div>
   );
-}
+};
 
 export default ProductPage;

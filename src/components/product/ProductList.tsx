@@ -24,11 +24,7 @@ export function ProductList({ products, viewMode }: ProductListProps) {
           images={product.images}
           seller={product.seller}
           expiry={product.expiry}
-          deliveryOptions={{
-            pickup: product.pickup ?? false,
-            shipping: product.shipping ?? false,
-            both: product.both ?? false
-          }}
+          delivery_option={product.delivery_option}
           category={product.category}
           className={viewMode === 'list' ? "flex flex-row" : ""}
         />
