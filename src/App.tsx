@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
 import { SellerRoute } from "@/components/auth/SellerRoute";
@@ -33,41 +33,49 @@ const NotFound = lazy(() => import("@/pages/NotFound"));
 
 export default function App() {
   return (
-    <Routes>
-      <Route element={<MarketplaceLayout />}>
-        <Route path="/" element={<Home />} />
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        <Route element={<MarketplaceLayout />}>
+          <Route path="/" element={<Home />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/category/:category" element={<CategoryProducts />} />
         <Route path="/product/:id" element={<ProductDetails />} />
-      </Route>
+        </Route>
 
-      <Route element={<AuthLayout />}>
+        <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
-      </Route>
+        </Route>
 
-      <Route element={<ProtectedRoute><DashboardLayout title="Dashboard" /></ProtectedRoute>}>
-        <Route path="/admin" element={<AdminRoute />}>
+        <Route element={
+          <ProtectedRoute>
+            <DashboardLayout title="Dashboard">
+              <Outlet />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }>
+          <Route path="/admin" element={<AdminRoute />}>
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="sellers" element={<AdminSellers />} />
           <Route path="transactions" element={<AdminTransactions />} />
           <Route path="settings" element={<AdminSettings />} />
-        </Route>
+          </Route>
 
-        <Route path="/seller" element={<SellerRoute />}>
+          <Route path="/seller" element={<SellerRoute />}>
           <Route index element={<SellerDashboard />} />
           <Route path="products" element={<SellerProducts />} />
           <Route path="add-product" element={<AddProductForm />} />
           <Route path="transactions" element={<SellerTransactions />} />
           <Route path="settings" element={<SellerSettings />} />
+          </Route>
         </Route>
-      </Route>
 
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 }
