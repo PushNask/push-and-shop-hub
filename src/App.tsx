@@ -49,7 +49,7 @@ export default function App() {
         <Route path="/verify-email" element={<VerifyEmail />} />
       </Route>
 
-      <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+      <Route element={<ProtectedRoute><DashboardLayout title="Dashboard" /></ProtectedRoute>}>
         <Route path="/admin" element={<AdminRoute />}>
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
