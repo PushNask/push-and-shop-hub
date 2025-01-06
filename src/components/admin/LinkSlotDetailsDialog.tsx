@@ -8,9 +8,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar, Link } from "lucide-react";
+import { Calendar, Link, ExternalLink, Copy } from "lucide-react";
 import type { Product } from "@/types/product";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 interface LinkSlotDetailsDialogProps {
   open: boolean;
@@ -27,7 +28,21 @@ export function LinkSlotDetailsDialog({
   product,
   onAssign,
 }: LinkSlotDetailsDialogProps) {
+  const { toast } = useToast();
   const isFeatured = slot <= 12;
+
+  const handleCopyLink = () => {
+    const link = `${window.location.origin}/P${slot}`;
+    navigator.clipboard.writeText(link);
+    toast({
+      title: "Link copied",
+      description: "The permanent link has been copied to your clipboard",
+    });
+  };
+
+  const handleVisitLink = () => {
+    window.open(`/P${slot}`, '_blank');
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -101,7 +116,26 @@ export function LinkSlotDetailsDialog({
                   )}
                 </div>
 
-                <div className="pt-4">
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={handleCopyLink}
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Link
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={handleVisitLink}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Visit Link
+                  </Button>
+                </div>
+
+                <div className="pt-2">
                   <Button
                     variant="outline"
                     className="w-full"
