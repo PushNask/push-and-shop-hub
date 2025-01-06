@@ -17,6 +17,7 @@ import ProductApproval from "@/pages/ProductApproval";
 import UserManagement from "@/pages/UserManagement";
 import Analytics from "@/pages/Analytics";
 
+// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -28,8 +29,8 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <BrowserRouter>
             <Routes>
@@ -57,8 +58,8 @@ function App() {
             <Toaster />
           </BrowserRouter>
         </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 
