@@ -11,6 +11,7 @@ import { ProductCardErrorBoundary } from "./product/ProductCardErrorBoundary";
 import { useTimeLeft } from "@/hooks/useTimeLeft";
 import { Clock, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { SkeletonCard } from "./SkeletonCard";
 import type { DeliveryOption } from "@/types/product";
 
 interface ProductCardProps {
