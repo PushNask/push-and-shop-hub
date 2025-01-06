@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
-import HomePage from "@/pages/HomePage";
+import Index from "@/pages/Index";  // Make sure this import exists
 import ProductPage from "@/pages/ProductPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
@@ -35,7 +35,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<Index />} />
               <Route path="/P:slot" element={<PermanentLinkSlot />} />
               <Route path="/products/:id" element={<ProductPage />} />
               <Route path="/login" element={<LoginPage />} />
