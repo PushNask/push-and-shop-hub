@@ -2,6 +2,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { ExternalLink } from "lucide-react";
 import type { Product } from "@/types/product";
 
 interface LinkManagementTableRowProps {
@@ -27,6 +28,12 @@ export function LinkManagementTableRow({
       title: "Link copied",
       description: "The permanent link has been copied to your clipboard.",
     });
+  };
+
+  const handleViewProduct = () => {
+    if (product) {
+      window.open(`/products/${product.id}`, '_blank');
+    }
   };
 
   return (
@@ -58,6 +65,16 @@ export function LinkManagementTableRow({
         >
           Copy Link
         </Button>
+        {product && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleViewProduct}
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            View
+          </Button>
+        )}
         <Button
           variant="outline"
           size="sm"
