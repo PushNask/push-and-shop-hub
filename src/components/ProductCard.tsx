@@ -133,23 +133,27 @@ export function ProductCard({
           />
         </div>
 
-        <div className="p-4 space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="font-medium text-sm sm:text-base truncate">{title}</h3>
-            {category && (
-              <Badge variant="secondary" className="text-xs shrink-0">
-                {category}
-              </Badge>
-            )}
+        <div className="p-4 space-y-4">
+          {/* Title and Category */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="font-semibold text-base sm:text-lg truncate">{title}</h3>
+              {category && (
+                <Badge variant="secondary" className="text-xs shrink-0">
+                  {category}
+                </Badge>
+              )}
+            </div>
+            <p className="text-xl font-bold text-primary">XAF {price.toLocaleString()}</p>
           </div>
-          
-          <p className="text-lg font-semibold text-primary">XAF {price.toLocaleString()}</p>
-          
+
+          {/* Description */}
           {description && (
             <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
           )}
 
-          <div className="space-y-2">
+          {/* Seller Info and Verification */}
+          <div className="space-y-2 border-t pt-2">
             {seller?.country && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 shrink-0" />
