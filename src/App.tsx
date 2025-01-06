@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
-import Index from "@/pages/Index";  // Make sure this import exists
+import Index from "@/pages/Index";
 import ProductPage from "@/pages/ProductPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
@@ -17,7 +17,6 @@ import ProductApproval from "@/pages/ProductApproval";
 import UserManagement from "@/pages/UserManagement";
 import Analytics from "@/pages/Analytics";
 
-// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
