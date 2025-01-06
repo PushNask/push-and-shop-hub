@@ -4,7 +4,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { supabase } from "@/integrations/supabase/client";
 import LinkSlotRedirect from "@/pages/LinkSlotRedirect";
 import { toast } from "sonner";
-import type { PostgrestQueryBuilder } from "@supabase/supabase-js";
 
 // Mock dependencies
 vi.mock("@/integrations/supabase/client", () => ({
@@ -24,7 +23,20 @@ describe("LinkSlotRedirect", () => {
     vi.clearAllMocks();
   });
 
-  const mockQueryBuilder = {
+  // Define a type for our mock query builder that matches what we're using
+  type MockQueryBuilder = {
+    select: ReturnType<typeof vi.fn>;
+    eq: ReturnType<typeof vi.fn>;
+    single: ReturnType<typeof vi.fn>;
+    url: string;
+    headers: Record<string, string>;
+    insert: ReturnType<typeof vi.fn>;
+    upsert: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+    filter: ReturnType<typeof vi.fn>;
+  };
+
+  const mockQueryBuilder: MockQueryBuilder = {
     select: vi.fn(),
     eq: vi.fn(),
     single: vi.fn(),
@@ -34,7 +46,7 @@ describe("LinkSlotRedirect", () => {
     upsert: vi.fn(),
     delete: vi.fn(),
     filter: vi.fn(),
-  } as unknown as PostgrestQueryBuilder<any, any, any>;
+  };
 
   const renderWithRouter = (slot: string) => {
     return render(
