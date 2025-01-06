@@ -1,101 +1,64 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "@/components/ui/toaster";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { AdminLayout } from "@/components/layouts/AdminLayout";
-import { SellerLayout } from "@/components/layouts/SellerLayout";
-import { ProfileRedirect } from "@/components/auth/ProfileRedirect";
-import Index from "@/pages/Index";
-import Login from "@/pages/Login";
-import SignUp from "@/pages/SignUp";
-import ForgotPassword from "@/pages/ForgotPassword";
-import ProductApprovals from "@/pages/ProductApprovals";
-import AdminProfile from "@/pages/AdminProfile";
-import SellerProfile from "@/pages/SellerProfile";
-import UserProfile from "@/pages/UserProfile";
-import AdminAnalytics from "@/pages/AdminAnalytics";
-import AdminManagement from "@/pages/AdminManagement";
-import TransactionHistory from "@/pages/TransactionHistory";
-import LinkManagement from "@/pages/LinkManagement";
-import MyProducts from "@/pages/MyProducts";
-import AddNewProduct from "@/pages/AddNewProduct";
-import PaymentHistory from "@/pages/PaymentHistory";
-import SellerAnalytics from "@/pages/SellerAnalytics";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SessionContextProvider } from '@supabase/auth-helpers-react';
-import { supabase } from "@/integrations/supabase/client";
+import { Toaster } from "@/components/ui/toaster";
+import { PermanentLinkSlot } from "@/components/product/PermanentLinkSlot";
+import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/providers/AuthProvider";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminRoute } from "@/components/auth/AdminRoute";
+import HomePage from "@/pages/HomePage";
+import ProductPage from "@/pages/ProductPage";
+import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
+import DashboardPage from "@/pages/DashboardPage";
+import AdminDashboard from "@/pages/AdminDashboard";
+import LinkManagement from "@/pages/LinkManagement";
+import ProductApproval from "@/pages/ProductApproval";
+import UserManagement from "@/pages/UserManagement";
+import Analytics from "@/pages/Analytics";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
       retry: 1,
-      refetchOnWindowFocus: false,
     },
   },
 });
 
 function App() {
   return (
-    <SessionContextProvider supabaseClient={supabase}>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <div className="min-h-screen flex flex-col">
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <AuthProvider>
+          <BrowserRouter>
             <Routes>
-              {/* Admin routes */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<Navigate to="/admin/product-approvals" replace />} />
-                <Route path="analytics" element={<AdminAnalytics />} />
-                <Route path="users" element={<AdminManagement />} />
-                <Route path="links" element={<LinkManagement />} />
-                <Route path="product-approvals" element={<ProductApprovals />} />
-                <Route path="transactions" element={<TransactionHistory />} />
-                <Route path="profile" element={<AdminProfile />} />
+              {/* Public Routes */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/P:slot" element={<PermanentLinkSlot />} />
+              <Route path="/products/:id" element={<ProductPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
               </Route>
 
-              {/* Seller routes */}
-              <Route path="/seller" element={<SellerLayout />}>
-                <Route index element={<Navigate to="/seller/products" replace />} />
-                <Route path="products" element={<MyProducts />} />
-                <Route path="add-product" element={<AddNewProduct />} />
-                <Route path="transactions" element={<PaymentHistory />} />
-                <Route path="analytics" element={<SellerAnalytics />} />
-                <Route path="profile" element={<SellerProfile />} />
+              {/* Admin Routes */}
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/links" element={<LinkManagement />} />
+                <Route path="/admin/approvals" element={<ProductApproval />} />
+                <Route path="/admin/users" element={<UserManagement />} />
+                <Route path="/admin/analytics" element={<Analytics />} />
               </Route>
-
-              {/* Public routes */}
-              <Route
-                path="/"
-                element={
-                  <>
-                    <Header />
-                    <main className="flex-1">
-                      <Index />
-                    </main>
-                    <Footer />
-                  </>
-                }
-              />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-
-              {/* Protected profile route with role-based redirect */}
-              <Route path="/profile" element={
-                <>
-                  <ProfileRedirect />
-                  <UserProfile />
-                </>
-              } />
-
-              {/* Catch-all redirect */}
-              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             <Toaster />
-          </div>
-        </Router>
-      </QueryClientProvider>
-    </SessionContextProvider>
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

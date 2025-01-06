@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link, Eye } from "lucide-react";
+import { Link, Eye, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { LinkSlotDetailsDialog } from "../LinkSlotDetailsDialog";
 import type { Product } from "@/types/product";
@@ -21,11 +21,28 @@ export function LinkManagementTableRow({
 }: LinkManagementTableRowProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const isFeatured = slot <= 12;
+  const permanentLink = `${window.location.origin}/P${slot}`;
 
   return (
     <>
       <TableRow>
-        <TableCell className="font-medium">P{slot}</TableCell>
+        <TableCell className="font-medium">
+          <div className="flex items-center gap-2">
+            P{slot}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => {
+                navigator.clipboard.writeText(permanentLink);
+                toast.success("Link copied to clipboard");
+              }}
+              title="Copy permanent link"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </div>
+        </TableCell>
         <TableCell>
           <Badge variant={isFeatured ? "default" : "secondary"}>
             {isFeatured ? "Featured" : "Standard"}
