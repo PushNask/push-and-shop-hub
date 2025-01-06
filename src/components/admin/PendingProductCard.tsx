@@ -2,7 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, MapPin, Clock, Package, Star } from "lucide-react";
-import { Product } from "@/types/product";
+import { DeliveryBadges } from "@/components/product/DeliveryBadges";
+import type { Product } from "@/types/product";
 
 interface PendingProductCardProps {
   product: Product;
@@ -78,17 +79,7 @@ export const PendingProductCard = ({ product, onReview }: PendingProductCardProp
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 mt-2">
-            {product.pickup && (
-              <Badge variant="outline">Pickup</Badge>
-            )}
-            {product.shipping && (
-              <Badge variant="outline">Shipping</Badge>
-            )}
-            {product.both && (
-              <Badge variant="outline">Pickup & Shipping</Badge>
-            )}
-          </div>
+          <DeliveryBadges delivery_option={product.delivery_option} />
           
           <Button 
             className="w-full mt-4" 

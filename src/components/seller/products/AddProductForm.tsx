@@ -24,9 +24,7 @@ const productSchema = z.object({
   price: z.number().positive("Price must be greater than 0"),
   category: z.string().min(1, "Please select a category"),
   images: z.array(z.string()).min(1, "At least one image is required"),
-  pickup: z.boolean().optional(),
-  shipping: z.boolean().optional(),
-  both: z.boolean().optional(),
+  delivery_option: z.enum(["pickup", "shipping", "both"]),
   listingType: z.enum(["standard", "featured"]),
   duration: z.string()
 });
@@ -46,9 +44,7 @@ export function AddProductForm() {
       price: 0,
       category: "",
       images: [],
-      pickup: false,
-      shipping: false,
-      both: false,
+      delivery_option: 'pickup',
       listingType: "standard",
       duration: "24"
     }
@@ -89,11 +85,6 @@ export function AddProductForm() {
   const onSubmit = async (data: AddProductFormValues) => {
     if (!session?.user?.id) {
       toast.error("You must be logged in to add a product");
-      return;
-    }
-
-    if (!data.pickup && !data.shipping && !data.both) {
-      toast.error("Please select at least one delivery option");
       return;
     }
 

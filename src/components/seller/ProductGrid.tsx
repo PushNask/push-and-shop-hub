@@ -22,11 +22,7 @@ export const ProductGrid = ({ products, isLoading, onRelist, onRemove }: Product
             images={product.images}
             seller={product.profiles}
             expiry={product.expiry}
-            deliveryOptions={{
-              pickup: product.pickup ?? false,
-              shipping: product.shipping ?? false,
-              both: product.both ?? false
-            }}
+            delivery_option={product.delivery_option}
             category={product.category}
             status={product.status as 'pending' | 'approved' | 'rejected'}
             className="transition-transform duration-200 group-hover:scale-[1.02]"

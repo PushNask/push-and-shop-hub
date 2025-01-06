@@ -26,11 +26,7 @@ export function ProductPreview({ formData, imageUrls }: ProductPreviewProps) {
             country: "Cameroon",
           }}
           status="pending"
-          deliveryOptions={{
-            pickup: formData.pickup || false,
-            shipping: formData.shipping || false,
-            both: formData.both || false,
-          }}
+          delivery_option={formData.delivery_option || 'pickup'}
           category={formData.category}
           description={formData.description}
         />
