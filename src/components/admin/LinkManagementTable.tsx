@@ -53,52 +53,50 @@ export function LinkManagementTable({
   }
 
   return (
-    <>
-      <div className="space-y-4">
-        <div className="relative">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search products in link slots..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search products in link slots..."
+          className="pl-8"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
 
-        <div className="rounded-md border">
-          <Table>
-            <LinkManagementTableHeader />
-            <TableBody>
-              {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => {
-                const slot = startIndex + index + 1;
-                if (slot > 120) return null;
-                
-                const product = linkSlots?.find((p) => p.link_slot === slot);
-                
-                if (
-                  searchQuery &&
-                  product?.title.toLowerCase().includes(searchQuery.toLowerCase()) === false
-                ) {
-                  return null;
-                }
+      <div className="rounded-md border bg-white">
+        <Table>
+          <LinkManagementTableHeader />
+          <TableBody>
+            {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => {
+              const slot = startIndex + index + 1;
+              if (slot > 120) return null;
+              
+              const product = linkSlots?.find((p) => p.link_slot === slot);
+              
+              if (
+                searchQuery &&
+                product?.title.toLowerCase().includes(searchQuery.toLowerCase()) === false
+              ) {
+                return null;
+              }
 
-                return (
-                  <LinkManagementTableRow
-                    key={slot}
-                    slot={slot}
-                    product={product}
-                    onAssign={(slot) => {
-                      setSelectedSlot(slot);
-                      setIsDialogOpen(true);
-                    }}
-                    onViewDetails={handleViewDetails}
-                    isAssigning={isAssigning}
-                  />
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
+              return (
+                <LinkManagementTableRow
+                  key={slot}
+                  slot={slot}
+                  product={product}
+                  onAssign={(slot) => {
+                    setSelectedSlot(slot);
+                    setIsDialogOpen(true);
+                  }}
+                  onViewDetails={handleViewDetails}
+                  isAssigning={isAssigning}
+                />
+              );
+            })}
+          </TableBody>
+        </Table>
       </div>
 
       <div className="mt-4">
@@ -128,6 +126,6 @@ export function LinkManagementTable({
           setIsDetailsOpen(false);
         }}
       />
-    </>
+    </div>
   );
 }

@@ -42,20 +42,28 @@ export function LinkManagementTableRow({
     <TableRow className="group hover:bg-muted/50">
       <TableCell className="font-medium">P{slot}</TableCell>
       <TableCell>
-        <Badge variant={isFeatured ? "default" : "secondary"}>
+        <Badge 
+          variant={isFeatured ? "default" : "secondary"}
+          className="font-medium"
+        >
           {isFeatured ? "Featured" : "Standard"}
         </Badge>
       </TableCell>
-      <TableCell>{product?.title || "Available"}</TableCell>
+      <TableCell className="max-w-[300px] truncate">
+        {product ? (
+          <span className="font-medium">{product.title}</span>
+        ) : (
+          <span className="text-muted-foreground">Available</span>
+        )}
+      </TableCell>
       <TableCell>
-        {product?.status ? (
+        {product?.status && (
           <Badge 
             variant={product.status === "approved" ? "default" : "secondary"}
+            className="font-medium"
           >
             {product.status}
           </Badge>
-        ) : (
-          "N/A"
         )}
       </TableCell>
       <TableCell>
@@ -65,6 +73,7 @@ export function LinkManagementTableRow({
             size="sm"
             onClick={handleCopyLink}
             disabled={!product}
+            className="h-8"
           >
             <Copy className="h-4 w-4 mr-2" />
             Copy Link
@@ -75,6 +84,7 @@ export function LinkManagementTableRow({
                 variant="outline"
                 size="sm"
                 onClick={handleViewProduct}
+                className="h-8"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
                 View
@@ -83,6 +93,7 @@ export function LinkManagementTableRow({
                 variant="outline"
                 size="sm"
                 onClick={() => onViewDetails(slot)}
+                className="h-8"
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Details
@@ -94,6 +105,7 @@ export function LinkManagementTableRow({
             size="sm"
             onClick={() => onAssign(slot)}
             disabled={isAssigning}
+            className="h-8"
           >
             {product ? "Change Product" : "Assign Product"}
           </Button>
