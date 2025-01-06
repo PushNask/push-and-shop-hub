@@ -14,7 +14,7 @@ import { MessageSquare } from "lucide-react";
 import { useTimeLeft } from "@/hooks/useTimeLeft";
 
 const ProductPage = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,8 +23,12 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        if (!id) return;
-        
+        if (!id) {
+          toast.error("Product ID is required");
+          navigate('/');
+          return;
+        }
+
         const { data, error } = await supabase
           .from('products')
           .select(`
@@ -36,7 +40,7 @@ const ProductPage = () => {
             )
           `)
           .eq('id', id)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         if (!data) {
@@ -45,7 +49,7 @@ const ProductPage = () => {
           return;
         }
 
-        setProduct(data);
+        setProduct(data as Product);
       } catch (error) {
         console.error('Error fetching product:', error);
         toast.error("Failed to load product");
@@ -54,9 +58,7 @@ const ProductPage = () => {
       }
     };
 
-    if (id) {
-      fetchProduct();
-    }
+    fetchProduct();
   }, [id, navigate]);
 
   const handleWhatsAppClick = () => {

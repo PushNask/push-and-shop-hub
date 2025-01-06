@@ -1,4 +1,5 @@
 export type DeliveryOption = 'pickup' | 'shipping' | 'both';
+export type ListingType = 'standard' | 'featured';
 
 export interface Product {
   id: string;
@@ -14,6 +15,7 @@ export interface Product {
   link_slot?: number;
   created_at?: string;
   delivery_option: DeliveryOption;
+  listingType?: ListingType;
   profiles?: {
     email: string;
     country: string;
@@ -37,6 +39,6 @@ export interface AddProductFormValues {
   category: string;
   images: string[];
   delivery_option: DeliveryOption;
-  listingType: "standard" | "featured";
+  listingType: ListingType;
   duration: string;
 }

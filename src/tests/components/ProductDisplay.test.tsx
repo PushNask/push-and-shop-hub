@@ -2,33 +2,30 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { ProductDisplay } from '@/components/ProductDisplay';
 import { BrowserRouter } from 'react-router-dom';
+import type { Product } from '@/types/product';
 
-// Mock data
-const mockProducts = [
-  {
-    id: '1',
-    seller_id: 'seller-1',
-    title: 'Test Product 1',
-    price: 100,
-    currency: 'XAF',
-    description: 'Test description 1',
-    category: 'Electronics',
-    images: ['test1.jpg'],
-    status: 'approved',
-    expiry: new Date(Date.now() + 86400000).toISOString(),
-    link_slot: 13,
-    listingType: 'standard' as const,
-    profiles: {
-      email: 'seller1@test.com',
-      country: 'Cameroon',
-      phone: '+237123456789'
-    },
-    pickup: true,
-    shipping: false,
-    both: false
-  },
-  // Add more mock products as needed
-];
+const mockProduct: Product = {
+  id: '1',
+  seller_id: '123',
+  title: 'Test Product 1',
+  price: 100,
+  currency: 'XAF',
+  description: 'Test description 1',
+  category: 'Electronics',
+  images: ['test1.jpg'],
+  status: 'approved',
+  expiry: new Date(Date.now() + 86400000).toISOString(),
+  link_slot: 13,
+  delivery_option: 'pickup',
+  listingType: 'standard',
+  profiles: {
+    email: 'seller1@test.com',
+    country: 'Cameroon',
+    phone: '+237123456789'
+  }
+};
+
+const mockProducts = [mockProduct];
 
 const renderWithRouter = (component: React.ReactNode) => {
   return render(
@@ -82,7 +79,7 @@ describe('ProductDisplay Component', () => {
     const manyProducts = Array(15).fill(null).map((_, index) => ({
       ...mockProducts[0],
       id: String(index + 1),
-      title: `Test Product ${index + 1}`
+      title: `Test Product ${index + 1 }`
     }));
 
     renderWithRouter(<ProductDisplay products={manyProducts} isLoading={false} />);

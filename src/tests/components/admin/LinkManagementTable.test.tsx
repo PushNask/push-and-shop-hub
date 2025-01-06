@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
-import { Product } from '@/types/product';
+import type { Product } from '@/types/product';
 import { LinkManagementTable } from '@/components/admin/LinkManagementTable';
 
 const mockProduct: Product = {
@@ -16,7 +16,7 @@ const mockProduct: Product = {
   expiry: '2024-12-31',
   link_slot: 1,
   images: [],
-  listingType: 'featured',
+  delivery_option: 'pickup',
   seller: {
     email: 'seller@example.com',
     country: 'Cameroon',
