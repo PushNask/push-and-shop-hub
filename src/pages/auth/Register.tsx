@@ -1,12 +1,13 @@
-import { useNavigate } from 'react-router-dom';
+import { RegisterForm } from '@/components/auth/RegisterForm';
+import { AuthLayout } from '@/components/layouts/AuthLayout';
 
 export default function Register() {
-  const navigate = useNavigate();
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Register</h1>
-      {/* Register form will be implemented later */}
-    </div>
+    <AuthLayout>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-4">Create an Account</h1>
+        <RegisterForm />
+      </div>
+    </AuthLayout>
   );
 }
