@@ -45,24 +45,35 @@ export function ProductCard({
 }: ProductCardProps) {
   return (
     <div className={cn(
-      "group relative overflow-hidden rounded-lg hover-lift glass-card h-full",
-      "transition-all duration-300 hover:shadow-lg",
+      "group relative overflow-hidden rounded-lg hover-lift glass-card",
+      "h-full flex flex-col transition-all duration-300 hover:shadow-lg",
       className
     )}>
-      <Link to={`/products/${id}`} className="block">
+      <Link to={`/products/${id}`} className="flex-1 flex flex-col">
         <ProductTimer expiry={expiry} />
-        <ProductImage image={images?.[0]} title={title} />
+        <div className="aspect-square w-full">
+          <ProductImage image={images?.[0]} title={title} />
+        </div>
 
-        <div className="p-4 space-y-4">
-          <ProductHeader title={title} category={category} price={price} />
+        <div className="p-4 space-y-4 flex-1 flex flex-col">
+          <ProductHeader 
+            title={title} 
+            category={category} 
+            price={price} 
+          />
 
           {description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
+            <p className="text-sm text-muted-foreground line-clamp-2 flex-grow">
+              {description}
+            </p>
           )}
 
-          <div className="space-y-2 border-t pt-2">
+          <div className="space-y-2 border-t pt-2 mt-auto">
             <SellerDetails seller={seller} status={status} />
-            <DeliveryBadges deliveryOptions={deliveryOptions} />
+            <DeliveryBadges 
+              deliveryOptions={deliveryOptions} 
+              className="flex-wrap gap-1"
+            />
           </div>
         </div>
       </Link>
