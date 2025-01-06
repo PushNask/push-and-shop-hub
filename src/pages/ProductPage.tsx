@@ -17,7 +17,6 @@ const ProductPage = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -92,7 +91,7 @@ const ProductPage = () => {
           <ProductImages images={product.images} title={product.title} />
         </div>
         <div className="space-y-6">
-          <ProductInfo product={product} timeLeft={timeLeft} />
+          <ProductInfo product={product} />
           
           <div className="flex flex-col gap-4">
             <Button 
@@ -110,19 +109,13 @@ const ProductPage = () => {
             </div>
           </div>
 
-          <DeliveryBadges
-            deliveryOptions={{
-              pickup: product.pickup || false,
-              shipping: product.shipping || false,
-              both: product.both || false
-            }}
-          />
+          <DeliveryBadges delivery_option={product.delivery_option} />
           
           <SellerInfo product={product} />
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default ProductPage;

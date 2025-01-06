@@ -10,6 +10,7 @@ import { ProductContactButton } from "./product/ProductContactButton";
 import { ProductCardErrorBoundary } from "./product/ProductCardErrorBoundary";
 import { useTimeLeft } from "@/hooks/useTimeLeft";
 import { Clock } from "lucide-react";
+import type { DeliveryOption } from "@/types/product";
 
 interface ProductCardProps {
   id: string;
@@ -24,7 +25,7 @@ interface ProductCardProps {
     email?: string;
   };
   expiry?: string;
-  delivery_option: 'pickup' | 'shipping' | 'both';
+  delivery_option: DeliveryOption;
   category?: string;
   description?: string;
   status?: 'pending' | 'approved' | 'rejected';

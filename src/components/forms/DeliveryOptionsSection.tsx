@@ -1,13 +1,14 @@
 import { FormLabel } from "@/components/ui/form";
 import { DeliveryOption } from "./delivery/DeliveryOption";
 import { DeliveryValidation } from "./delivery/DeliveryValidation";
+import type { DeliveryOption as DeliveryOptionType } from "@/types/product";
 
 interface DeliveryOptionsSectionProps {
   form: any;
 }
 
 export function DeliveryOptionsSection({ form }: DeliveryOptionsSectionProps) {
-  const delivery_option = form.watch("delivery_option");
+  const delivery_option = form.watch("delivery_option") as DeliveryOptionType;
 
   return (
     <div className="space-y-3">
@@ -16,7 +17,6 @@ export function DeliveryOptionsSection({ form }: DeliveryOptionsSectionProps) {
         <DeliveryOption
           form={form}
           name="delivery_option"
-          value="pickup"
           label="Pickup Available"
           description="Buyers can pick up the product from your location"
           checked={delivery_option === 'pickup'}
@@ -25,7 +25,6 @@ export function DeliveryOptionsSection({ form }: DeliveryOptionsSectionProps) {
         <DeliveryOption
           form={form}
           name="delivery_option"
-          value="shipping"
           label="Shipping Available"
           description="You can ship the product to buyers"
           checked={delivery_option === 'shipping'}
@@ -34,7 +33,6 @@ export function DeliveryOptionsSection({ form }: DeliveryOptionsSectionProps) {
         <DeliveryOption
           form={form}
           name="delivery_option"
-          value="both"
           label="Both Options Available"
           description="Offer both pickup and shipping options to buyers"
           checked={delivery_option === 'both'}
