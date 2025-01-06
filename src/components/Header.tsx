@@ -1,24 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Menu, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { HeaderNav } from "./navigation/HeaderNav";
 
 export function Header() {
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check current auth status
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -26,7 +17,6 @@ export function Header() {
       }
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -57,18 +47,6 @@ export function Header() {
       title: "Logged out successfully",
       description: "You have been logged out of your account.",
     });
-    navigate("/");
-  };
-
-  const getDashboardLink = () => {
-    switch (userRole) {
-      case "admin":
-        return "/admin/analytics";
-      case "seller":
-        return "/seller/products";
-      default:
-        return "/profile";
-    }
   };
 
   return (
@@ -82,68 +60,11 @@ export function Header() {
           />
           <span className="font-semibold text-lg">PushNshop</span>
         </Link>
-        <div className="flex-1 flex items-center justify-end gap-4 md:gap-8">
-          <nav className="hidden md:flex items-center gap-6">
-            <Link
-              to="/featured"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Featured
-            </Link>
-          </nav>
-
-          {/* Mobile Navigation */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {user ? (
-                <>
-                  <DropdownMenuItem asChild>
-                    <Link to={getDashboardLink()}>Dashboard</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    Logout
-                  </DropdownMenuItem>
-                </>
-              ) : (
-                <>
-                  <DropdownMenuItem asChild>
-                    <Link to="/login">Login</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/signup">Sign Up</Link>
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <div className="hidden md:flex items-center gap-2">
-          {user ? (
-            <>
-              <Button variant="ghost" asChild>
-                <Link to={getDashboardLink()}>Dashboard</Link>
-              </Button>
-              <Button onClick={handleLogout} variant="destructive">
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="ghost" asChild>
-                <Link to="/login">Login</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/signup">Sign Up</Link>
-              </Button>
-            </>
-          )}
-        </div>
+        <HeaderNav 
+          user={user}
+          userRole={userRole}
+          onLogout={handleLogout}
+        />
       </div>
     </header>
   );
