@@ -7,12 +7,12 @@ import {
 export function LinkManagementTableHeader() {
   return (
     <TableHeader>
-      <TableRow className="border-b">
-        <TableHead className="w-[100px] font-bold">Slot</TableHead>
-        <TableHead className="w-[120px] font-bold">Type</TableHead>
-        <TableHead className="w-[300px] font-bold">Current Product</TableHead>
-        <TableHead className="w-[120px] font-bold">Status</TableHead>
-        <TableHead className="w-[350px] font-bold text-left">Actions</TableHead>
+      <TableRow>
+        <TableHead>Slot</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Current Product</TableHead>
+        <TableHead>Status</TableHead>
+        <TableHead>Actions</TableHead>
       </TableRow>
     </TableHeader>
   );

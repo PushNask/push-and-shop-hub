@@ -18,6 +18,7 @@ export function Header() {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check current auth status
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -25,6 +26,7 @@ export function Header() {
       }
     });
 
+    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -76,12 +78,11 @@ export function Header() {
           <img
             src="/lovable-uploads/032557e3-02ca-48fd-8b47-c3029d8d0104.png"
             alt="PushNshop Logo"
-            className="h-6 w-6 sm:h-8 sm:w-8 transition-transform hover:scale-105"
+            className="h-8 w-8"
           />
-          <span className="font-semibold text-base sm:text-lg">PushNshop</span>
+          <span className="font-semibold text-lg">PushNshop</span>
         </Link>
-        
-        <div className="flex-1 flex items-center justify-end gap-2 sm:gap-4">
+        <div className="flex-1 flex items-center justify-end gap-4 md:gap-8">
           <nav className="hidden md:flex items-center gap-6">
             <Link
               to="/featured"
@@ -94,58 +95,50 @@ export function Header() {
           {/* Mobile Navigation */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-56 bg-popover/95 backdrop-blur-sm border shadow-lg"
-            >
+            <DropdownMenuContent align="end">
               {user ? (
                 <>
                   <DropdownMenuItem asChild>
-                    <Link to={getDashboardLink()} className="w-full">
-                      Dashboard
-                    </Link>
+                    <Link to={getDashboardLink()}>Dashboard</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout} className="w-full">
-                    <LogOut className="h-4 w-4 mr-2" />
+                  <DropdownMenuItem onClick={handleLogout}>
                     Logout
                   </DropdownMenuItem>
                 </>
               ) : (
                 <>
                   <DropdownMenuItem asChild>
-                    <Link to="/login" className="w-full">Login</Link>
+                    <Link to="/login">Login</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/signup" className="w-full">Sign Up</Link>
+                    <Link to="/signup">Sign Up</Link>
                   </DropdownMenuItem>
                 </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-
-        {/* Desktop Authentication Buttons */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-2">
           {user ? (
             <>
-              <Button variant="ghost" asChild className="px-4">
+              <Button variant="ghost" asChild>
                 <Link to={getDashboardLink()}>Dashboard</Link>
               </Button>
-              <Button onClick={handleLogout} variant="destructive" className="px-4">
+              <Button onClick={handleLogout} variant="destructive">
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild className="px-4">
+              <Button variant="ghost" asChild>
                 <Link to="/login">Login</Link>
               </Button>
-              <Button asChild className="px-4">
+              <Button asChild>
                 <Link to="/signup">Sign Up</Link>
               </Button>
             </>
