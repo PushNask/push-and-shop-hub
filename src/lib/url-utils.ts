@@ -1,5 +1,7 @@
 // Base URL for the platform
-const BASE_URL = import.meta.env.PROD ? "https://pushnshop.com" : window.location.origin;
+const BASE_URL = import.meta.env.PROD 
+  ? window.location.origin 
+  : window.location.origin;
 
 export const generateLinkSlotUrl = (slotNumber: number): string => {
   return `${BASE_URL}/P${slotNumber}`;
