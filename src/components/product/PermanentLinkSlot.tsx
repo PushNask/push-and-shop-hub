@@ -1,103 +1,70 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Product } from "@/types/product";
 import { ProductCard } from "@/components/ProductCard";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function PermanentLinkSlot() {
   const { slot } = useParams();
-  const navigate = useNavigate();
-  const slotNumber = parseInt(slot?.replace("P", "") || "0");
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const { data: product, isLoading, error } = useQuery({
-    queryKey: ["permanent-link", slotNumber],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          profiles (
-            email,
-            country,
-            phone
-          )
-        `)
-        .eq("link_slot", slotNumber)
-        .eq("status", "approved")
-        .single();
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("link_slot", slot?.replace("P", ""))
+          .eq("status", "approved")
+          .single();
 
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!slotNumber && slotNumber > 0 && slotNumber <= 120,
-  });
+        if (error) throw error;
+        setProduct(data);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (!slotNumber || slotNumber < 1 || slotNumber > 120) {
-    return (
-      <div className="container py-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">Invalid Link Slot</h1>
-        <p className="text-muted-foreground mb-4">
-          This permanent link slot does not exist. Valid slots are P1 through P120.
-        </p>
-        <Button onClick={() => navigate("/")} variant="outline">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
-        </Button>
-      </div>
-    );
-  }
+    if (slot) {
+      fetchProduct();
+    }
+  }, [slot]);
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="container py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 w-64 bg-muted rounded" />
-          <div className="h-[400px] bg-muted rounded" />
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container py-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">Error Loading Product</h1>
-        <p className="text-muted-foreground mb-4">
-          Failed to load the product for this permanent link slot.
-        </p>
-        <Button onClick={() => navigate("/")} variant="outline">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
-        </Button>
+        <Skeleton className="h-[400px] w-full" />
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="container py-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">Link Slot P{slotNumber}</h1>
-        <p className="text-muted-foreground mb-4">
-          This permanent link slot is currently available.
-        </p>
-        <Button onClick={() => navigate("/")} variant="outline">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
-        </Button>
+      <div className="container py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">No Product Found</h1>
+          <p className="text-muted-foreground">
+            This permanent link slot is currently available.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="container py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">Permanent Link Slot P{slotNumber}</h1>
-        <p className="text-muted-foreground">
-          {slotNumber <= 12 ? "Featured slot with premium visibility" : "Standard link slot"}
-        </p>
-      </div>
-      <ProductCard product={product} />
+      <ProductCard 
+        title={product.title}
+        price={product.price}
+        currency={product.currency}
+        image={product.images?.[0]}
+        category={product.category}
+        id={product.id}
+      />
     </div>
   );
 }
