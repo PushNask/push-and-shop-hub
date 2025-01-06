@@ -44,6 +44,7 @@ export function ProductCard({
   status = 'pending'
 }: ProductCardProps) {
   const [timeLeft, setTimeLeft] = useState<string>("");
+  const [timeStatus, setTimeStatus] = useState<'ample' | 'medium' | 'critical'>('ample');
 
   const handleWhatsAppClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -64,10 +65,21 @@ export function ProductCard({
       const now = new Date().getTime();
       const expiryTime = new Date(expiry).getTime();
       const distance = expiryTime - now;
+      const totalDuration = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
       
       if (distance < 0) {
         setTimeLeft("EXPIRED");
+        setTimeStatus('critical');
         return null;
+      }
+
+      // Calculate time status based on remaining time
+      if (distance > totalDuration * 0.7) {
+        setTimeStatus('ample');
+      } else if (distance > totalDuration * 0.3) {
+        setTimeStatus('medium');
+      } else {
+        setTimeStatus('critical');
       }
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -99,6 +111,19 @@ export function ProductCard({
       className
     )}>
       <Link to={`/products/${id}`} className="block">
+        {timeLeft && (
+          <div className={cn(
+            "absolute top-0 left-0 right-0 z-10 px-4 py-2 text-sm font-medium text-white",
+            "flex items-center justify-center gap-2 backdrop-blur-sm",
+            timeStatus === 'ample' && "bg-green-500/80",
+            timeStatus === 'medium' && "bg-yellow-500/80",
+            timeStatus === 'critical' && "bg-red-500/80"
+          )}>
+            <Clock className="h-4 w-4" />
+            <span>{timeLeft}</span>
+          </div>
+        )}
+
         <div className="aspect-square overflow-hidden bg-gray-100">
           <img
             src={images?.[0] || "/placeholder.svg"}
@@ -107,44 +132,40 @@ export function ProductCard({
             loading="lazy"
           />
         </div>
-        <div className="p-4 space-y-2">
+
+        <div className="p-4 space-y-3">
           <div className="flex items-center justify-between gap-2">
             <h3 className="font-medium text-sm sm:text-base truncate">{title}</h3>
             {category && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs shrink-0">
                 {category}
               </Badge>
             )}
           </div>
           
-          <p className="text-sm text-muted-foreground">XAF {price.toLocaleString()}</p>
+          <p className="text-lg font-semibold text-primary">XAF {price.toLocaleString()}</p>
           
           {description && (
             <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
           )}
 
-          {seller?.country && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span>{seller.country}</span>
-            </div>
-          )}
-          
-          {timeLeft && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>{timeLeft}</span>
-            </div>
-          )}
+          <div className="space-y-2">
+            {seller?.country && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4 shrink-0" />
+                <span className="truncate">{seller.country}</span>
+              </div>
+            )}
+            
+            {status === 'approved' && (
+              <div className="flex items-center gap-2 text-sm text-green-600">
+                <Shield className="h-4 w-4 shrink-0" />
+                <span>Verified Listing</span>
+              </div>
+            )}
 
-          {status === 'approved' && (
-            <div className="flex items-center gap-2 text-sm text-green-600">
-              <Shield className="h-4 w-4" />
-              <span>Verified Listing</span>
-            </div>
-          )}
-
-          <DeliveryBadges deliveryOptions={deliveryOptions} />
+            <DeliveryBadges deliveryOptions={deliveryOptions} />
+          </div>
         </div>
       </Link>
       
