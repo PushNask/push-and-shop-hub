@@ -119,44 +119,60 @@ export type Database = {
       }
       products: {
         Row: {
+          both_options: boolean | null
           category: string
           created_at: string | null
           currency: string
+          delivery_option: Database["public"]["Enums"]["delivery_option"] | null
           description: string | null
           expiry: string | null
           id: string
           images: string[] | null
           link_slot: number | null
+          pickup: boolean | null
           price: number
           seller_id: string | null
+          shipping: boolean | null
           status: string | null
           title: string
         }
         Insert: {
+          both_options?: boolean | null
           category: string
           created_at?: string | null
           currency?: string
+          delivery_option?:
+            | Database["public"]["Enums"]["delivery_option"]
+            | null
           description?: string | null
           expiry?: string | null
           id?: string
           images?: string[] | null
           link_slot?: number | null
+          pickup?: boolean | null
           price: number
           seller_id?: string | null
+          shipping?: boolean | null
           status?: string | null
           title: string
         }
         Update: {
+          both_options?: boolean | null
           category?: string
           created_at?: string | null
           currency?: string
+          delivery_option?:
+            | Database["public"]["Enums"]["delivery_option"]
+            | null
           description?: string | null
           expiry?: string | null
           id?: string
           images?: string[] | null
           link_slot?: number | null
+          pickup?: boolean | null
           price?: number
           seller_id?: string | null
+          shipping?: boolean | null
           status?: string | null
           title?: string
         }
@@ -365,7 +381,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      delivery_option: "pickup" | "shipping" | "both"
     }
     CompositeTypes: {
       [_ in never]: never

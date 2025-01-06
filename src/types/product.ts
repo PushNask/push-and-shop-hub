@@ -26,9 +26,7 @@ export interface Product {
     rating?: number;
     joinedDate?: string;
   };
-  pickup?: boolean;
-  shipping?: boolean;
-  both?: boolean;
+  delivery_option: 'pickup' | 'shipping' | 'both';
 }
 
 export type ProductRow = Omit<Product, 'seller'>;
@@ -61,9 +59,7 @@ export interface AddProductFormValues {
   price: number;
   category: string;
   images: string[];
-  pickup: boolean;
-  shipping: boolean;
-  both: boolean;
+  delivery_option: 'pickup' | 'shipping' | 'both';
   listingType: "standard" | "featured";
   duration: string;
 }

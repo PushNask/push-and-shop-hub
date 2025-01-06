@@ -1,26 +1,23 @@
 import { Store, Truck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import type { DeliveryOption } from "@/types/database";
 
 interface DeliveryBadgesProps {
-  deliveryOptions?: {
-    pickup: boolean;
-    shipping: boolean;
-    both: boolean;
-  };
+  delivery_option?: DeliveryOption;
 }
 
-export function DeliveryBadges({ deliveryOptions }: DeliveryBadgesProps) {
-  if (!deliveryOptions) return null;
+export function DeliveryBadges({ delivery_option }: DeliveryBadgesProps) {
+  if (!delivery_option) return null;
 
   return (
     <div className="flex flex-wrap gap-2">
-      {(deliveryOptions.pickup || deliveryOptions.both) && (
+      {(delivery_option === 'pickup' || delivery_option === 'both') && (
         <Badge variant="outline" className="flex items-center gap-1">
           <Store className="h-3 w-3" />
           Pickup
         </Badge>
       )}
-      {(deliveryOptions.shipping || deliveryOptions.both) && (
+      {(delivery_option === 'shipping' || delivery_option === 'both') && (
         <Badge variant="outline" className="flex items-center gap-1">
           <Truck className="h-3 w-3" />
           Shipping

@@ -7,9 +7,7 @@ interface DeliveryOptionsSectionProps {
 }
 
 export function DeliveryOptionsSection({ form }: DeliveryOptionsSectionProps) {
-  const pickup = form.watch("pickup");
-  const shipping = form.watch("shipping");
-  const both = form.watch("both");
+  const delivery_option = form.watch("delivery_option");
 
   return (
     <div className="space-y-3">
@@ -17,46 +15,33 @@ export function DeliveryOptionsSection({ form }: DeliveryOptionsSectionProps) {
       <div className="flex flex-col gap-4">
         <DeliveryOption
           form={form}
-          name="pickup"
+          name="delivery_option"
+          value="pickup"
           label="Pickup Available"
           description="Buyers can pick up the product from your location"
-          checked={pickup || both}
-          onCheckedChange={(checked) => {
-            form.setValue("pickup", checked);
-            if (both) {
-              form.setValue("both", false);
-            }
-          }}
+          checked={delivery_option === 'pickup'}
+          onCheckedChange={() => form.setValue("delivery_option", "pickup")}
         />
         <DeliveryOption
           form={form}
-          name="shipping"
+          name="delivery_option"
+          value="shipping"
           label="Shipping Available"
           description="You can ship the product to buyers"
-          checked={shipping || both}
-          onCheckedChange={(checked) => {
-            form.setValue("shipping", checked);
-            if (both) {
-              form.setValue("both", false);
-            }
-          }}
+          checked={delivery_option === 'shipping'}
+          onCheckedChange={() => form.setValue("delivery_option", "shipping")}
         />
         <DeliveryOption
           form={form}
-          name="both"
+          name="delivery_option"
+          value="both"
           label="Both Options Available"
           description="Offer both pickup and shipping options to buyers"
-          checked={both}
-          onCheckedChange={(checked) => {
-            form.setValue("both", checked);
-            if (checked) {
-              form.setValue("pickup", false);
-              form.setValue("shipping", false);
-            }
-          }}
+          checked={delivery_option === 'both'}
+          onCheckedChange={() => form.setValue("delivery_option", "both")}
         />
       </div>
-      <DeliveryValidation showError={!pickup && !shipping && !both} />
+      <DeliveryValidation showError={!delivery_option} />
     </div>
   );
 }

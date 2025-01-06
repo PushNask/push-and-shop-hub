@@ -24,11 +24,7 @@ interface ProductCardProps {
     email?: string;
   };
   expiry?: string;
-  deliveryOptions: {
-    pickup: boolean;
-    shipping: boolean;
-    both: boolean;
-  };
+  delivery_option: 'pickup' | 'shipping' | 'both';
   category?: string;
   description?: string;
   status?: 'pending' | 'approved' | 'rejected';
@@ -42,7 +38,7 @@ export function ProductCard({
   className,
   seller,
   expiry,
-  deliveryOptions,
+  delivery_option,
   category,
   status = 'pending'
 }: ProductCardProps) {
@@ -79,7 +75,7 @@ export function ProductCard({
             )}
 
             <ProductStatus status={status} />
-            <DeliveryBadges deliveryOptions={deliveryOptions} />
+            <DeliveryBadges delivery_option={delivery_option} />
           </div>
         </Link>
         
