@@ -1,44 +1,73 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Index from "@/pages/Index";
-import Login from "@/pages/Login";
-import SignUp from "@/pages/SignUp";
-import ForgotPassword from "@/pages/ForgotPassword";
-import ProductPage from "@/pages/ProductPage";
-import UserProfile from "@/pages/UserProfile";
-import { AdminLayout } from "@/components/layouts/AdminLayout";
-import AdminAnalytics from "@/pages/AdminAnalytics";
-import AdminManagement from "@/pages/AdminManagement";
-import ProductApprovals from "@/pages/ProductApprovals";
-import TransactionHistory from "@/pages/TransactionHistory";
-import AdminProfile from "@/pages/AdminProfile";
-import LinkManagement from "@/pages/LinkManagement";
-import LinkSlotRedirect from "@/pages/LinkSlotRedirect";
-import { Toaster } from "@/components/ui/sonner";
+import { Routes, Route } from "react-router-dom";
+import { lazy } from "react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminRoute } from "@/components/auth/AdminRoute";
+import { SellerRoute } from "@/components/auth/SellerRoute";
+import { AuthLayout } from "@/components/layouts/AuthLayout";
+import { DashboardLayout } from "@/components/layouts/DashboardLayout";
+import { MarketplaceLayout } from "@/components/layouts/MarketplaceLayout";
+import { AddProductForm } from "@/components/seller/products/AddProductForm";
 
-function App() {
+const Home = lazy(() => import("@/pages/Home"));
+const Login = lazy(() => import("@/pages/auth/Login"));
+const Register = lazy(() => import("@/pages/auth/Register"));
+const ForgotPassword = lazy(() => import("@/pages/auth/ForgotPassword"));
+const ResetPassword = lazy(() => import("@/pages/auth/ResetPassword"));
+const VerifyEmail = lazy(() => import("@/pages/auth/VerifyEmail"));
+
+const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
+const AdminProducts = lazy(() => import("@/pages/admin/Products"));
+const AdminSellers = lazy(() => import("@/pages/admin/Sellers"));
+const AdminTransactions = lazy(() => import("@/pages/admin/Transactions"));
+const AdminSettings = lazy(() => import("@/pages/admin/Settings"));
+
+const SellerDashboard = lazy(() => import("@/pages/seller/Dashboard"));
+const SellerProducts = lazy(() => import("@/pages/seller/Products"));
+const SellerTransactions = lazy(() => import("@/pages/seller/Transactions"));
+const SellerSettings = lazy(() => import("@/pages/seller/Settings"));
+
+const ProductDetails = lazy(() => import("@/pages/ProductDetails"));
+const SearchResults = lazy(() => import("@/pages/SearchResults"));
+const CategoryProducts = lazy(() => import("@/pages/CategoryProducts"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+
+export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
+    <Routes>
+      <Route element={<MarketplaceLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/search" element={<SearchResults />} />
+        <Route path="/category/:category" element={<CategoryProducts />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
+      </Route>
+
+      <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/profile" element={<UserProfile />} />
-        <Route path="/products/:id" element={<ProductPage />} />
-        <Route path="/P:slot" element={<LinkSlotRedirect />} />
-        
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="analytics" element={<AdminAnalytics />} />
-          <Route path="users" element={<AdminManagement />} />
-          <Route path="links" element={<LinkManagement />} />
-          <Route path="product-approvals" element={<ProductApprovals />} />
-          <Route path="transactions" element={<TransactionHistory />} />
-          <Route path="profile" element={<AdminProfile />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+      </Route>
+
+      <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+        <Route path="/admin" element={<AdminRoute />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="sellers" element={<AdminSellers />} />
+          <Route path="transactions" element={<AdminTransactions />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
-      </Routes>
-      <Toaster />
-    </Router>
+
+        <Route path="/seller" element={<SellerRoute />}>
+          <Route index element={<SellerDashboard />} />
+          <Route path="products" element={<SellerProducts />} />
+          <Route path="add-product" element={<AddProductForm />} />
+          <Route path="transactions" element={<SellerTransactions />} />
+          <Route path="settings" element={<SellerSettings />} />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
-
-export default App;
