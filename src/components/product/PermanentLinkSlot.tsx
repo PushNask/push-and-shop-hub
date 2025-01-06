@@ -60,7 +60,6 @@ export function PermanentLinkSlot() {
       <ProductCard 
         title={product.title}
         price={product.price}
-        currency={product.currency}
         image={product.images?.[0]}
         category={product.category}
         id={product.id}

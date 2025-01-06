@@ -1,19 +1,20 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import type { Product } from "@/types/product";
 
 interface LinkManagementTableRowProps {
   slot: number;
-  product?: any;
+  product?: Product;
   onAssign: (slot: number) => void;
-  isLoading?: boolean;
+  isAssigning?: boolean;
 }
 
 export function LinkManagementTableRow({
   slot,
   product,
   onAssign,
-  isLoading,
+  isAssigning,
 }: LinkManagementTableRowProps) {
   const { toast } = useToast();
   
@@ -46,7 +47,7 @@ export function LinkManagementTableRow({
           variant="outline"
           size="sm"
           onClick={() => onAssign(slot)}
-          disabled={isLoading}
+          disabled={isAssigning}
         >
           {product ? "Change Product" : "Assign Product"}
         </Button>
