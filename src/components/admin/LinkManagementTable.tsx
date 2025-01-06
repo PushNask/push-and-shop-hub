@@ -8,6 +8,7 @@ import { LinkManagementTableSkeleton } from "./table/LinkManagementTableSkeleton
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import type { Product } from "@/types/product";
+import { LinkSlotDetailsDialog } from "./LinkSlotDetailsDialog";
 
 interface LinkManagementTableProps {
   linkSlots: Product[];
@@ -26,6 +27,7 @@ export function LinkManagementTable({
 }: LinkManagementTableProps) {
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -40,6 +42,11 @@ export function LinkManagementTable({
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const totalPages = Math.ceil(120 / ITEMS_PER_PAGE);
+
+  const handleViewDetails = (slot: number) => {
+    setSelectedSlot(slot);
+    setIsDetailsOpen(true);
+  };
 
   if (isLoading) {
     return <LinkManagementTableSkeleton />;
@@ -68,7 +75,6 @@ export function LinkManagementTable({
                 
                 const product = linkSlots?.find((p) => p.link_slot === slot);
                 
-                // Filter based on search query
                 if (
                   searchQuery &&
                   product?.title.toLowerCase().includes(searchQuery.toLowerCase()) === false
@@ -85,6 +91,7 @@ export function LinkManagementTable({
                       setSelectedSlot(slot);
                       setIsDialogOpen(true);
                     }}
+                    onViewDetails={handleViewDetails}
                     isAssigning={isAssigning}
                   />
                 );
@@ -94,11 +101,13 @@ export function LinkManagementTable({
         </div>
       </div>
 
-      <AdminPagination
-        page={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+      <div className="mt-4">
+        <AdminPagination
+          page={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
 
       <ProductAssignmentDialog
         open={isDialogOpen}
@@ -106,6 +115,18 @@ export function LinkManagementTable({
         onAssign={handleAssignProduct}
         slot={selectedSlot}
         isAssigning={isAssigning}
+      />
+
+      <LinkSlotDetailsDialog
+        open={isDetailsOpen}
+        onOpenChange={setIsDetailsOpen}
+        slot={selectedSlot || 0}
+        product={linkSlots?.find((p) => p.link_slot === selectedSlot)}
+        onAssign={(slot) => {
+          setSelectedSlot(slot);
+          setIsDialogOpen(true);
+          setIsDetailsOpen(false);
+        }}
       />
     </>
   );
