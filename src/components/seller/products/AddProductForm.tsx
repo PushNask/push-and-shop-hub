@@ -14,6 +14,9 @@ import { useAddProduct } from "@/hooks/seller/useAddProduct";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useState } from "react";
 import type { AddProductFormValues } from "@/types/product";
+import { FormHeader } from "./sections/FormHeader";
+import { ProductPreview } from "./ProductPreview";
+import { ImageUploadLoading } from "./ImageUploadLoading";
 
 const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -33,6 +36,7 @@ export function AddProductForm() {
   const session = useSession();
   const { mutateAsync: addProduct, isPending } = useAddProduct();
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<AddProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -52,15 +56,28 @@ export function AddProductForm() {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const urls = [...imageUrls];
+    setIsUploading(true);
     
-    for (const file of files) {
-      const url = URL.createObjectURL(file);
-      urls.push(url);
+    try {
+      const urls = [...imageUrls];
+      
+      for (const file of files) {
+        if (file.size > 2 * 1024 * 1024) {
+          toast.error(`File ${file.name} exceeds 2MB limit`);
+          continue;
+        }
+        const url = URL.createObjectURL(file);
+        urls.push(url);
+      }
+      
+      setImageUrls(urls);
+      form.setValue("images", urls);
+    } catch (error) {
+      toast.error("Error uploading images");
+      console.error("Upload error:", error);
+    } finally {
+      setIsUploading(false);
     }
-    
-    setImageUrls(urls);
-    form.setValue("images", urls);
   };
 
   const handleImageRemove = (index: number) => {
@@ -96,27 +113,45 @@ export function AddProductForm() {
     }
   };
 
+  const hasErrors = Object.keys(form.formState.errors).length > 0;
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <ProductDetailsSection form={form} />
-        <ImageUploadSection 
-          form={form}
-          imageUrls={imageUrls}
-          onImageChange={handleImageChange}
-          onImageRemove={handleImageRemove}
-        />
-        <CategorySection form={form} />
-        <DeliveryOptionsSection form={form} />
-        <ListingFeeSection form={form} />
+        <FormHeader errors={hasErrors} />
         
-        <Button 
-          type="submit" 
-          className="w-full" 
-          disabled={isPending}
-        >
-          {isPending ? "Submitting..." : "Add Product"}
-        </Button>
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="space-y-8">
+            <ProductDetailsSection form={form} />
+            <div className="relative">
+              <ImageUploadSection 
+                form={form}
+                imageUrls={imageUrls}
+                onImageChange={handleImageChange}
+                onImageRemove={handleImageRemove}
+              />
+              {isUploading && <ImageUploadLoading />}
+            </div>
+            <CategorySection form={form} />
+            <DeliveryOptionsSection form={form} />
+            <ListingFeeSection form={form} />
+            
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isPending || isUploading}
+            >
+              {isPending ? "Submitting..." : "Add Product"}
+            </Button>
+          </div>
+
+          <div className="lg:sticky lg:top-4">
+            <ProductPreview 
+              formData={form.watch()} 
+              imageUrls={imageUrls}
+            />
+          </div>
+        </div>
       </form>
     </Form>
   );
