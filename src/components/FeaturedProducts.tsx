@@ -4,28 +4,45 @@ import { Product } from "@/types/product";
 import { ProductCarousel } from "./ProductCarousel";
 import { Skeleton } from "./ui/skeleton";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { toast } from "sonner";
 
 export function FeaturedProducts() {
   const { data: featuredProducts, isLoading, error } = useQuery({
     queryKey: ["featured-products"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          profiles (
-            email,
-            country,
-            phone
-          )
-        `)
-        .eq("status", "approved")
-        .lte("link_slot", 12)
-        .order("link_slot", { ascending: true });
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select(`
+            *,
+            profiles (
+              email,
+              country,
+              phone
+            )
+          `)
+          .eq("status", "approved")
+          .lte("link_slot", 12)
+          .order("link_slot", { ascending: true });
 
-      if (error) throw error;
-      return data as Product[];
+        if (error) {
+          console.error("Supabase error:", error);
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error("No data returned from Supabase");
+        }
+
+        return data as Product[];
+      } catch (err) {
+        console.error("Failed to fetch featured products:", err);
+        toast.error("Failed to load featured products. Please try again later.");
+        throw err;
+      }
     },
+    retry: 2,
+    retryDelay: 1000,
   });
 
   if (isLoading) {
@@ -42,6 +59,7 @@ export function FeaturedProducts() {
   }
 
   if (error) {
+    console.error("Error in FeaturedProducts:", error);
     return (
       <div className="text-red-500">
         Failed to load featured products. Please try again later.
