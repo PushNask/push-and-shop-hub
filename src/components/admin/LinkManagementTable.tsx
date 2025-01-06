@@ -8,6 +8,7 @@ import { LinkManagementTableSkeleton } from "./table/LinkManagementTableSkeleton
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import type { Product } from "@/types/product";
+import { generateLinkSlotUrl } from "@/lib/url-utils";
 
 interface LinkManagementTableProps {
   linkSlots: Product[];
@@ -68,7 +69,6 @@ export function LinkManagementTable({
                 
                 const product = linkSlots?.find((p) => p.link_slot === slot);
                 
-                // Filter based on search query
                 if (
                   searchQuery &&
                   product?.title.toLowerCase().includes(searchQuery.toLowerCase()) === false
@@ -76,11 +76,14 @@ export function LinkManagementTable({
                   return null;
                 }
 
+                const slotUrl = generateLinkSlotUrl(slot);
+
                 return (
                   <LinkManagementTableRow
                     key={slot}
                     slot={slot}
                     product={product}
+                    slotUrl={slotUrl}
                     onAssign={(slot) => {
                       setSelectedSlot(slot);
                       setIsDialogOpen(true);

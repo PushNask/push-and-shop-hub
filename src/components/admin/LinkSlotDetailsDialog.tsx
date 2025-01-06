@@ -8,7 +8,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar, Link } from "lucide-react";
+import { Calendar, Link, Copy } from "lucide-react";
+import { toast } from "sonner";
 import type { Product } from "@/types/product";
 import { format } from "date-fns";
 
@@ -17,6 +18,7 @@ interface LinkSlotDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
   slot: number;
   product?: Product;
+  slotUrl: string;
   onAssign: (slot: number) => void;
 }
 
@@ -25,9 +27,19 @@ export function LinkSlotDetailsDialog({
   onOpenChange,
   slot,
   product,
+  slotUrl,
   onAssign,
 }: LinkSlotDetailsDialogProps) {
   const isFeatured = slot <= 12;
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(slotUrl);
+      toast.success("URL copied to clipboard");
+    } catch (error) {
+      toast.error("Failed to copy URL");
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -43,17 +55,33 @@ export function LinkSlotDetailsDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Badge variant={isFeatured ? "default" : "secondary"}>
-              {isFeatured ? "Featured" : "Standard"}
-            </Badge>
-            {product?.status && (
-              <Badge 
-                variant={product.status === "approved" ? "default" : "secondary"}
-              >
-                {product.status}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Badge variant={isFeatured ? "default" : "secondary"}>
+                {isFeatured ? "Featured" : "Standard"}
               </Badge>
-            )}
+              {product?.status && (
+                <Badge 
+                  variant={product.status === "approved" ? "default" : "secondary"}
+                >
+                  {product.status}
+                </Badge>
+              )}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCopyUrl}
+              className="flex items-center gap-2"
+            >
+              <Copy className="h-4 w-4" />
+              Copy URL
+            </Button>
+          </div>
+
+          <div className="rounded-lg border p-3 bg-muted/50">
+            <p className="text-sm font-medium">Permanent Link</p>
+            <p className="text-sm text-muted-foreground break-all">{slotUrl}</p>
           </div>
 
           {product ? (

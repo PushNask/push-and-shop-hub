@@ -1,14 +1,16 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link, Eye } from "lucide-react";
+import { Link, Eye, Copy } from "lucide-react";
 import { useState } from "react";
 import { LinkSlotDetailsDialog } from "../LinkSlotDetailsDialog";
+import { toast } from "sonner";
 import type { Product } from "@/types/product";
 
 interface LinkManagementTableRowProps {
   slot: number;
   product?: Product;
+  slotUrl: string;
   onAssign: (slot: number) => void;
   isAssigning?: boolean;
 }
@@ -16,11 +18,21 @@ interface LinkManagementTableRowProps {
 export function LinkManagementTableRow({
   slot,
   product,
+  slotUrl,
   onAssign,
   isAssigning,
 }: LinkManagementTableRowProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const isFeatured = slot <= 12;
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(slotUrl);
+      toast.success("URL copied to clipboard");
+    } catch (error) {
+      toast.error("Failed to copy URL");
+    }
+  };
 
   return (
     <>
@@ -33,10 +45,10 @@ export function LinkManagementTableRow({
         </TableCell>
         <TableCell>
           {product ? (
-            <span className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <Link className="h-4 w-4" />
-              {product.title}
-            </span>
+              <span>{product.title}</span>
+            </div>
           ) : (
             <span className="text-muted-foreground">Available</span>
           )}
@@ -50,23 +62,33 @@ export function LinkManagementTableRow({
             "-"
           )}
         </TableCell>
-        <TableCell className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onAssign(slot)}
-            disabled={isAssigning}
-          >
-            {product ? "Replace" : "Assign"}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsDetailsOpen(true)}
-          >
-            <Eye className="h-4 w-4" />
-            <span className="sr-only">View details</span>
-          </Button>
+        <TableCell>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onAssign(slot)}
+              disabled={isAssigning}
+            >
+              {product ? "Replace" : "Assign"}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsDetailsOpen(true)}
+            >
+              <Eye className="h-4 w-4" />
+              <span className="sr-only">View details</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopyUrl}
+            >
+              <Copy className="h-4 w-4" />
+              <span className="sr-only">Copy URL</span>
+            </Button>
+          </div>
         </TableCell>
       </TableRow>
 
@@ -75,6 +97,7 @@ export function LinkManagementTableRow({
         onOpenChange={setIsDetailsOpen}
         slot={slot}
         product={product}
+        slotUrl={slotUrl}
         onAssign={onAssign}
       />
     </>
