@@ -14,9 +14,34 @@ export function DashboardHeader({ title }: DashboardHeaderProps) {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      // First check if we have a session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // If no session, just clear state and redirect
+        navigate("/login");
+        return;
+      }
+
+      // If we have a session, sign out properly
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
       navigate("/login");
+      
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account.",
+      });
     } catch (error) {
+      console.error("Logout error:", error);
+      
+      // If we get a session_not_found error, just redirect
+      if (error.message?.includes('session_not_found')) {
+        navigate("/login");
+        return;
+      }
+
       toast({
         title: "Error",
         description: "Failed to log out. Please try again.",
