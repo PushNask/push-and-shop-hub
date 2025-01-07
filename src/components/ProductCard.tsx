@@ -57,24 +57,24 @@ export function ProductCard({
         aria-label={`Product: ${title}`}
       >
         <Link to={`/products/${id}`} className="block">
+          {timeLeft && (
+            <div className="absolute top-2 right-2 z-10 bg-background/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 text-sm text-muted-foreground shadow-sm">
+              <Clock className="h-4 w-4" aria-hidden="true" />
+              <span>{timeLeft}</span>
+            </div>
+          )}
+          
           <div className="aspect-square overflow-hidden bg-muted">
             <ProductCardImage 
               src={images?.[0]} 
               alt={`Product image for ${title}`} 
             />
           </div>
+          
           <div className="p-4 space-y-2">
             <ProductTitle title={title} category={category} />
             <ProductPrice price={price} />
             <ProductLocation country={seller?.country} />
-            
-            {timeLeft && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" aria-hidden="true" />
-                <span>{timeLeft}</span>
-              </div>
-            )}
-
             <ProductStatus status={status} />
             <DeliveryBadges delivery_option={delivery_option} />
           </div>
