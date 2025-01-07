@@ -53,13 +53,14 @@ export function LoginForm() {
           return 'Too many login attempts. Please try again later.';
       }
     }
-    return error.message;
+    return 'An unexpected error occurred. Please try again.';
   };
 
   const onSubmit = async (values: LoginForm) => {
     try {
       setIsLoading(true);
 
+      // First attempt to sign in
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
@@ -82,6 +83,18 @@ export function LoginForm() {
 
       if (profileError) {
         throw profileError;
+      }
+
+      // Check if user has admin role for /admin routes
+      if (window.location.pathname.startsWith('/admin') && profile?.role !== 'admin') {
+        await supabase.auth.signOut(); // Sign out if not admin
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "You don't have admin privileges to access this area.",
+        });
+        navigate("/login");
+        return;
       }
 
       // Redirect based on user role
