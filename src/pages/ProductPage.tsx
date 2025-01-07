@@ -42,7 +42,11 @@ const ProductPage = () => {
           .eq('id', id)
           .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching product:', error);
+          throw error;
+        }
+
         if (!data) {
           toast.error("Product not found");
           navigate('/');
