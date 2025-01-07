@@ -45,6 +45,7 @@ const ProductPage = () => {
         if (error) {
           console.error('Error fetching product:', error);
           toast.error("Failed to load product");
+          navigate('/');
           return;
         }
 
@@ -58,6 +59,7 @@ const ProductPage = () => {
       } catch (error) {
         console.error('Error fetching product:', error);
         toast.error("Failed to load product");
+        navigate('/');
       } finally {
         setLoading(false);
       }
