@@ -60,7 +60,7 @@ export function LoginForm() {
     try {
       setIsLoading(true);
 
-      // First attempt to sign in
+      // First check if the user exists and can sign in
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
@@ -82,12 +82,15 @@ export function LoginForm() {
         .single();
 
       if (profileError) {
-        throw profileError;
+        console.error("Profile fetch error:", profileError);
+        throw new Error("Failed to fetch user profile");
       }
 
-      // Check if user has admin role for /admin routes
-      if (window.location.pathname.startsWith('/admin') && profile?.role !== 'admin') {
-        await supabase.auth.signOut(); // Sign out if not admin
+      // For admin routes, verify admin role
+      const isAdminRoute = window.location.pathname.startsWith('/admin');
+      if (isAdminRoute && profile?.role !== 'admin') {
+        // Sign out if not admin
+        await supabase.auth.signOut();
         toast({
           variant: "destructive",
           title: "Access Denied",
