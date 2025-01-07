@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { ProductCarousel } from "./ProductCarousel";
 import { Skeleton } from "./ui/skeleton";
-import { ErrorBoundary } from "./ErrorBoundary";
 import { toast } from "sonner";
 
 export function FeaturedProducts() {
@@ -13,36 +12,31 @@ export function FeaturedProducts() {
       try {
         const { data, error } = await supabase
           .from("products")
-          .select(`
-            *,
-            profiles (
-              email,
-              country,
-              phone
-            )
-          `)
+          .select("*, profiles(email, country, phone)")
           .eq("status", "approved")
           .lte("link_slot", 12)
           .order("link_slot", { ascending: true });
 
         if (error) {
           console.error("Supabase error:", error);
-          throw error;
+          throw new Error(error.message);
         }
 
         if (!data) {
-          throw new Error("No data returned from Supabase");
+          return [];
         }
 
         return data as Product[];
       } catch (err) {
         console.error("Failed to fetch featured products:", err);
-        toast.error("Failed to load featured products. Please try again later.");
+        toast.error("Failed to load featured products");
         throw err;
       }
     },
-    retry: 2,
-    retryDelay: 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
   });
 
   if (isLoading) {
@@ -59,10 +53,10 @@ export function FeaturedProducts() {
   }
 
   if (error) {
-    console.error("Error in FeaturedProducts:", error);
     return (
-      <div className="text-red-500">
-        Failed to load featured products. Please try again later.
+      <div className="text-red-500 p-4 text-center">
+        <p>Unable to load featured products.</p>
+        <p className="text-sm">Please try refreshing the page.</p>
       </div>
     );
   }
