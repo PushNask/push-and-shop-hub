@@ -12,12 +12,25 @@ export function Header() {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserRole(session.user.id);
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          return;
+        }
+
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          fetchUserRole(session.user.id);
+        }
+      } catch (error) {
+        console.error("Auth initialization error:", error);
       }
-    });
+    };
+
+    initializeAuth();
 
     // Listen for auth state changes
     const {
@@ -31,7 +44,9 @@ export function Header() {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const fetchUserRole = async (userId) => {
@@ -42,7 +57,11 @@ export function Header() {
         .eq("id", userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching user role:", error);
+        return;
+      }
+
       if (data) {
         setUserRole(data.role);
       }
@@ -66,11 +85,19 @@ export function Header() {
 
       // If we have a session, sign out properly
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
-      // Clear local state
+      
+      // Clear local state regardless of error
       setUser(null);
       setUserRole(null);
+
+      if (error) {
+        // If we get a refresh_token_not_found error, just redirect
+        if (error.message?.includes('refresh_token_not_found')) {
+          navigate("/");
+          return;
+        }
+        throw error;
+      }
 
       // Navigate to home page
       navigate("/");
@@ -81,13 +108,6 @@ export function Header() {
       });
     } catch (error) {
       console.error("Logout error:", error);
-      // If we get a session_not_found error, just clear local state
-      if (error.message?.includes('session_not_found')) {
-        setUser(null);
-        setUserRole(null);
-        navigate("/");
-        return;
-      }
       
       toast({
         variant: "destructive",
