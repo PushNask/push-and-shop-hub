@@ -2,6 +2,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SellerHeader } from "./SellerHeader";
 import { SellerSidebar } from "./SellerSidebar";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -36,14 +38,18 @@ export function SellerLayout() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <SellerSidebar />
-        <div className="flex-1">
-          <SellerHeader />
-          <main className="container py-6 animate-fadeIn">
-            <Outlet />
-          </main>
+      <div className="flex min-h-screen w-full flex-col bg-background">
+        <Header />
+        <div className="flex flex-1">
+          <SellerSidebar />
+          <div className="flex-1">
+            <SellerHeader />
+            <main className="container py-6 animate-fadeIn">
+              <Outlet />
+            </main>
+          </div>
         </div>
+        <Footer />
       </div>
     </SidebarProvider>
   );
