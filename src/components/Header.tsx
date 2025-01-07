@@ -73,10 +73,10 @@ export function Header() {
   const handleLogout = async () => {
     try {
       // First check if we have a session
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (!session) {
-        // If no session, just clear local state and redirect
+      if (sessionError || !session) {
+        // If no session or session error, just clear local state and redirect
         setUser(null);
         setUserRole(null);
         navigate("/");
@@ -91,8 +91,9 @@ export function Header() {
       setUserRole(null);
 
       if (error) {
-        // If we get a refresh_token_not_found error, just redirect
-        if (error.message?.includes('refresh_token_not_found')) {
+        // Handle specific error cases
+        if (error.message?.includes('refresh_token_not_found') || 
+            error.message?.includes('session_not_found')) {
           navigate("/");
           return;
         }
