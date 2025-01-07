@@ -1,5 +1,6 @@
 import { Store, Truck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import type { DeliveryOption } from "@/types/product";
 
 interface DeliveryBadgesProps {
