@@ -44,7 +44,8 @@ const ProductPage = () => {
 
         if (error) {
           console.error('Error fetching product:', error);
-          throw error;
+          toast.error("Failed to load product");
+          return;
         }
 
         if (!data) {
