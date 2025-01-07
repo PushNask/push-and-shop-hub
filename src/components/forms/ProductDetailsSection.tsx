@@ -52,6 +52,7 @@ export function ProductDetailsSection({ form }: ProductDetailsSectionProps) {
                 type="number"
                 placeholder="0"
                 {...field}
+                onChange={(e) => field.onChange(e.target.value)}
               />
             </FormControl>
             <FormMessage />

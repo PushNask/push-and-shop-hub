@@ -21,7 +21,7 @@ import { ImageUploadLoading } from "./ImageUploadLoading";
 const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  price: z.number().positive("Price must be greater than 0"),
+  price: z.string().transform((val) => Number(val)), // Transform string to number
   category: z.string().min(1, "Please select a category"),
   images: z.array(z.string()).min(1, "At least one image is required"),
   delivery_option: z.enum(["pickup", "shipping", "both"]),
@@ -91,6 +91,7 @@ export function AddProductForm() {
     try {
       await addProduct({
         ...data,
+        price: Number(data.price), // Ensure price is converted to number
         seller_id: session.user.id,
         currency: "XAF",
         status: "pending"
@@ -132,7 +133,7 @@ export function AddProductForm() {
               className="w-full" 
               disabled={isPending || isUploading}
             >
-              {isPending ? "Submitting..." : "Add Product"}
+              {isPending ? "Creating..." : "Create Ad"}
             </Button>
           </div>
 
