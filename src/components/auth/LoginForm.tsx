@@ -29,7 +29,6 @@ export function LoginForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { session } = useSessionContext();
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(formSchema),
@@ -59,20 +58,23 @@ export function LoginForm() {
   const onSubmit = async (values: LoginForm) => {
     try {
       setIsLoading(true);
+      console.log("Attempting to sign in with:", values.email);
 
-      // First check if the user exists and can sign in
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
 
       if (signInError) {
+        console.error("Sign in error:", signInError);
         throw signInError;
       }
 
       if (!data.session) {
         throw new Error("No session created after login");
       }
+
+      console.log("Successfully signed in, fetching profile...");
 
       // Fetch user profile with role
       const { data: profile, error: profileError } = await supabase
@@ -86,9 +88,12 @@ export function LoginForm() {
         throw new Error("Failed to fetch user profile");
       }
 
+      console.log("Fetched profile:", profile);
+
       // For admin routes, verify admin role
       const isAdminRoute = window.location.pathname.startsWith('/admin');
       if (isAdminRoute && profile?.role !== 'admin') {
+        console.log("Access denied: User is not an admin");
         // Sign out if not admin
         await supabase.auth.signOut();
         toast({
