@@ -16,6 +16,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSessionContext } from '@supabase/auth-helpers-react';
+import { AuthError, AuthApiError } from '@supabase/supabase-js';
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -37,6 +38,23 @@ export function LoginForm() {
       password: "",
     },
   });
+
+  const getErrorMessage = (error: AuthError) => {
+    if (error instanceof AuthApiError) {
+      switch (error.status) {
+        case 400:
+          if (error.message.includes('Invalid login credentials')) {
+            return 'Invalid email or password. Please check your credentials and try again.';
+          }
+          break;
+        case 422:
+          return 'Invalid email format. Please enter a valid email address.';
+        case 429:
+          return 'Too many login attempts. Please try again later.';
+      }
+    }
+    return error.message;
+  };
 
   const onSubmit = async (values: LoginForm) => {
     try {
@@ -81,12 +99,16 @@ export function LoginForm() {
       });
     } catch (error) {
       console.error('Login error:', error);
+      
+      // Clear the password field on error
+      form.setValue('password', '');
+      
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message === "Invalid login credentials" 
-          ? "Invalid email or password"
-          : error.message || "An error occurred during login",
+        title: "Login Failed",
+        description: error instanceof AuthError 
+          ? getErrorMessage(error)
+          : "An unexpected error occurred. Please try again.",
       });
     } finally {
       setIsLoading(false);
