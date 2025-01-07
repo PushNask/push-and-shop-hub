@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { HeaderNav } from "./navigation/HeaderNav";
@@ -8,6 +8,7 @@ export function Header() {
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -23,6 +24,8 @@ export function Header() {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchUserRole(session.user.id);
+      } else {
+        setUserRole(null);
       }
     });
 
@@ -30,23 +33,46 @@ export function Header() {
   }, []);
 
   const fetchUserRole = async (userId) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userId)
+        .single();
 
-    if (data) {
-      setUserRole(data.role);
+      if (error) throw error;
+      if (data) {
+        setUserRole(data.role);
+      }
+    } catch (error) {
+      console.error("Error fetching user role:", error);
     }
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Logged out successfully",
-      description: "You have been logged out of your account.",
-    });
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      // Clear local state
+      setUser(null);
+      setUserRole(null);
+
+      // Navigate to home page
+      navigate("/");
+
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account.",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+      });
+    }
   };
 
   return (
