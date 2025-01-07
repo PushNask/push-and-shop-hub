@@ -11,6 +11,7 @@ export function Header() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -18,9 +19,10 @@ export function Header() {
       }
     });
 
+    // Listen for auth state changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchUserRole(session.user.id);
@@ -51,6 +53,18 @@ export function Header() {
 
   const handleLogout = async () => {
     try {
+      // First check if we have a session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // If no session, just clear local state and redirect
+        setUser(null);
+        setUserRole(null);
+        navigate("/");
+        return;
+      }
+
+      // If we have a session, sign out properly
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
@@ -67,6 +81,14 @@ export function Header() {
       });
     } catch (error) {
       console.error("Logout error:", error);
+      // If we get a session_not_found error, just clear local state
+      if (error.message?.includes('session_not_found')) {
+        setUser(null);
+        setUserRole(null);
+        navigate("/");
+        return;
+      }
+      
       toast({
         variant: "destructive",
         title: "Error",
