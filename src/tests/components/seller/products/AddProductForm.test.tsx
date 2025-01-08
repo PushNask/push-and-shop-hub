@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AddProductForm } from '@/components/seller/products/AddProductForm';
 import { BrowserRouter } from 'react-router-dom';
@@ -40,11 +40,25 @@ describe('AddProductForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock successful auth session by default
+    // Mock successful auth session with complete User object
     vi.mocked(supabase.auth.getSession).mockResolvedValue({
       data: {
         session: {
-          user: { id: 'test-user-id', email: 'test@example.com' }
+          user: {
+            id: 'test-user-id',
+            email: 'test@example.com',
+            app_metadata: {},
+            user_metadata: {},
+            aud: 'authenticated',
+            created_at: '2024-01-01T00:00:00.000Z',
+            role: 'authenticated',
+            updated_at: '2024-01-01T00:00:00.000Z',
+          },
+          access_token: 'test-token',
+          refresh_token: 'test-refresh-token',
+          expires_in: 3600,
+          expires_at: 1234567890,
+          token_type: 'bearer',
         }
       },
       error: null
