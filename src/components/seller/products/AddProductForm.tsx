@@ -21,7 +21,7 @@ import { ImageUploadLoading } from "./ImageUploadLoading";
 const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  price: z.string().transform((val) => Number(val)), // Transform string to number
+  price: z.string().transform((val) => Number(val)),
   category: z.string().min(1, "Please select a category"),
   images: z.array(z.string()).min(1, "At least one image is required"),
   delivery_option: z.enum(["pickup", "shipping", "both"]),
@@ -62,15 +62,35 @@ export function AddProductForm() {
           toast.error(`File ${file.name} exceeds 2MB limit`);
           continue;
         }
-        const url = URL.createObjectURL(file);
-        urls.push(url);
+        
+        // Create a FormData object for the file upload
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Upload to Supabase Storage
+        const fileName = `${crypto.randomUUID()}-${file.name}`;
+        const { data, error } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, file);
+
+        if (error) {
+          console.error('Upload error:', error);
+          toast.error(`Failed to upload ${file.name}`);
+          continue;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(fileName);
+
+        urls.push(publicUrl);
       }
       
       setImageUrls(urls);
       form.setValue("images", urls);
     } catch (error) {
-      toast.error("Error uploading images");
       console.error("Upload error:", error);
+      toast.error("Error uploading images");
     } finally {
       setIsUploading(false);
     }
@@ -91,7 +111,7 @@ export function AddProductForm() {
     try {
       await addProduct({
         ...data,
-        price: Number(data.price), // Ensure price is converted to number
+        price: Number(data.price),
         seller_id: session.user.id,
         currency: "XAF",
         status: "pending"
