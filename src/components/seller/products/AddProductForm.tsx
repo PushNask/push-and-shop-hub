@@ -20,6 +20,7 @@ import { ImageUploadLoading } from "./ImageUploadLoading";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { sanitizeFileName } from "@/utils/file-utils";
 
 const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -110,8 +111,11 @@ export function AddProductForm() {
           toast.error(`File ${file.name} exceeds 2MB limit`);
           continue;
         }
+
+        // Sanitize and format the filename
+        const sanitizedName = sanitizeFileName(file.name);
+        const fileName = `${crypto.randomUUID()}-${sanitizedName}`;
         
-        const fileName = `${crypto.randomUUID()}-${file.name}`;
         const { data, error } = await supabase.storage
           .from('product-images')
           .upload(fileName, file);
