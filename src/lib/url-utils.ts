@@ -1,7 +1,7 @@
 // Base URL for the platform
 const BASE_URL = import.meta.env.PROD 
-  ? window.location.origin.replace(/:$/, '') // Remove trailing colon if present
-  : window.location.origin.replace(/:$/, ''); // Remove trailing colon if present
+  ? window.location.origin.replace(/:\/?$/, '') // Remove trailing colon and optional slash
+  : window.location.origin.replace(/:\/?$/, ''); // Remove trailing colon and optional slash
 
 export const generateLinkSlotUrl = (slotNumber: number): string => {
   return `${BASE_URL}/P${slotNumber}`;
