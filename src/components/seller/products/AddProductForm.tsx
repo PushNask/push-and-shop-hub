@@ -17,6 +17,7 @@ import type { AddProductFormValues } from "@/types/product";
 import { FormHeader } from "./sections/FormHeader";
 import { ProductPreview } from "./ProductPreview";
 import { ImageUploadLoading } from "./ImageUploadLoading";
+import { supabase } from "@/integrations/supabase/client";
 
 const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
