@@ -12,12 +12,14 @@ import { DeliveryOptionsSection } from "@/components/forms/DeliveryOptionsSectio
 import { ListingFeeSection } from "@/components/forms/ListingFeeSection";
 import { useAddProduct } from "@/hooks/seller/useAddProduct";
 import { useSession } from "@supabase/auth-helpers-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { AddProductFormValues } from "@/types/product";
 import { FormHeader } from "./sections/FormHeader";
 import { ProductPreview } from "./ProductPreview";
 import { ImageUploadLoading } from "./ImageUploadLoading";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -36,6 +38,51 @@ export function AddProductForm() {
   const { mutateAsync: addProduct, isPending } = useAddProduct();
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Auth error:", error);
+          setAuthError("Authentication error. Please try logging in again.");
+          return;
+        }
+
+        if (!session) {
+          setAuthError("You must be logged in to add a product");
+          return;
+        }
+
+        // Check if user is a seller
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError || !profile) {
+          console.error("Profile error:", profileError);
+          setAuthError("Error verifying seller privileges");
+          return;
+        }
+
+        if (profile.role !== 'seller') {
+          setAuthError("Only sellers can add products");
+          return;
+        }
+
+        setAuthError(null);
+      } catch (error) {
+        console.error("Auth check error:", error);
+        setAuthError("An error occurred while checking authentication");
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const form = useForm<AddProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -64,11 +111,6 @@ export function AddProductForm() {
           continue;
         }
         
-        // Create a FormData object for the file upload
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        // Upload to Supabase Storage
         const fileName = `${crypto.randomUUID()}-${file.name}`;
         const { data, error } = await supabase.storage
           .from('product-images')
@@ -126,6 +168,15 @@ export function AddProductForm() {
     }
   };
 
+  if (authError) {
+    return (
+      <Alert variant="destructive" className="mb-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{authError}</AlertDescription>
+      </Alert>
+    );
+  }
+
   const hasErrors = Object.keys(form.formState.errors).length > 0;
 
   return (
@@ -152,7 +203,7 @@ export function AddProductForm() {
             <Button 
               type="submit" 
               className="w-full" 
-              disabled={isPending || isUploading}
+              disabled={isPending || isUploading || !!authError}
             >
               {isPending ? "Creating..." : "Create Ad"}
             </Button>
