@@ -21,6 +21,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import { sanitizeFileName } from "@/utils/file-utils";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { Link } from "react-router-dom";
 
 const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -141,7 +142,9 @@ export function AddProductForm() {
       <div className="flex items-center justify-between">
         <Breadcrumb>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/seller/products">Products</BreadcrumbLink>
+            <BreadcrumbLink as={Link} to="/seller/products">
+              Products
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>Add New Product</BreadcrumbItem>
         </Breadcrumb>
