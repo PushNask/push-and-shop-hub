@@ -12,15 +12,15 @@ import { DeliveryOptionsSection } from "@/components/forms/DeliveryOptionsSectio
 import { ListingFeeSection } from "@/components/forms/ListingFeeSection";
 import { useAddProduct } from "@/hooks/seller/useAddProduct";
 import { useSession } from "@supabase/auth-helpers-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { AddProductFormValues } from "@/types/product";
-import { FormHeader } from "./sections/FormHeader";
 import { ProductPreview } from "./ProductPreview";
 import { ImageUploadLoading } from "./ImageUploadLoading";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft } from "lucide-react";
 import { sanitizeFileName } from "@/utils/file-utils";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 
 const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -40,50 +40,6 @@ export function AddProductForm() {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error("Auth error:", error);
-          setAuthError("Authentication error. Please try logging in again.");
-          return;
-        }
-
-        if (!session?.user) {
-          setAuthError("You must be logged in to add a product");
-          return;
-        }
-
-        // Check if user is a seller
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profileError) {
-          console.error("Profile error:", profileError);
-          setAuthError("Error verifying seller privileges");
-          return;
-        }
-
-        if (profile?.role !== 'seller') {
-          setAuthError("Only sellers can add products");
-          return;
-        }
-
-        setAuthError(null);
-      } catch (error) {
-        console.error("Auth check error:", error);
-        setAuthError("An error occurred while checking authentication");
-      }
-    };
-
-    checkAuth();
-  }, []);
 
   const form = useForm<AddProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -112,7 +68,6 @@ export function AddProductForm() {
           continue;
         }
 
-        // Sanitize and format the filename
         const sanitizedName = sanitizeFileName(file.name);
         const fileName = `${crypto.randomUUID()}-${sanitizedName}`;
         
@@ -181,46 +136,61 @@ export function AddProductForm() {
     );
   }
 
-  const hasErrors = Object.keys(form.formState.errors).length > 0;
-
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormHeader errors={hasErrors} />
-        
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div className="space-y-8">
-            <ProductDetailsSection form={form} />
-            <div className="relative">
-              <ImageUploadSection 
-                form={form}
-                imageUrls={imageUrls}
-                onImageChange={handleImageChange}
-                onImageRemove={handleImageRemove}
-              />
-              {isUploading && <ImageUploadLoading />}
-            </div>
-            <CategorySection form={form} />
-            <DeliveryOptionsSection form={form} />
-            <ListingFeeSection form={form} />
-            
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isPending || isUploading || !!authError}
-            >
-              {isPending ? "Creating..." : "Create Ad"}
-            </Button>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <Breadcrumb>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/seller/products">Products</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>Add New Product</BreadcrumbItem>
+        </Breadcrumb>
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/seller/products")}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Products
+        </Button>
+      </div>
 
-          <div className="lg:sticky lg:top-4">
-            <ProductPreview 
-              formData={form.watch()} 
-              imageUrls={imageUrls}
-            />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div className="space-y-8">
+              <ProductDetailsSection form={form} />
+              <div className="relative">
+                <ImageUploadSection 
+                  form={form}
+                  imageUrls={imageUrls}
+                  onImageChange={handleImageChange}
+                  onImageRemove={handleImageRemove}
+                />
+                {isUploading && <ImageUploadLoading />}
+              </div>
+              <CategorySection form={form} />
+              <DeliveryOptionsSection form={form} />
+              <ListingFeeSection form={form} />
+              
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isPending || isUploading || !!authError}
+              >
+                {isPending ? "Creating..." : "Create Ad"}
+              </Button>
+            </div>
+
+            <div className="lg:sticky lg:top-4">
+              <ProductPreview 
+                formData={form.watch()} 
+                imageUrls={imageUrls}
+              />
+            </div>
           </div>
-        </div>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </div>
   );
 }
