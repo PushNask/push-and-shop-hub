@@ -52,7 +52,7 @@ export function AddProductForm() {
           return;
         }
 
-        if (!session) {
+        if (!session?.user) {
           setAuthError("You must be logged in to add a product");
           return;
         }
@@ -64,13 +64,13 @@ export function AddProductForm() {
           .eq('id', session.user.id)
           .single();
 
-        if (profileError || !profile) {
+        if (profileError) {
           console.error("Profile error:", profileError);
           setAuthError("Error verifying seller privileges");
           return;
         }
 
-        if (profile.role !== 'seller') {
+        if (profile?.role !== 'seller') {
           setAuthError("Only sellers can add products");
           return;
         }
@@ -174,7 +174,7 @@ export function AddProductForm() {
 
   if (authError) {
     return (
-      <Alert variant="destructive" className="mb-4">
+      <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>{authError}</AlertDescription>
       </Alert>
