@@ -142,7 +142,7 @@ export function AddProductForm() {
       <div className="flex items-center justify-between">
         <Breadcrumb>
           <BreadcrumbItem>
-            <BreadcrumbLink as={Link} to="/seller/products">
+            <BreadcrumbLink to="/seller/products" component={Link}>
               Products
             </BreadcrumbLink>
           </BreadcrumbItem>
