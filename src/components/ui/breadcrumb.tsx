@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import { Link, LinkProps } from "react-router-dom";
 
 export interface BreadcrumbProps extends React.ComponentPropsWithoutRef<"nav"> {
   children: React.ReactNode;
@@ -32,7 +32,7 @@ export function BreadcrumbItem({ children, className, ...props }: BreadcrumbItem
   );
 }
 
-export interface BreadcrumbLinkProps extends React.ComponentPropsWithoutRef<typeof Link> {
+export interface BreadcrumbLinkProps extends LinkProps {
   children: React.ReactNode;
 }
 
